@@ -13,7 +13,7 @@ type HealthResponse = {
 };
 
 async function getHealth(): Promise<HealthResponse> {
-  const headerList = headers();
+  const headerList = await headers();
   const host = headerList.get("host") ?? "localhost:3000";
   const proto = headerList.get("x-forwarded-proto") ?? "http";
   const res = await fetch(`${proto}://${host}/api/health`, { cache: "no-store" });

@@ -1,4 +1,4 @@
-"use client";
+ï»¿"use client";
 
 import { useEffect, useMemo, useState } from "react";
 
@@ -90,7 +90,7 @@ export default function DemoPage() {
         </p>
         <h1 className="text-3xl font-semibold">Demo Console</h1>
         <p className="text-sm text-zinc-600">
-          Week: {health?.weekId ?? "..."} · DB: {health?.db ? "OK" : "..."}
+          Week: {health?.weekId ?? "..."} Â· DB: {health?.db ? "OK" : "..."}
         </p>
       </header>
 
@@ -130,21 +130,21 @@ export default function DemoPage() {
             onClick={() => sendMessage("new 123456")}
             disabled={busy}
           >
-            Send “new 123456”
+            Send "new 123456"
           </button>
           <button
             className="rounded-full border border-zinc-200 px-4 py-2 text-sm"
             onClick={() => sendMessage("A123")}
             disabled={busy}
           >
-            Send “A123”
+            Send "A123"
           </button>
           <button
             className="rounded-full border border-zinc-200 px-4 py-2 text-sm"
             onClick={() => sendMessage("B123")}
             disabled={busy}
           >
-            Send “B123”
+            Send "B123"
           </button>
         </div>
       </section>
