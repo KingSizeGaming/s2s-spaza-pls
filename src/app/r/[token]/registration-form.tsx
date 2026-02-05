@@ -90,6 +90,31 @@ export default function RegistrationForm({
       setValidationError("SA Identity Number must be exactly 13 digits.");
       return;
     }
+
+    const yy = Number(form.idNumber.slice(0, 2));
+    const mm = Number(form.idNumber.slice(2, 4));
+    const dd = Number(form.idNumber.slice(4, 6));
+    const now = new Date();
+    const currentYY = now.getFullYear() % 100;
+    const year = yy <= currentYY ? 2000 + yy : 1900 + yy;
+    const birthDate = new Date(year, mm - 1, dd);
+    if (
+      birthDate.getFullYear() !== year ||
+      birthDate.getMonth() !== mm - 1 ||
+      birthDate.getDate() !== dd
+    ) {
+      setModalMessage("SA Identity Number is invalid.");
+      return;
+    }
+    const cutoff = new Date(
+      now.getFullYear() - 18,
+      now.getMonth(),
+      now.getDate()
+    );
+    if (birthDate > cutoff) {
+      setModalMessage("You must be at least 18 years old to register.");
+      return;
+    }
     if (!/^[A-Z]{3}$/.test(form.desiredLeaderboardName)) {
       setValidationError("Leaderboard ID must be exactly 3 letters.");
       return;

@@ -47,6 +47,9 @@ export const users = pgTable(
     waNumber: text("wa_number").notNull(),
     state: userStateEnum("state").notNull().default("UNKNOWN"),
     homeSid: text("home_sid").references(() => spazaSids.sid),
+    firstName: text("first_name"),
+    lastName: text("last_name"),
+    saIdHash: text("sa_id_hash"),
     leaderboardId: text("leaderboard_id"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
