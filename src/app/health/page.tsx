@@ -13,11 +13,18 @@ type HealthResponse = {
 };
 
 async function getHealth(): Promise<HealthResponse> {
-  const headerList = await headers();
-  const host = headerList.get("host") ?? "localhost:3000";
-  const proto = headerList.get("x-forwarded-proto") ?? "http";
-  const res = await fetch(`${proto}://${host}/api/health`, { cache: "no-store" });
-  return res.json();
+  const res = await fetch("/api/health", { cache: "no-store" });
+  try {
+    return await res.json();
+  } catch {
+    const text = await res.text();
+    return {
+      status: "error",
+      db: false,
+      weekId: "unknown",
+      error: `Non-JSON response (${res.status}): ${text.slice(0, 120)}`,
+    };
+  }
 }
 
 export default async function HealthPage() {
