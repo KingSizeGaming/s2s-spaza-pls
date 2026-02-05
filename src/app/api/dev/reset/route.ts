@@ -34,16 +34,27 @@ export async function POST(request: NextRequest) {
   const seededSids = await db
     .insert(spazaSids)
     .values([
-      { sid: "123456", name: "Spaza 1", isActive: true },
-      { sid: "123457", name: "Spaza 2", isActive: true },
+      { sid: "123458", name: "Spaza Three", isActive: true },
+      { sid: "123459", name: "Spaza Four", isActive: true },
+      { sid: "123460", name: "Spaza Five", isActive: true },
+      { sid: "123461", name: "Spaza Six", isActive: true },
+      { sid: "123462", name: "Spaza Seven", isActive: true },
     ])
     .returning({ sid: spazaSids.sid });
 
   const seededVouchers = await db
     .insert(vouchers)
     .values([
-      { voucherToken: "A123", issuingSid: "123456", weekId, isUsed: false },
-      { voucherToken: "B123", issuingSid: "123457", weekId, isUsed: false },
+      { voucherToken: "C123", issuingSid: "123458", weekId, isUsed: false },
+      { voucherToken: "C124", issuingSid: "123458", weekId, isUsed: false },
+      { voucherToken: "D123", issuingSid: "123459", weekId, isUsed: false },
+      { voucherToken: "D124", issuingSid: "123459", weekId, isUsed: false },
+      { voucherToken: "E123", issuingSid: "123460", weekId, isUsed: false },
+      { voucherToken: "E124", issuingSid: "123460", weekId, isUsed: false },
+      { voucherToken: "F123", issuingSid: "123461", weekId, isUsed: false },
+      { voucherToken: "F124", issuingSid: "123461", weekId, isUsed: false },
+      { voucherToken: "G123", issuingSid: "123462", weekId, isUsed: false },
+      { voucherToken: "G124", issuingSid: "123462", weekId, isUsed: false },
     ])
     .returning({ id: vouchers.id });
 
