@@ -78,6 +78,19 @@ export async function POST(request: NextRequest) {
         homeSid: sid,
       });
     } else {
+      const current = await db
+        .select({ state: users.state })
+        .from(users)
+        .where(eq(users.waNumber, from))
+        .limit(1);
+      if (current.length > 0 && current[0].state === "ACTIVE") {
+        return NextResponse.json({
+          reply: {
+            type: "text",
+            body: "This number is already registered and used its first pick.\nGet a Spaza voucher code to play more.",
+          },
+        });
+      }
       await db
         .update(users)
         .set({ state: "PENDING_REGISTRATION", homeSid: sid })
