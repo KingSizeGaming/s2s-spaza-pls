@@ -5,6 +5,7 @@ import { useState } from "react";
 type CompletionResponse = {
   leaderboardId?: string;
   predictionUrl?: string;
+  outboundMessage?: string;
   error?: string;
 };
 
@@ -46,6 +47,22 @@ export default function RegistrationForm({ token }: { token: string }) {
     if (!res.ok) {
       setResult({ error: data.error ?? "Something went wrong." });
     } else {
+      if (data.outboundMessage) {
+        try {
+          const payload = JSON.stringify({
+            message: data.outboundMessage,
+            ts: Date.now(),
+          });
+          localStorage.setItem("demo:lastOutbound", payload);
+          if ("BroadcastChannel" in window) {
+            const channel = new BroadcastChannel("demo-outbound");
+            channel.postMessage(payload);
+            channel.close();
+          }
+        } catch {
+          // ignore storage errors
+        }
+      }
       setResult(data);
     }
 
@@ -56,13 +73,9 @@ export default function RegistrationForm({ token }: { token: string }) {
     return (
       <section className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 text-emerald-900">
         <p className="text-sm uppercase tracking-[0.2em]">Registration complete</p>
-        <p className="mt-2 text-2xl font-semibold">Leaderboard ID: {result.leaderboardId}</p>
-        <a
-          className="mt-4 inline-flex items-center gap-2 rounded-full bg-emerald-900 px-4 py-2 text-sm font-semibold text-white"
-          href={result.predictionUrl}
-        >
-          Go to prediction link
-        </a>
+        <p className="mt-3 text-lg font-semibold">
+          Registration complete please wait for a message to be sent to you.
+        </p>
       </section>
     );
   }

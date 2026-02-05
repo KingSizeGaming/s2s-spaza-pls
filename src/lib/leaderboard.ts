@@ -9,19 +9,18 @@ export async function generateUniqueLeaderboardId(
 ): Promise<string> {
   let base = normalizeDesiredLeaderboard(desired);
   if (!base) base = "AAA";
+  base = base.slice(0, 3);
 
-  if (!(await existsFn(base))) {
-    return base;
-  }
-
-  let suffix = 1;
-  while (true) {
-    const candidate = `${base}${suffix}`;
+  for (let attempt = 0; attempt < 1000; attempt += 1) {
+    const rand = Math.floor(Math.random() * 1000);
+    const digits = String(rand).padStart(3, "0");
+    const candidate = `${base}${digits}`;
     if (!(await existsFn(candidate))) {
       return candidate;
     }
-    suffix += 1;
   }
+
+  throw new Error("Unable to generate unique leaderboard ID.");
 }
 
 if (process.env.NODE_ENV !== "production") {
@@ -33,7 +32,7 @@ if (process.env.NODE_ENV !== "production") {
   const existing = new Set(["ABC", "ABC1"]);
   generateUniqueLeaderboardId("abc", async (id) => existing.has(id)).then(
     (id) => {
-      if (id !== "ABC2") {
+      if (!/^ABC\\d{3}$/.test(id)) {
         throw new Error(`leaderboard.ts sanity check failed: ${id}`);
       }
     }

@@ -139,9 +139,18 @@ export async function POST(
       expiresAt: getIsoWeekEndUtc(now),
     });
 
+    const predictionUrl = `${baseUrl}/predict/${predictionToken}`;
+    const outboundMessage = [
+      "Welcome! You are now registered.",
+      `Your Leaderboard ID is: ${leaderboardId}`,
+      "Submit your predictions here:",
+      predictionUrl,
+    ].join("\n");
+
     return {
       leaderboardId,
-      predictionUrl: `${baseUrl}/predict/${predictionToken}`,
+      predictionUrl,
+      outboundMessage,
     } as const;
   });
 

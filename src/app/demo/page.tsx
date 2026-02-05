@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 const defaultWaNumber = "+27820001111";
 
@@ -46,12 +46,61 @@ export default function DemoPage() {
   const [busy, setBusy] = useState(false);
   const [adminKey, setAdminKey] = useState("");
   const [chat, setChat] = useState<ChatMessage[]>([]);
+  const lastOutboundRef = useRef<string | null>(null);
+
+  const pushInboundMessage = (text: string) => {
+    setChat((prev) => [
+      ...prev,
+      { id: crypto.randomUUID(), direction: "in", text },
+    ]);
+  };
 
   useEffect(() => {
     fetch("/api/health", { cache: "no-store" })
       .then((res) => res.json())
       .then((data: HealthPayload) => setHealth(data))
       .catch(() => null);
+  }, []);
+
+  useEffect(() => {
+    const readStored = () => {
+      try {
+        const raw = localStorage.getItem("demo:lastOutbound");
+        if (!raw || raw === lastOutboundRef.current) return;
+        lastOutboundRef.current = raw;
+        const parsed = JSON.parse(raw) as { message?: string };
+        if (parsed?.message) {
+          pushInboundMessage(parsed.message);
+        }
+      } catch {
+        // ignore
+      }
+    };
+
+    readStored();
+    const interval = window.setInterval(readStored, 1500);
+
+    let channel: BroadcastChannel | null = null;
+    if ("BroadcastChannel" in window) {
+      channel = new BroadcastChannel("demo-outbound");
+      channel.onmessage = (event) => {
+        if (typeof event.data === "string") {
+          try {
+            const parsed = JSON.parse(event.data) as { message?: string };
+            if (parsed?.message) {
+              pushInboundMessage(parsed.message);
+            }
+          } catch {
+            // ignore
+          }
+        }
+      };
+    }
+
+    return () => {
+      window.clearInterval(interval);
+      if (channel) channel.close();
+    };
   }, []);
 
   const replyParts = useMemo(() => {
