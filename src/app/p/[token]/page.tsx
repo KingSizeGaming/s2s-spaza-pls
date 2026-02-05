@@ -1,20 +1,17 @@
-import { eq } from "drizzle-orm";
+﻿import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { links } from "@/db/schema";
 import PredictionForm from "./prediction-form";
 
 function renderError(title: string, message: string) {
   return (
-    <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-6 px-6 py-16">
-      <header className="space-y-2">
-        <p className="text-sm uppercase tracking-[0.2em] text-zinc-500">
-          S2S Spaza PSL POC
-        </p>
-        <h1 className="text-3xl font-semibold">{title}</h1>
-      </header>
-      <section className="rounded-2xl border border-rose-200 bg-rose-50 p-6 text-rose-900">
-        <p>{message}</p>
-      </section>
+    <main className="min-h-screen bg-white">
+      <div className="mx-auto flex min-h-screen w-full max-w-[390px] items-center px-4">
+        <div className="w-full rounded-3xl border border-emerald-700 bg-white p-6 text-zinc-900 shadow-xl">
+          <h1 className="text-2xl font-semibold">{title}</h1>
+          <p className="mt-3 text-sm text-zinc-600">{message}</p>
+        </div>
+      </div>
     </main>
   );
 }
@@ -54,17 +51,19 @@ export async function PredictionPage({
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-6 px-6 py-16">
-      <header className="space-y-2">
-        <p className="text-sm uppercase tracking-[0.2em] text-zinc-500">
-          S2S Spaza PSL POC
-        </p>
-        <h1 className="text-3xl font-semibold">Submit Your Picks</h1>
-        <p className="text-sm text-zinc-600">
-          Choose outcomes for 5 games. Your entry is final once submitted.
-        </p>
-      </header>
-      <PredictionForm token={token} />
+    <main className="min-h-screen bg-white">
+      <div className="mx-auto flex min-h-screen w-full max-w-[390px] items-center px-4">
+        <div className="relative h-[844px] w-full scale-[1.25] overflow-hidden rounded-3xl bg-white">
+          <img
+            src="/images/bg_1.png"
+            alt="Background"
+            className="absolute inset-0 h-full w-full object-cover opacity-90"
+          />
+          <div className="relative z-10 flex h-full flex-col gap-4 px-6 py-8">
+            <PredictionForm token={token} />
+          </div>
+        </div>
+      </div>
     </main>
   );
 }
