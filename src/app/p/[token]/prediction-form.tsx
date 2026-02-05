@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 type SubmitResponse = {
   ok?: boolean;
   leaderboardUrl?: string;
+  outboundMessage?: string;
   error?: string;
 };
 
@@ -24,6 +25,7 @@ export default function PredictionForm({ token }: { token: string }) {
   });
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<SubmitResponse | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const jsonPreview = useMemo(
     () => JSON.stringify({ picks: form.picks }, null, 2),
@@ -40,14 +42,17 @@ export default function PredictionForm({ token }: { token: string }) {
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
-    setSubmitting(true);
-    setResult(null);
-
     if (!form.confirmFinal) {
       setResult({ error: "Please confirm your entry is final." });
-      setSubmitting(false);
       return;
     }
+    setConfirmOpen(true);
+  };
+
+  const confirmSubmit = async () => {
+    setConfirmOpen(false);
+    setSubmitting(true);
+    setResult(null);
 
     const res = await fetch(`/api/p/${token}/submit`, {
       method: "POST",
@@ -59,6 +64,21 @@ export default function PredictionForm({ token }: { token: string }) {
     if (!res.ok) {
       setResult({ error: data.error ?? "Something went wrong." });
     } else {
+      if (data.outboundMessage) {
+        try {
+          const payload = JSON.stringify({
+            message: data.outboundMessage,
+            ts: Date.now(),
+          });
+          if ("BroadcastChannel" in window) {
+            const channel = new BroadcastChannel("demo-outbound");
+            channel.postMessage(payload);
+            channel.close();
+          }
+        } catch {
+          // ignore
+        }
+      }
       setResult(data);
     }
 
@@ -147,6 +167,39 @@ export default function PredictionForm({ token }: { token: string }) {
       >
         {submitting ? "Submitting..." : "Submit picks"}
       </button>
+
+      {confirmOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+            <p className="text-sm uppercase tracking-[0.2em] text-zinc-500">
+              Confirm Entry
+            </p>
+            <h3 className="mt-2 text-xl font-semibold text-zinc-900">
+              Submit final picks?
+            </h3>
+            <p className="mt-2 text-sm text-zinc-600">
+              Your entry is final and cannot be changed after submission.
+            </p>
+            <div className="mt-5 flex flex-wrap gap-2">
+              <button
+                type="button"
+                className="rounded-full border border-zinc-200 px-4 py-2 text-sm"
+                onClick={() => setConfirmOpen(false)}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="rounded-full bg-emerald-700 px-4 py-2 text-sm font-semibold text-white"
+                onClick={confirmSubmit}
+                disabled={submitting}
+              >
+                Confirm & Submit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </form>
   );
 }

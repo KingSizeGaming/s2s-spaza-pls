@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { and, eq, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { entries, users } from "@/db/schema";
+import { entries, links, users } from "@/db/schema";
 import { getCurrentWeekId } from "@/lib/week";
 
 function summarizePicks(picks: unknown): string {
@@ -19,21 +19,60 @@ export async function GET(
   { params }: { params: Promise<{ leaderboardId: string }> }
 ) {
   const { searchParams } = new URL(request.url);
-  const weekId = searchParams.get("weekId") || getCurrentWeekId();
+  const weekId = searchParams.get("weekId");
+  const token = searchParams.get("token");
   const { leaderboardId } = await params;
   const normalizedLeaderboardId = leaderboardId.toUpperCase();
+
+  if (!token) {
+    return NextResponse.json(
+      { error: "Missing token." },
+      { status: 401 }
+    );
+  }
+
+  const linkRows = await db
+    .select({ waNumber: links.waNumber, type: links.type })
+    .from(links)
+    .where(eq(links.token, token))
+    .limit(1);
+
+  if (linkRows.length === 0 || linkRows[0].type !== "PREDICTION") {
+    return NextResponse.json(
+      { error: "Invalid token." },
+      { status: 403 }
+    );
+  }
+
+  const userRows = await db
+    .select({ leaderboardId: users.leaderboardId, waNumber: users.waNumber })
+    .from(users)
+    .where(eq(users.waNumber, linkRows[0].waNumber))
+    .limit(1);
+
+  if (userRows.length === 0 || !userRows[0].leaderboardId) {
+    return NextResponse.json({ error: "User not found." }, { status: 404 });
+  }
+
+  if (userRows[0].leaderboardId !== normalizedLeaderboardId) {
+    return NextResponse.json(
+      { error: "Not authorized." },
+      { status: 403 }
+    );
+  }
 
   const rows = await db
     .select({
       submittedAt: entries.submittedAt,
       picks: entries.picks,
+      weekId: entries.weekId,
     })
     .from(entries)
     .innerJoin(users, eq(entries.waNumber, users.waNumber))
     .where(
       and(
-        eq(entries.weekId, weekId),
-        eq(users.leaderboardId, normalizedLeaderboardId)
+        eq(users.leaderboardId, normalizedLeaderboardId),
+        weekId ? eq(entries.weekId, weekId) : sql`true`
       )
     )
     .orderBy(sql`${entries.submittedAt} desc`);
@@ -45,7 +84,7 @@ export async function GET(
   }));
 
   return NextResponse.json({
-    weekId,
+    weekId: weekId ?? getCurrentWeekId(),
     leaderboardId: normalizedLeaderboardId,
     entries: entriesWithSummary,
   });

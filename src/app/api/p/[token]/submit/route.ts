@@ -21,6 +21,9 @@ export async function POST(
   const { token } = await params;
   const now = new Date();
   const weekId = getCurrentWeekId();
+  const host = request.headers.get("host") ?? "localhost:3000";
+  const proto = request.headers.get("x-forwarded-proto") ?? "http";
+  const baseUrl = `${proto}://${host}`;
 
   const linkRows = await db
     .select({
@@ -104,9 +107,18 @@ export async function POST(
       return { error: "Entry already submitted.", status: 409 } as const;
     }
 
+    const leaderboardUrl = `${baseUrl}/leaderboard/${userRows[0].leaderboardId}?token=${token}`;
+    const outboundMessage = [
+      "Your entry has been accepted.",
+      "",
+      "View your picks and history here:",
+      leaderboardUrl,
+    ].join("\n");
+
     return {
       ok: true,
-      leaderboardUrl: `/leaderboard/${userRows[0].leaderboardId}`,
+      leaderboardUrl,
+      outboundMessage,
     } as const;
   });
 

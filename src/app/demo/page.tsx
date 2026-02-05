@@ -185,7 +185,27 @@ export default function DemoPage() {
                         : "max-w-[80%] rounded-2xl rounded-bl-sm bg-white px-4 py-3 text-sm text-zinc-900 shadow"
                     }
                   >
-                    {item.text}
+                    {item.direction === "out" ? (
+                      item.text
+                    ) : (
+                      <span className="whitespace-pre-line">
+                        {linkify(item.text).map((part, index) =>
+                          part.type === "link" ? (
+                            <a
+                              key={`${part.value}-${index}`}
+                              className="text-emerald-700 underline"
+                              href={part.value}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              {part.value}
+                            </a>
+                          ) : (
+                            <span key={`${part.value}-${index}`}>{part.value}</span>
+                          )
+                        )}
+                      </span>
+                    )}
                   </div>
                 </div>
               ))
