@@ -60,7 +60,13 @@ export default function PredictionForm({ token }: { token: string }) {
       body: JSON.stringify({ picks: form.picks }),
     });
 
-    const data = (await res.json()) as SubmitResponse;
+    const rawText = await res.text();
+    let data: SubmitResponse = {};
+    try {
+      data = JSON.parse(rawText) as SubmitResponse;
+    } catch {
+      data = { error: rawText || "Something went wrong." };
+    }
     if (!res.ok) {
       setResult({ error: data.error ?? "Something went wrong." });
     } else {

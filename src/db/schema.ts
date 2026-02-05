@@ -143,10 +143,6 @@ export const entries = pgTable(
       .$onUpdate(() => new Date()),
   },
   (table) => ({
-    waWeekUnique: uniqueIndex("entries_wa_week_uq").on(
-      table.waNumber,
-      table.weekId
-    ),
     linkTokenUnique: uniqueIndex("entries_link_token_uq").on(table.linkToken),
     waWeekIdx: index("entries_wa_week_idx").on(table.waNumber, table.weekId),
     linkTokenIdx: index("entries_link_token_idx").on(table.linkToken),

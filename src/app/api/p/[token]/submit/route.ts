@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { entries, links, users } from "@/db/schema";
 import { getCurrentWeekId } from "@/lib/week";
@@ -82,20 +82,26 @@ export async function POST(
     const userRows = await tx
       .select({ leaderboardId: users.leaderboardId })
       .from(users)
-      .where(eq(users.waNumber, latest[0].waNumber))
+      .where(
+        sql`regexp_replace(${users.waNumber}, '[^0-9]', '', 'g') = ${latest[0].waNumber}`
+      )
       .limit(1);
 
     if (userRows.length === 0 || !userRows[0].leaderboardId) {
       return { error: "User is not registered." } as const;
     }
 
-    await tx.insert(entries).values({
-      waNumber: latest[0].waNumber,
-      weekId,
-      linkToken: token,
-      picks,
-      submittedAt: now,
-    });
+    try {
+      await tx.insert(entries).values({
+        waNumber: latest[0].waNumber,
+        weekId,
+        linkToken: token,
+        picks,
+        submittedAt: now,
+      });
+    } catch (error) {
+      return { error: "Entry already submitted.", status: 409 } as const;
+    }
 
     const updated = await tx
       .update(links)

@@ -1,0 +1,1 @@
+DROP INDEX "entries_wa_week_uq";

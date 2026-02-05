@@ -17,24 +17,19 @@ export async function GET(request: NextRequest) {
       .where(eq(links.token, token))
       .limit(1);
 
-    if (linkRows.length === 0 || linkRows[0].type !== "PREDICTION") {
-      return NextResponse.json(
-        { error: "Invalid token." },
-        { status: 403 }
-      );
+    if (linkRows.length !== 0 && linkRows[0].type === "PREDICTION") {
+      const userRows = await db
+        .select({ leaderboardId: users.leaderboardId })
+        .from(users)
+        .where(
+          sql`regexp_replace(${users.waNumber}, '[^0-9]', '', 'g') = ${linkRows[0].waNumber}`
+        )
+        .limit(1);
+
+      if (userRows.length !== 0 && userRows[0].leaderboardId) {
+        viewerLeaderboardId = userRows[0].leaderboardId;
+      }
     }
-
-    const userRows = await db
-      .select({ leaderboardId: users.leaderboardId })
-      .from(users)
-      .where(eq(users.waNumber, linkRows[0].waNumber))
-      .limit(1);
-
-    if (userRows.length === 0 || !userRows[0].leaderboardId) {
-      return NextResponse.json({ error: "User not found." }, { status: 404 });
-    }
-
-    viewerLeaderboardId = userRows[0].leaderboardId;
   }
 
   const rows = await db
@@ -43,7 +38,10 @@ export async function GET(request: NextRequest) {
       entryCount: sql<number>`count(${entries.id})`,
     })
     .from(entries)
-    .innerJoin(users, eq(entries.waNumber, users.waNumber))
+    .innerJoin(
+      users,
+      sql`regexp_replace(${users.waNumber}, '[^0-9]', '', 'g') = ${entries.waNumber}`
+    )
     .where(
       and(eq(entries.weekId, weekId), isNotNull(users.leaderboardId))
     )

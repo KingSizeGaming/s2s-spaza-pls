@@ -47,7 +47,9 @@ export async function GET(
   const userRows = await db
     .select({ leaderboardId: users.leaderboardId, waNumber: users.waNumber })
     .from(users)
-    .where(eq(users.waNumber, linkRows[0].waNumber))
+    .where(
+      sql`regexp_replace(${users.waNumber}, '[^0-9]', '', 'g') = ${linkRows[0].waNumber}`
+    )
     .limit(1);
 
   if (userRows.length === 0 || !userRows[0].leaderboardId) {

@@ -16,7 +16,8 @@ type LeaderboardRow = {
 
 type LeaderboardResponse = {
   weekId: string;
-  leaderboards: LeaderboardRow[];
+  leaderboards?: LeaderboardRow[];
+  error?: string;
 };
 
 export default async function LeaderboardPage({
@@ -37,6 +38,7 @@ export default async function LeaderboardPage({
     { cache: "no-store" }
   );
   const data = (await res.json()) as LeaderboardResponse;
+  const leaderboards = data.leaderboards ?? [];
   const hasToken = Boolean(token);
 
   return (
@@ -50,11 +52,11 @@ export default async function LeaderboardPage({
       </header>
 
       <section className="rounded-2xl border border-zinc-200 bg-white p-6">
-        {data.leaderboards.length === 0 ? (
+        {leaderboards.length === 0 ? (
           <p className="text-sm text-zinc-600">No entries yet.</p>
         ) : (
           <ul className="space-y-3">
-            {data.leaderboards.map((row) => (
+            {leaderboards.map((row) => (
               <li
                 key={row.leaderboardId ?? "unknown"}
                 className="flex items-center justify-between rounded-xl border border-zinc-100 px-4 py-3"
