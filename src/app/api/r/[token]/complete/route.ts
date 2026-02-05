@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { links, users } from "@/db/schema";
@@ -6,7 +6,7 @@ import { generateUniqueLeaderboardId } from "@/lib/leaderboard";
 import { generateToken } from "@/lib/tokens";
 import { getCurrentWeekId } from "@/lib/week";
 
-function getBaseUrl(request: Request): string {
+function getBaseUrl(request: NextRequest): string {
   const host = request.headers.get("host") ?? "localhost:3000";
   const proto = request.headers.get("x-forwarded-proto") ?? "http";
   return `${proto}://${host}`;
@@ -21,8 +21,8 @@ function getIsoWeekEndUtc(date: Date): Date {
 }
 
 export async function POST(
-  request: Request,
-  { params }: { params: { token: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ token: string }> }
 ) {
   const body = await request.json().catch(() => null);
   const firstName = String(body?.firstName ?? "").trim();
@@ -37,7 +37,7 @@ export async function POST(
     );
   }
 
-  const token = params.token;
+  const { token } = await params;
   const now = new Date();
   const baseUrl = getBaseUrl(request);
 

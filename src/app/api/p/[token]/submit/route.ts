@@ -1,12 +1,12 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { entries, links, users } from "@/db/schema";
 import { getCurrentWeekId } from "@/lib/week";
 
 export async function POST(
-  request: Request,
-  { params }: { params: { token: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ token: string }> }
 ) {
   const body = await request.json().catch(() => null);
   const picks = body?.picks;
@@ -18,7 +18,7 @@ export async function POST(
     );
   }
 
-  const token = params.token;
+  const { token } = await params;
   const now = new Date();
   const weekId = getCurrentWeekId();
 

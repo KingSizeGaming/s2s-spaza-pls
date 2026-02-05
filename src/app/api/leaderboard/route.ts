@@ -1,10 +1,10 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { and, eq, isNotNull, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { entries, users } from "@/db/schema";
 import { getCurrentWeekId } from "@/lib/week";
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const weekId = searchParams.get("weekId") || getCurrentWeekId();
 
