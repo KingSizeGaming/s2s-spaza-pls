@@ -42,57 +42,83 @@ export default async function LeaderboardDetailPage({
 
   if (!res.ok) {
     return (
-      <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 px-6 py-16">
-        <header className="space-y-2">
-          <p className="text-sm uppercase tracking-[0.2em] text-zinc-500">
-            S2S Spaza PSL POC
-          </p>
-          <h1 className="text-3xl font-semibold">Leaderboard Access</h1>
-          <p className="text-sm text-zinc-600">
-            {data.error ?? "Unable to view this leaderboard."}
-          </p>
-        </header>
+      <main className="min-h-screen bg-white">
+        <div className="mx-auto flex min-h-screen w-full max-w-[390px] items-center px-4 py-6">
+          <div className="relative h-[844px] w-full scale-[1.35] overflow-hidden rounded-3xl">
+            <img
+              src="/images/bg_1.png"
+              alt="Background"
+              className="absolute inset-0 h-full w-full object-cover opacity-90"
+            />
+            <div className="relative z-10 flex h-full flex-col items-center justify-center px-6 text-white">
+              <h1 className="text-center text-2xl font-bold">Access denied</h1>
+              <p className="mt-3 text-center text-sm text-white/80">
+                {data.error ?? "Unable to view this leaderboard."}
+              </p>
+              <Link
+                className="mt-6 text-sm font-semibold text-white"
+                href={`/leaderboard${weekIdQuery ? `?weekId=${weekIdQuery}` : ""}`}
+              >
+                Back to leaderboards
+              </Link>
+            </div>
+          </div>
+        </div>
       </main>
     );
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 px-6 py-16">
-      <header className="space-y-2">
-        <p className="text-sm uppercase tracking-[0.2em] text-zinc-500">
-          S2S Spaza PSL POC
-        </p>
-        <h1 className="text-3xl font-semibold">Leaderboard {data.leaderboardId}</h1>
-        <p className="text-sm text-zinc-600">Week: {data.weekId}</p>
-        <Link
-          className="text-sm font-medium text-zinc-900"
-          href={`/leaderboard?weekId=${data.weekId}${token ? `&token=${token}` : ""}`}
-        >
-          Back to leaderboards
-        </Link>
-      </header>
+    <main className="min-h-screen bg-white">
+      <div className="mx-auto flex min-h-screen w-full max-w-[390px] items-center px-4 py-6">
+        <div className="relative h-[844px] w-full scale-[1.35] overflow-hidden rounded-3xl">
+          <img
+            src="/images/bg_1.png"
+            alt="Background"
+            className="absolute inset-0 h-full w-full object-cover opacity-90"
+          />
+          <div className="relative z-10 flex h-full flex-col px-5 py-8 text-white">
+            <h1 className="text-center text-3xl font-bold">Your Entries</h1>
+            <p className="mt-2 text-center text-sm text-white/80">
+              {data.leaderboardId} - Week {data.weekId}
+            </p>
 
-      <section className="rounded-2xl border border-zinc-200 bg-white p-6">
-        {data.entries.length === 0 ? (
-          <p className="text-sm text-zinc-600">No entries found.</p>
-        ) : (
-          <ul className="space-y-3">
-            {data.entries.map((entry) => (
-              <li
-                key={`${entry.submittedAt}-${entry.summary}`}
-                className="rounded-xl border border-zinc-100 px-4 py-3"
-              >
-                <p className="text-xs text-zinc-500">
-                  {entry.submittedAt} {entry.weekId ? `· ${entry.weekId}` : ""}
-                </p>
-                <p className="mt-2 text-sm font-semibold text-zinc-900">
-                  {entry.summary}
-                </p>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+            <div className="mt-5 flex flex-1 flex-col overflow-hidden rounded-3xl bg-[url('/images/leaderboard_bg.png')] bg-cover bg-center px-3 py-5">
+              {data.entries.length === 0 ? (
+                <p className="text-center text-sm text-white/80">No entries found.</p>
+              ) : (
+                <ul className="space-y-3 overflow-y-auto pr-1">
+                  {data.entries.map((entry) => (
+                    <li key={`${entry.submittedAt}-${entry.summary}`}>
+                      <div className="relative flex min-h-[64px] flex-col justify-center overflow-hidden rounded-2xl px-5 py-3">
+                        <img
+                          src="/images/player_panel.png"
+                          alt="Entry"
+                          className="absolute inset-0 h-full w-full object-cover"
+                        />
+                        <div className="relative z-10 text-xs text-white/80">
+                          {entry.submittedAt}
+                          {entry.weekId ? ` - ${entry.weekId}` : ""}
+                        </div>
+                        <div className="relative z-10 text-sm font-semibold text-white">
+                          {entry.summary}
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            <Link
+              className="mt-4 text-center text-sm font-semibold text-white"
+              href={`/leaderboard?weekId=${data.weekId}${token ? `&token=${token}` : ""}`}
+            >
+              Back to leaderboards
+            </Link>
+          </div>
+        </div>
+      </div>
     </main>
   );
 }

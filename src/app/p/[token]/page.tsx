@@ -53,7 +53,7 @@ export async function PredictionPage({
   return (
     <main className="min-h-screen bg-white">
       <div className="mx-auto flex min-h-screen w-full max-w-[390px] items-center px-4">
-        <div className="relative h-[844px] w-full scale-[1.25] overflow-hidden rounded-3xl bg-white">
+        <div className="relative h-[844px] w-full scale-[1.35] overflow-hidden rounded-3xl bg-white">
           <img
             src="/images/bg_1.png"
             alt="Background"

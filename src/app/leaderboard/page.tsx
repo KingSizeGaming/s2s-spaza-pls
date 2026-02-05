@@ -1,5 +1,5 @@
 import { headers } from "next/headers";
-import Link from "next/link";
+import LeaderboardList from "./leaderboard-list";
 
 async function getBaseUrl(): Promise<string> {
   const headerList = await headers();
@@ -42,48 +42,36 @@ export default async function LeaderboardPage({
   const hasToken = Boolean(token);
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 px-6 py-16">
-      <header className="space-y-2">
-        <p className="text-sm uppercase tracking-[0.2em] text-zinc-500">
-          S2S Spaza PSL POC
-        </p>
-        <h1 className="text-3xl font-semibold">Leaderboards</h1>
-        <p className="text-sm text-zinc-600">Week: {data.weekId}</p>
-      </header>
+    <main className="min-h-screen bg-white">
+      <div className="mx-auto flex min-h-screen w-full max-w-[390px] items-center px-4 py-6">
+        <div className="relative h-[844px] w-full scale-[1.35] overflow-hidden rounded-3xl">
+          <img
+            src="/images/bg_1.png"
+            alt="Background"
+            className="absolute inset-0 h-full w-full object-cover opacity-90"
+          />
+          <div className="relative z-10 flex h-full flex-col px-5 py-8">
+            <h1 className="text-center text-3xl font-bold text-white">
+              This Week's
+              <br />
+              Leaderboard
+            </h1>
 
-      <section className="rounded-2xl border border-zinc-200 bg-white p-6">
-        {leaderboards.length === 0 ? (
-          <p className="text-sm text-zinc-600">No entries yet.</p>
-        ) : (
-          <ul className="space-y-3">
-            {leaderboards.map((row) => (
-              <li
-                key={row.leaderboardId ?? "unknown"}
-                className="flex items-center justify-between rounded-xl border border-zinc-100 px-4 py-3"
-              >
-                <div>
-                  <p className="text-sm font-semibold text-zinc-900">
-                    {row.leaderboardId ?? "Unknown"}
-                  </p>
-                  <p className="text-xs text-zinc-500">
-                    Entries: {row.entryCount}
-                  </p>
-                </div>
-                {row.leaderboardId && row.canView && hasToken && (
-                  <Link
-                    className="text-sm font-medium text-zinc-900"
-                    href={`/leaderboard/${row.leaderboardId}?weekId=${data.weekId}${
-                      token ? `&token=${token}` : ""
-                    }`}
-                  >
-                    View
-                  </Link>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+            <div className="mt-5 flex flex-1 flex-col overflow-hidden rounded-3xl bg-[url('/images/leaderboard_bg.png')] bg-cover bg-center px-3 py-5">
+              {leaderboards.length === 0 ? (
+                <p className="text-center text-sm text-white/80">No entries yet.</p>
+              ) : (
+                <LeaderboardList
+                  leaderboards={leaderboards}
+                  weekId={data.weekId}
+                  token={token}
+                  hasToken={hasToken}
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
     </main>
   );
 }
