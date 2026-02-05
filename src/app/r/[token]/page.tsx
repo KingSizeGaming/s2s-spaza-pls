@@ -22,9 +22,9 @@ function renderError(title: string, message: string) {
 export async function RegistrationPage({
   params,
 }: {
-  params: { token: string };
+  params: Promise<{ token: string }>;
 }) {
-  const token = params.token;
+  const { token } = await params;
   const rows = await db
     .select({
       token: links.token,
@@ -41,15 +41,17 @@ export async function RegistrationPage({
   }
 
   const link = rows[0];
-  const expired = link.expiresAt.getTime() < Date.now();
+  const expiresAt = new Date(link.expiresAt);
+  const expired = expiresAt.getTime() < Date.now();
   if (link.type !== "REGISTRATION") {
     return renderError("Wrong Link", "This link is not for registration.");
   }
 
   if (link.status !== "VALID" || expired) {
+    const details = `status=${link.status} expiresAt=${expiresAt.toISOString()} now=${new Date().toISOString()}`;
     return renderError(
       "Link Expired",
-      "This registration link is expired or already used. Please request a new registration link."
+      `This registration link is expired or already used. Please request a new registration link. (${details})`
     );
   }
 

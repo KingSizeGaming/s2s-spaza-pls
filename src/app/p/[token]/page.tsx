@@ -22,9 +22,9 @@ function renderError(title: string, message: string) {
 export async function PredictionPage({
   params,
 }: {
-  params: { token: string };
+  params: Promise<{ token: string }>;
 }) {
-  const token = params.token;
+  const { token } = await params;
   const rows = await db
     .select({
       token: links.token,
