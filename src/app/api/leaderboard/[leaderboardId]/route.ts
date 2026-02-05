@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { and, eq, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { entries, users } from "@/db/schema";
@@ -15,12 +15,13 @@ function summarizePicks(picks: unknown): string {
 }
 
 export async function GET(
-  request: Request,
-  { params }: { params: { leaderboardId: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ leaderboardId: string }> }
 ) {
   const { searchParams } = new URL(request.url);
   const weekId = searchParams.get("weekId") || getCurrentWeekId();
-  const leaderboardId = params.leaderboardId.toUpperCase();
+  const { leaderboardId } = await params;
+  const normalizedLeaderboardId = leaderboardId.toUpperCase();
 
   const rows = await db
     .select({
@@ -30,7 +31,10 @@ export async function GET(
     .from(entries)
     .innerJoin(users, eq(entries.waNumber, users.waNumber))
     .where(
-      and(eq(entries.weekId, weekId), eq(users.leaderboardId, leaderboardId))
+      and(
+        eq(entries.weekId, weekId),
+        eq(users.leaderboardId, normalizedLeaderboardId)
+      )
     )
     .orderBy(sql`${entries.submittedAt} desc`);
 
@@ -42,7 +46,7 @@ export async function GET(
 
   return NextResponse.json({
     weekId,
-    leaderboardId,
+    leaderboardId: normalizedLeaderboardId,
     entries: entriesWithSummary,
   });
 }
