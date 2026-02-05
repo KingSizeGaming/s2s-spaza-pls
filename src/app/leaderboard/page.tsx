@@ -21,12 +21,18 @@ type LeaderboardResponse = {
 export default async function LeaderboardPage({
   searchParams,
 }: {
-  searchParams?: { weekId?: string };
+  searchParams?: Promise<{ weekId?: string; token?: string }>;
 }) {
-  const weekIdQuery = searchParams?.weekId;
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const weekIdQuery = resolvedSearchParams?.weekId;
+  const token = resolvedSearchParams?.token;
   const baseUrl = await getBaseUrl();
+  const queryParts = new URLSearchParams();
+  if (weekIdQuery) queryParts.set("weekId", weekIdQuery);
+  if (token) queryParts.set("token", token);
+  const queryString = queryParts.toString();
   const res = await fetch(
-    `${baseUrl}/api/leaderboard${weekIdQuery ? `?weekId=${weekIdQuery}` : ""}`,
+    `${baseUrl}/api/leaderboard${queryString ? `?${queryString}` : ""}`,
     { cache: "no-store" }
   );
   const data = (await res.json()) as LeaderboardResponse;
@@ -62,7 +68,9 @@ export default async function LeaderboardPage({
                 {row.leaderboardId && (
                   <Link
                     className="text-sm font-medium text-zinc-900"
-                    href={`/leaderboard/${row.leaderboardId}?weekId=${data.weekId}`}
+                    href={`/leaderboard/${row.leaderboardId}?weekId=${data.weekId}${
+                      token ? `&token=${token}` : ""
+                    }`}
                   >
                     View
                   </Link>

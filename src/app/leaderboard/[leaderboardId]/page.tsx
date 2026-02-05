@@ -66,7 +66,7 @@ export default async function LeaderboardDetailPage({
         <p className="text-sm text-zinc-600">Week: {data.weekId}</p>
         <Link
           className="text-sm font-medium text-zinc-900"
-          href={`/leaderboard?weekId=${data.weekId}`}
+          href={`/leaderboard?weekId=${data.weekId}${token ? `&token=${token}` : ""}`}
         >
           Back to leaderboards
         </Link>
