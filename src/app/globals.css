@@ -24,3 +24,14 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+@font-face {
+  font-family: "Hit the Road";
+  src: url("/fonts/hit_the_road/hitroad.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+.font-hitroad {
+  font-family: "Hit the Road", sans-serif;
+}

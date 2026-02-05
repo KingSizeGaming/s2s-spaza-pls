@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const defaultWaNumber = "+27820001111";
 
@@ -46,7 +46,7 @@ export default function DemoPage() {
   const [busy, setBusy] = useState(false);
   const [adminKey, setAdminKey] = useState("");
   const [chat, setChat] = useState<ChatMessage[]>([]);
-  const lastOutboundRef = useRef<string | null>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const pushInboundMessage = (text: string) => {
     setChat((prev) => [
@@ -63,25 +63,19 @@ export default function DemoPage() {
   }, []);
 
   useEffect(() => {
-    const handleOutbound = (raw: string) => {
-      if (!raw || raw === lastOutboundRef.current) return;
-      lastOutboundRef.current = raw;
-      try {
-        const parsed = JSON.parse(raw) as { message?: string };
-        if (parsed?.message) {
-          pushInboundMessage(parsed.message);
-        }
-      } catch {
-        // ignore
-      }
-    };
-
     let channel: BroadcastChannel | null = null;
     if ("BroadcastChannel" in window) {
       channel = new BroadcastChannel("demo-outbound");
       channel.onmessage = (event) => {
         if (typeof event.data === "string") {
-          handleOutbound(event.data);
+          try {
+            const parsed = JSON.parse(event.data) as { message?: string };
+            if (parsed?.message) {
+              pushInboundMessage(parsed.message);
+            }
+          } catch {
+            // ignore
+          }
         }
       };
     }
@@ -107,11 +101,11 @@ export default function DemoPage() {
     let res: Response | null = null;
     try {
       res = await fetch("/api/simulate/inbound-message", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ from: waNumber, message: text }),
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ from: waNumber, message: text }),
       });
-    } catch (error) {
+    } catch {
       setReply("Request failed. Check the server logs.");
       setBusy(false);
       return;
@@ -154,211 +148,213 @@ export default function DemoPage() {
   };
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-6xl flex-col gap-6 px-6 py-12">
-      <header className="space-y-2">
-        <p className="text-sm uppercase tracking-[0.2em] text-zinc-500">
-          S2S Spaza PSL POC
-        </p>
-        <h1 className="text-3xl font-semibold">Demo Console</h1>
-        <p className="text-sm text-zinc-600">
-          Week: {health?.weekId ?? "..."} · DB: {health?.db ? "OK" : "..."}
-        </p>
-      </header>
-
-      <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-        <div className="overflow-hidden rounded-3xl border border-zinc-200 bg-[#ECE5DD] shadow-sm">
-          <div className="flex items-center gap-3 border-b border-zinc-200 bg-[#075E54] px-5 py-4 text-white">
-            <div className="h-9 w-9 rounded-full bg-white/20" />
-            <div>
-              <p className="text-sm font-semibold">S2S Spaza Demo</p>
-              <p className="text-xs text-white/70">WhatsApp simulated</p>
-            </div>
+    <main className="min-h-screen bg-white">
+      <div className="mx-auto flex min-h-screen max-w-5xl flex-col items-center px-4 py-6">
+        <header className="mb-4 flex w-full max-w-screen-sm items-center justify-between px-2">
+          <div>
+            <p className="text-xs uppercase tracking-[0.3em] text-emerald-700">
+              S2S Spaza PSL POC
+            </p>
+            <h1 className="text-2xl font-semibold text-zinc-900">KingSizeGames POC Demo</h1>
           </div>
-          <div className="flex h-[520px] flex-col gap-3 overflow-y-auto bg-[#ECE5DD] p-5">
-            {chat.length === 0 ? (
-              <p className="rounded-2xl border border-dashed border-zinc-200 bg-white/80 p-4 text-sm text-zinc-600">
-                Start the conversation by sending a message.
-              </p>
-            ) : (
-              chat.map((item) => (
-                <div
-                  key={item.id}
-                  className={
-                    item.direction === "out"
-                      ? "flex justify-end"
-                      : "flex justify-start"
-                  }
-                >
+          <button
+            className="rounded-full bg-emerald-700 px-4 py-2 text-xs font-semibold text-white"
+            onClick={() => setDrawerOpen(true)}
+          >
+            Open Test Panel
+          </button>
+        </header>
+
+        <section className="flex w-full max-w-screen-sm flex-1 overflow-hidden rounded-3xl border border-emerald-100 bg-[#EFEAE2] shadow-xl">
+          <div className="flex w-full flex-col">
+            <div className="flex items-center gap-3 border-b border-emerald-800/20 bg-[#075E54] px-5 py-4 text-white">
+              <div className="h-10 w-10 rounded-full bg-white/20" />
+              <div>
+                <p className="text-sm font-semibold">Talk to Spaza</p>
+                <p className="text-xs text-white/70">WhatsApp simulated</p>
+              </div>
+            </div>
+
+            <div className="flex flex-1 flex-col gap-3 overflow-y-auto bg-[#EFEAE2] p-6">
+              {chat.length === 0 ? (
+                <p className="rounded-2xl border border-dashed border-emerald-100 bg-white/80 p-4 text-sm text-zinc-600">
+                  Start the conversation by sending a message.
+                </p>
+              ) : (
+                chat.map((item) => (
                   <div
+                    key={item.id}
                     className={
                       item.direction === "out"
-                        ? "max-w-[80%] rounded-2xl rounded-br-sm bg-[#DCF8C6] px-4 py-3 text-sm text-zinc-900 shadow"
-                        : item.direction === "system"
-                        ? "max-w-[90%] rounded-2xl bg-amber-100 px-4 py-3 text-xs text-amber-900"
-                        : "max-w-[80%] rounded-2xl rounded-bl-sm bg-white px-4 py-3 text-sm text-zinc-900 shadow"
+                        ? "flex justify-end"
+                        : "flex justify-start"
                     }
                   >
-                    {item.direction === "out" ? (
-                      item.text
-                    ) : (
-                      <span className="whitespace-pre-line">
-                        {linkify(item.text).map((part, index) =>
-                          part.type === "link" ? (
-                            <a
-                              key={`${part.value}-${index}`}
-                              className="text-emerald-700 underline"
-                              href={part.value}
-                              target="_blank"
-                              rel="noreferrer"
-                            >
-                              {part.value}
-                            </a>
-                          ) : (
-                            <span key={`${part.value}-${index}`}>{part.value}</span>
-                          )
-                        )}
-                      </span>
-                    )}
+                    <div
+                      className={
+                        item.direction === "out"
+                          ? "max-w-[80%] rounded-2xl rounded-br-sm bg-[#DCF8C6] px-4 py-3 text-sm text-zinc-900 shadow"
+                          : item.direction === "system"
+                          ? "max-w-[90%] rounded-2xl bg-amber-100 px-4 py-3 text-xs text-amber-900"
+                          : "max-w-[80%] rounded-2xl rounded-bl-sm bg-white px-4 py-3 text-sm text-zinc-900 shadow"
+                      }
+                    >
+                      {item.direction === "out" ? (
+                        item.text
+                      ) : (
+                        <span className="whitespace-pre-line">
+                          {linkify(item.text).map((part, index) =>
+                            part.type === "link" ? (
+                              <a
+                                key={`${part.value}-${index}`}
+                                className="text-emerald-700 underline"
+                                href={part.value}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                {part.value}
+                              </a>
+                            ) : (
+                              <span key={`${part.value}-${index}`}>{part.value}</span>
+                            )
+                          )}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))
-            )}
-          </div>
-          <div className="border-t border-zinc-200 bg-white p-4">
-            <div className="grid gap-3 md:grid-cols-[1fr_auto]">
-              <input
-                className="rounded-full border border-zinc-200 px-4 py-2 text-sm"
-                value={message}
-                onChange={(event) => setMessage(event.target.value)}
-                placeholder="Type a message (e.g., code D124)"
-              />
-              <button
-                className="rounded-full bg-[#075E54] px-5 py-2 text-sm font-semibold text-white"
-                onClick={() => sendMessage(message)}
-                disabled={busy}
-              >
-                Send
-              </button>
+                ))
+              )}
             </div>
-            <div className="mt-3 flex flex-wrap gap-2">
-              <button
-                className="rounded-full border border-zinc-200 px-3 py-1 text-xs"
-                onClick={() => sendMessage("new 123456")}
-                disabled={busy}
-              >
-                new 123456
-              </button>
-              <button
-                className="rounded-full border border-zinc-200 px-3 py-1 text-xs"
-                onClick={() => sendMessage("code C123")}
-                disabled={busy}
-              >
-                C123
-              </button>
-              <button
-                className="rounded-full border border-zinc-200 px-3 py-1 text-xs"
-                onClick={() => sendMessage("code D123")}
-                disabled={busy}
-              >
-                D123
-              </button>
-              <button
-                className="rounded-full border border-zinc-200 px-3 py-1 text-xs"
-                onClick={() => sendMessage("code E123")}
-                disabled={busy}
-              >
-                E123
-              </button>
-            </div>
-          </div>
-        </div>
 
-        <div className="space-y-6">
-          <div className="rounded-3xl border border-zinc-200 bg-white px-6 py-4">
+            <div className="border-t border-emerald-100 bg-white p-4">
+              <div className="grid gap-3 md:grid-cols-[1fr_auto]">
+                <input
+                  className="rounded-full border border-emerald-100 bg-white px-4 py-2 text-sm shadow-sm"
+                  value={message}
+                  onChange={(event) => setMessage(event.target.value)}
+                  placeholder="Type a message ( e.g., code <voucher>, new <spazaId> ...)"
+                />
+                <button
+                  className="rounded-full bg-[#075E54] px-5 py-2 text-sm font-semibold text-white"
+                  onClick={() => sendMessage(message)}
+                  disabled={busy}
+                >
+                  Send
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div
+        className={`fixed inset-0 z-50 transition ${
+          drawerOpen ? "visible" : "invisible"
+        }`}
+      >
+        <div
+          className={`absolute inset-0 bg-black/20 transition-opacity ${
+            drawerOpen ? "opacity-100" : "opacity-0"
+          }`}
+          onClick={() => setDrawerOpen(false)}
+        />
+        <aside
+          className={`absolute right-0 top-0 h-full w-full max-w-md transform bg-white shadow-2xl transition-transform ${
+            drawerOpen ? "translate-x-0" : "translate-x-full"
+          }`}
+        >
+          <div className="flex items-center justify-between border-b border-zinc-200 px-6 py-4">
             <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">
               Test Panel
             </p>
+            <button
+              className="rounded-full border border-zinc-200 px-3 py-1 text-xs"
+              onClick={() => setDrawerOpen(false)}
+            >
+              Close
+            </button>
           </div>
+          <div className="space-y-6 p-6">
+            <section className="rounded-2xl border border-zinc-200 bg-white p-5">
+              <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-zinc-500">
+                Sender
+              </h2>
+              <label className="mt-4 flex flex-col gap-2 text-sm">
+                WhatsApp number
+                <input
+                  className="rounded-lg border border-zinc-200 px-3 py-2"
+                  value={waNumber}
+                  onChange={(event) => setWaNumber(event.target.value)}
+                />
+              </label>
+            </section>
 
-          <section className="rounded-3xl border border-zinc-200 bg-white p-6">
-            <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-zinc-500">
-              Sender
-            </h2>
-            <label className="mt-4 flex flex-col gap-2 text-sm">
-              WhatsApp number
-              <input
-                className="rounded-lg border border-zinc-200 px-3 py-2"
-                value={waNumber}
-                onChange={(event) => setWaNumber(event.target.value)}
-              />
-            </label>
-          </section>
+            <section className="rounded-2xl border border-zinc-200 bg-white p-5">
+              <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-zinc-500">
+                Demo data
+              </h2>
+              <label className="mt-4 flex flex-col gap-2 text-sm">
+                DEMO_ADMIN_KEY
+                <input
+                  className="rounded-lg border border-zinc-200 px-3 py-2"
+                  value={adminKey}
+                  onChange={(event) => setAdminKey(event.target.value)}
+                />
+              </label>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <button
+                  className="rounded-full bg-zinc-900 px-4 py-2 text-sm font-semibold text-white"
+                  onClick={() => seedOrReset("/api/dev/seed")}
+                  disabled={busy}
+                >
+                  Seed demo data
+                </button>
+                <button
+                  className="rounded-full border border-zinc-200 px-4 py-2 text-sm"
+                  onClick={() => seedOrReset("/api/dev/reset")}
+                  disabled={busy}
+                >
+                  Reset demo data
+                </button>
+                <button
+                  className="rounded-full border border-rose-200 bg-rose-50 px-4 py-2 text-sm text-rose-700"
+                  onClick={() => seedOrReset("/api/dev/reset")}
+                  disabled={busy}
+                >
+                  RESET DATABASE
+                </button>
+              </div>
+            </section>
 
-          <section className="rounded-3xl border border-zinc-200 bg-white p-6">
-            <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-zinc-500">
-              Demo data
-            </h2>
-            <label className="mt-4 flex flex-col gap-2 text-sm">
-              DEMO_ADMIN_KEY
-              <input
-                className="rounded-lg border border-zinc-200 px-3 py-2"
-                value={adminKey}
-                onChange={(event) => setAdminKey(event.target.value)}
-              />
-            </label>
-            <div className="mt-4 flex flex-wrap gap-2">
-              <button
-                className="rounded-full bg-zinc-900 px-4 py-2 text-sm font-semibold text-white"
-                onClick={() => seedOrReset("/api/dev/seed")}
-                disabled={busy}
-              >
-                Seed demo data
-              </button>
-              <button
-                className="rounded-full border border-zinc-200 px-4 py-2 text-sm"
-                onClick={() => seedOrReset("/api/dev/reset")}
-                disabled={busy}
-              >
-                Reset demo data
-              </button>
-              <button
-                className="rounded-full border border-rose-200 bg-rose-50 px-4 py-2 text-sm text-rose-700"
-                onClick={() => seedOrReset("/api/dev/reset")}
-                disabled={busy}
-              >
-                RESET DATABASE
-              </button>
-            </div>
-          </section>
-
-          <section className="rounded-3xl border border-zinc-200 bg-white p-6">
-            <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-zinc-500">
-              Last reply
-            </h2>
-            <div className="mt-3 min-h-[80px] rounded-2xl border border-dashed border-zinc-200 bg-zinc-50 p-4 text-sm text-zinc-700">
-              {reply ? (
-                <p>
-                  {replyParts.map((part, index) =>
-                    part.type === "link" ? (
-                      <a
-                        key={`${part.value}-${index}`}
-                        className="text-zinc-900 underline"
-                        href={part.value}
-                      >
-                        {part.value}
-                      </a>
-                    ) : (
-                      <span key={`${part.value}-${index}`}>{part.value}</span>
-                    )
-                  )}
-                </p>
-              ) : (
-                "Send a message to see the reply."
-              )}
-            </div>
-          </section>
-        </div>
-      </section>
+            <section className="rounded-2xl border border-zinc-200 bg-white p-5">
+              <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-zinc-500">
+                Last reply
+              </h2>
+              <div className="mt-3 min-h-[80px] rounded-2xl border border-dashed border-zinc-200 bg-zinc-50 p-4 text-sm text-zinc-700">
+                {reply ? (
+                  <p>
+                    {replyParts.map((part, index) =>
+                      part.type === "link" ? (
+                        <a
+                          key={`${part.value}-${index}`}
+                          className="text-zinc-900 underline"
+                          href={part.value}
+                        >
+                          {part.value}
+                        </a>
+                      ) : (
+                        <span key={`${part.value}-${index}`}>{part.value}</span>
+                      )
+                    )}
+                  </p>
+                ) : (
+                  "Send a message to see the reply."
+                )}
+              </div>
+            </section>
+          </div>
+        </aside>
+      </div>
     </main>
   );
 }

@@ -1,20 +1,25 @@
-import { eq } from "drizzle-orm";
+﻿import { eq } from "drizzle-orm";
+import localFont from "next/font/local";
 import { db } from "@/db";
 import { links } from "@/db/schema";
 import RegistrationForm from "./registration-form";
 
+const hitRoad = localFont({
+  src: "../../../../public/fonts/hit_the_road/hitroad.ttf",
+  display: "swap",
+});
+
 function renderError(title: string, message: string) {
   return (
-    <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-6 px-6 py-16">
-      <header className="space-y-2">
-        <p className="text-sm uppercase tracking-[0.2em] text-zinc-500">
-          S2S Spaza PSL POC
-        </p>
-        <h1 className="text-3xl font-semibold">{title}</h1>
-      </header>
-      <section className="rounded-2xl border border-rose-200 bg-rose-50 p-6 text-rose-900">
-        <p>{message}</p>
-      </section>
+    <main className="min-h-screen bg-white">
+      <div className="mx-auto flex min-h-screen w-full max-w-[390px] items-center px-4">
+        <div className="w-full rounded-3xl border border-emerald-700 bg-white p-6 text-zinc-900 shadow-xl">
+          <h1 className={`text-2xl font-semibold ${hitRoad.className}`}>
+            {title}
+          </h1>
+          <p className="mt-3 text-sm text-zinc-600">{message}</p>
+        </div>
+      </div>
     </main>
   );
 }
@@ -48,25 +53,27 @@ export async function RegistrationPage({
   }
 
   if (link.status !== "VALID" || expired) {
-    const details = `status=${link.status} expiresAt=${expiresAt.toISOString()} now=${new Date().toISOString()}`;
     return renderError(
       "Link Expired",
-      `This registration link is expired or already used. Please request a new registration link. (${details})`
+      "This registration link is expired or already used. Please request a new registration link."
     );
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-6 px-6 py-16">
-      <header className="space-y-2">
-        <p className="text-sm uppercase tracking-[0.2em] text-zinc-500">
-          S2S Spaza PSL POC
-        </p>
-        <h1 className="text-3xl font-semibold">Complete Registration</h1>
-        <p className="text-sm text-zinc-600">
-          Fill in your details to activate your entry.
-        </p>
-      </header>
-      <RegistrationForm token={token} />
+    <main className={`min-h-screen bg-white ${hitRoad.className}`}>
+      <div className="mx-auto flex min-h-screen w-full max-w-[390px] items-center px-4">
+        <div className="relative h-[844px] w-full scale-[1.35] overflow-hidden rounded-3xl bg-white">
+          <img
+            src="/images/bg_1.png"
+            alt="Background"
+            className="absolute inset-0 h-full w-full object-cover opacity-90"
+          />
+          <div className="relative z-20 flex flex-1 flex-col gap-10 px-6 py-16">
+            <img src="/images/logo.png" alt="Weekly Soccer Picks" className="w-full" />
+            <RegistrationForm token={token} fontClassName={hitRoad.className} />
+          </div>
+        </div>
+      </div>
     </main>
   );
 }
