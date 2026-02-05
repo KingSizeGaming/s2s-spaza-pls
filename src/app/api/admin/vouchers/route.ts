@@ -6,7 +6,7 @@ import { getCurrentWeekId } from "@/lib/week";
 type VoucherInput = {
   voucherToken: string;
   issuingSid: string;
-  weekId?: string;
+  weekId: string;
 };
 
 export async function POST(request: NextRequest) {

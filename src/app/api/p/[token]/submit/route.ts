@@ -32,6 +32,7 @@ export async function POST(
       status: links.status,
       expiresAt: links.expiresAt,
       waNumber: links.waNumber,
+      weekId: links.weekId,
     })
     .from(links)
     .where(eq(links.token, token))
