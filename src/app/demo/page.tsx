@@ -131,12 +131,23 @@ export default function DemoPage() {
 
         <section className="flex w-full max-w-screen-sm flex-1 overflow-hidden rounded-3xl border border-emerald-100 bg-[#EFEAE2] shadow-xl">
           <div className="flex w-full flex-col">
-            <div className="flex items-center gap-3 border-b border-emerald-800/20 bg-[#075E54] px-5 py-4 text-white">
-              <div className="h-10 w-10 rounded-full bg-white/20" />
-              <div>
-                <p className="text-sm font-semibold">Talk to Spaza</p>
-                <p className="text-xs text-white/70">WhatsApp simulated</p>
+            <div className="flex flex-col gap-3 border-b border-emerald-800/20 bg-[#075E54] px-5 py-4 text-white">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-full bg-white/20" />
+                <div>
+                  <p className="text-sm font-semibold">Talk to Spaza</p>
+                  <p className="text-xs text-white/70">WhatsApp simulated</p>
+                </div>
               </div>
+              <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.2em] text-white/70">
+                Sender number
+                <input
+                  className="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-emerald-200/60"
+                  value={waNumber}
+                  onChange={(event) => setWaNumber(event.target.value)}
+                  placeholder="+27820001111"
+                />
+              </label>
             </div>
 
             <div className="flex flex-1 flex-col gap-3 overflow-y-auto bg-[#EFEAE2] p-6">
