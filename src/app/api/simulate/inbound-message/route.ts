@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { links, spazaSids, users, vouchers } from "@/db/schema";
@@ -15,7 +15,7 @@ function normalizeMessage(input: string): string {
   return input.trim().replace(/\s+/g, " ");
 }
 
-function getBaseUrl(request: Request): string {
+function getBaseUrl(request: NextRequest): string {
   const host = request.headers.get("host") ?? "localhost:3000";
   const proto = request.headers.get("x-forwarded-proto") ?? "http";
   return `${proto}://${host}`;
@@ -29,7 +29,7 @@ function getIsoWeekEndUtc(date: Date): Date {
   return utc;
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => null);
   const from = normalizeWaNumber(String(body?.from ?? ""));
   const message = normalizeMessage(String(body?.message ?? ""));

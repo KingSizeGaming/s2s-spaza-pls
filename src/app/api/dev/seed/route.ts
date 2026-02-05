@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { spazaSids, vouchers } from "@/db/schema";
 import { getCurrentWeekId } from "@/lib/week";
 
-function assertAdminKey(request: Request) {
+function assertAdminKey(request: NextRequest) {
   const expected = process.env.DEMO_ADMIN_KEY;
   if (!expected) {
     return { ok: false, status: 500, error: "DEMO_ADMIN_KEY is not set" } as const;
@@ -17,7 +17,7 @@ function assertAdminKey(request: Request) {
   return { ok: true } as const;
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   const auth = assertAdminKey(request);
   if (!auth.ok) {
     return NextResponse.json({ ok: false, error: auth.error }, { status: auth.status });
