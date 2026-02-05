@@ -1,8 +1,8 @@
 import { headers } from "next/headers";
 import Link from "next/link";
 
-function getBaseUrl(): string {
-  const headerList = headers();
+async function getBaseUrl(): Promise<string> {
+  const headerList = await headers();
   const host = headerList.get("host") ?? "localhost:3000";
   const proto = headerList.get("x-forwarded-proto") ?? "http";
   return `${proto}://${host}`;
@@ -22,7 +22,7 @@ export default async function LeaderboardDetailPage({
   searchParams?: { weekId?: string };
 }) {
   const weekIdQuery = searchParams?.weekId;
-  const baseUrl = getBaseUrl();
+  const baseUrl = await getBaseUrl();
   const res = await fetch(
     `${baseUrl}/api/leaderboard/${params.leaderboardId}${ 
       weekIdQuery ? `?weekId=${weekIdQuery}` : ""
