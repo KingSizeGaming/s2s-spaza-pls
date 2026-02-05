@@ -6,7 +6,9 @@ const statusStyles = {
 };
 
 type HealthResponse = {
-  ok: boolean;
+  status: "ok" | "error";
+  db: boolean;
+  weekId: string;
   error?: string;
 };
 
@@ -20,7 +22,7 @@ async function getHealth(): Promise<HealthResponse> {
 
 export default async function HealthPage() {
   const data = await getHealth();
-  const status = data.ok ? "ok" : "error";
+  const status = data.status === "ok" ? "ok" : "error";
   const style = statusStyles[status];
 
   return (
@@ -29,7 +31,7 @@ export default async function HealthPage() {
         <p className="text-sm uppercase tracking-[0.2em] text-zinc-500">
           S2S Spaza PSL POC
         </p>
-        <h1 className="text-3xl font-semibold">Database Health</h1>
+        <h1 className="text-3xl font-semibold">System Health</h1>
       </header>
 
       <section className={`rounded-2xl border p-6 ${style}`}>
@@ -37,12 +39,13 @@ export default async function HealthPage() {
           <div>
             <p className="text-xs uppercase tracking-[0.2em]">Status</p>
             <p className="text-2xl font-semibold">
-              {data.ok ? "OK" : "Unavailable"}
+              {data.status === "ok" ? "OK" : "Unavailable"}
             </p>
+            <p className="mt-1 text-xs text-zinc-600">Week: {data.weekId}</p>
           </div>
           <span className="text-sm">/api/health</span>
         </div>
-        {!data.ok && (
+        {data.status !== "ok" && (
           <p className="mt-4 text-sm">{data.error ?? "Unknown error"}</p>
         )}
       </section>

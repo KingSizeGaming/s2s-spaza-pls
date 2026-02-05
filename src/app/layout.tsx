@@ -27,6 +27,14 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <div className="bg-amber-100 text-amber-900">
+          <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-3 text-sm">
+            <span>
+              POC Demo: WhatsApp is simulated. Flow and logic represent BSP
+              integration.
+            </span>
+          </div>
+        </div>
         {children}
       </body>
     </html>
