@@ -1,30 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
-import { entries, links, spazaSids, users, vouchers } from "@/db/schema";
+import { entries, links, matches, prizeDraws, spazaSids, users, vouchers } from "@/db/schema";
 import { getCurrentWeekId } from "@/lib/week";
 
-function assertAdminKey(request: NextRequest) {
-  const expected = process.env.DEMO_ADMIN_KEY;
-  if (!expected) {
-    return { ok: false, status: 500, error: "DEMO_ADMIN_KEY is not set" } as const;
-  }
-
-  const provided = request.headers.get("x-demo-admin-key");
-  if (!provided || provided !== expected) {
-    return { ok: false, status: 401, error: "Unauthorized" } as const;
-  }
-
-  return { ok: true } as const;
-}
-
 export async function POST(request: NextRequest) {
-  const auth = assertAdminKey(request);
-  if (!auth.ok) {
-    return NextResponse.json({ ok: false, error: auth.error }, { status: auth.status });
-  }
-
   const weekId = getCurrentWeekId();
 
+  const deletedPrizeDraws = await db.delete(prizeDraws).returning({ id: prizeDraws.id });
+  const deletedMatches = await db.delete(matches).returning({ id: matches.id });
   const deletedEntries = await db.delete(entries).returning({ id: entries.id });
   const deletedLinks = await db.delete(links).returning({ id: links.id });
   const deletedVouchers = await db.delete(vouchers).returning({ id: vouchers.id });
@@ -63,6 +46,8 @@ export async function POST(request: NextRequest) {
     weekId,
     cleared: {
       entries: deletedEntries.length,
+      matches: deletedMatches.length,
+      prizeDraws: deletedPrizeDraws.length,
       links: deletedLinks.length,
       vouchers: deletedVouchers.length,
       users: deletedUsers.length,

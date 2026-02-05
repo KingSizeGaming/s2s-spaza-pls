@@ -150,13 +150,15 @@ export async function POST(request: NextRequest) {
     .where(sql`regexp_replace(${users.waNumber}, '[^0-9]', '', 'g') = ${from}`)
     .limit(1);
 
-  if (user.length === 0) {
+  if (user.length === 0 || user[0].state !== "ACTIVE") {
     return NextResponse.json({
       reply: {
         type: "text",
         body:
           "Get a Spaza Shop code and get a chance to play" +
-          (debugEnabled ? " [debug: user_not_active]" : ""),
+          (debugEnabled
+            ? ` [debug: user_not_active state=${user[0]?.state ?? "none"}]`
+            : ""),
       },
     });
   }

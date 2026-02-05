@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { and, eq, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { entries, links, users } from "@/db/schema";
+import { entries, links, matches, users } from "@/db/schema";
 import { getCurrentWeekId } from "@/lib/week";
 
 export async function POST(
@@ -42,6 +42,7 @@ export async function POST(
   }
 
   const link = linkRows[0];
+  const linkWeekId = link.weekId ?? weekId;
   if (link.type !== "PREDICTION") {
     return NextResponse.json({ error: "Invalid link type." }, { status: 400 });
   }
@@ -61,6 +62,15 @@ export async function POST(
   }
 
   const result = await db.transaction(async (tx) => {
+    const matchRows = await tx
+      .select({ id: matches.id })
+      .from(matches)
+      .where(eq(matches.weekId, linkWeekId));
+
+    if (matchRows.length > 0 && matchRows.length !== picks.length) {
+      return { error: "Picks do not match this week's fixtures." } as const;
+    }
+
     const latest = await tx
       .select({ status: links.status, expiresAt: links.expiresAt, waNumber: links.waNumber })
       .from(links)
@@ -94,7 +104,7 @@ export async function POST(
     try {
       await tx.insert(entries).values({
         waNumber: latest[0].waNumber,
-        weekId,
+        weekId: linkWeekId,
         linkToken: token,
         picks,
         submittedAt: now,

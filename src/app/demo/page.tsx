@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 const defaultWaNumber = "+27820001111";
 
@@ -41,12 +41,9 @@ type ChatMessage = {
 export default function DemoPage() {
   const [waNumber, setWaNumber] = useState(defaultWaNumber);
   const [message, setMessage] = useState("");
-  const [reply, setReply] = useState<string | null>(null);
   const [health, setHealth] = useState<HealthPayload | null>(null);
   const [busy, setBusy] = useState(false);
-  const [adminKey, setAdminKey] = useState("");
   const [chat, setChat] = useState<ChatMessage[]>([]);
-  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const pushInboundMessage = (text: string) => {
     setChat((prev) => [
@@ -85,14 +82,9 @@ export default function DemoPage() {
     };
   }, []);
 
-  const replyParts = useMemo(() => {
-    return reply ? linkify(reply) : [];
-  }, [reply]);
-
   const sendMessage = async (text: string) => {
     if (!text.trim()) return;
     setBusy(true);
-    setReply(null);
     setChat((prev) => [
       ...prev,
       { id: crypto.randomUUID(), direction: "out", text },
@@ -106,7 +98,6 @@ export default function DemoPage() {
         body: JSON.stringify({ from: waNumber, message: text }),
       });
     } catch {
-      setReply("Request failed. Check the server logs.");
       setBusy(false);
       return;
     }
@@ -119,30 +110,9 @@ export default function DemoPage() {
     } catch {
       responseText = rawText || responseText;
     }
-    setReply(responseText);
     setChat((prev) => [
       ...prev,
       { id: crypto.randomUUID(), direction: "in", text: responseText },
-    ]);
-    setBusy(false);
-  };
-
-  const seedOrReset = async (path: "/api/dev/seed" | "/api/dev/reset") => {
-    if (!adminKey.trim()) {
-      setReply("Missing DEMO_ADMIN_KEY.");
-      return;
-    }
-    setBusy(true);
-    const res = await fetch(path, {
-      method: "POST",
-      headers: { "x-demo-admin-key": adminKey.trim() },
-    });
-    const data = await res.json();
-    const text = JSON.stringify(data, null, 2);
-    setReply(text);
-    setChat((prev) => [
-      ...prev,
-      { id: crypto.randomUUID(), direction: "system", text },
     ]);
     setBusy(false);
   };
@@ -157,12 +127,6 @@ export default function DemoPage() {
             </p>
             <h1 className="text-2xl font-semibold text-zinc-900">KingSizeGames POC Demo</h1>
           </div>
-          <button
-            className="rounded-full bg-emerald-700 px-4 py-2 text-xs font-semibold text-white"
-            onClick={() => setDrawerOpen(true)}
-          >
-            Open Test Panel
-          </button>
         </header>
 
         <section className="flex w-full max-w-screen-sm flex-1 overflow-hidden rounded-3xl border border-emerald-100 bg-[#EFEAE2] shadow-xl">
@@ -245,115 +209,6 @@ export default function DemoPage() {
             </div>
           </div>
         </section>
-      </div>
-
-      <div
-        className={`fixed inset-0 z-50 transition ${
-          drawerOpen ? "visible" : "invisible"
-        }`}
-      >
-        <div
-          className={`absolute inset-0 bg-black/20 transition-opacity ${
-            drawerOpen ? "opacity-100" : "opacity-0"
-          }`}
-          onClick={() => setDrawerOpen(false)}
-        />
-        <aside
-          className={`absolute right-0 top-0 h-full w-full max-w-md transform bg-white shadow-2xl transition-transform ${
-            drawerOpen ? "translate-x-0" : "translate-x-full"
-          }`}
-        >
-          <div className="flex items-center justify-between border-b border-zinc-200 px-6 py-4">
-            <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">
-              Test Panel
-            </p>
-            <button
-              className="rounded-full border border-zinc-200 px-3 py-1 text-xs"
-              onClick={() => setDrawerOpen(false)}
-            >
-              Close
-            </button>
-          </div>
-          <div className="space-y-6 p-6">
-            <section className="rounded-2xl border border-zinc-200 bg-white p-5">
-              <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-zinc-500">
-                Sender
-              </h2>
-              <label className="mt-4 flex flex-col gap-2 text-sm">
-                WhatsApp number
-                <input
-                  className="rounded-lg border border-zinc-200 px-3 py-2"
-                  value={waNumber}
-                  onChange={(event) => setWaNumber(event.target.value)}
-                />
-              </label>
-            </section>
-
-            <section className="rounded-2xl border border-zinc-200 bg-white p-5">
-              <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-zinc-500">
-                Demo data
-              </h2>
-              <label className="mt-4 flex flex-col gap-2 text-sm">
-                DEMO_ADMIN_KEY
-                <input
-                  className="rounded-lg border border-zinc-200 px-3 py-2"
-                  value={adminKey}
-                  onChange={(event) => setAdminKey(event.target.value)}
-                />
-              </label>
-              <div className="mt-4 flex flex-wrap gap-2">
-                <button
-                  className="rounded-full bg-zinc-900 px-4 py-2 text-sm font-semibold text-white"
-                  onClick={() => seedOrReset("/api/dev/seed")}
-                  disabled={busy}
-                >
-                  Seed demo data
-                </button>
-                <button
-                  className="rounded-full border border-zinc-200 px-4 py-2 text-sm"
-                  onClick={() => seedOrReset("/api/dev/reset")}
-                  disabled={busy}
-                >
-                  Reset demo data
-                </button>
-                <button
-                  className="rounded-full border border-rose-200 bg-rose-50 px-4 py-2 text-sm text-rose-700"
-                  onClick={() => seedOrReset("/api/dev/reset")}
-                  disabled={busy}
-                >
-                  RESET DATABASE
-                </button>
-              </div>
-            </section>
-
-            <section className="rounded-2xl border border-zinc-200 bg-white p-5">
-              <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-zinc-500">
-                Last reply
-              </h2>
-              <div className="mt-3 min-h-[80px] rounded-2xl border border-dashed border-zinc-200 bg-zinc-50 p-4 text-sm text-zinc-700">
-                {reply ? (
-                  <p>
-                    {replyParts.map((part, index) =>
-                      part.type === "link" ? (
-                        <a
-                          key={`${part.value}-${index}`}
-                          className="text-zinc-900 underline"
-                          href={part.value}
-                        >
-                          {part.value}
-                        </a>
-                      ) : (
-                        <span key={`${part.value}-${index}`}>{part.value}</span>
-                      )
-                    )}
-                  </p>
-                ) : (
-                  "Send a message to see the reply."
-                )}
-              </div>
-            </section>
-          </div>
-        </aside>
       </div>
     </main>
   );

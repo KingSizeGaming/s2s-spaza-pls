@@ -1,6 +1,7 @@
 import {
   boolean,
   index,
+  integer,
   jsonb,
   pgEnum,
   pgTable,
@@ -150,5 +151,47 @@ export const entries = pgTable(
     waWeekIdx: index("entries_wa_week_idx").on(table.waNumber, table.weekId),
     linkTokenIdx: index("entries_link_token_idx").on(table.linkToken),
     submittedAtIdx: index("entries_submitted_at_idx").on(table.submittedAt),
+  })
+);
+
+export const matches = pgTable(
+  "matches",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    weekId: text("week_id").notNull(),
+    homeTeam: text("home_team").notNull(),
+    awayTeam: text("away_team").notNull(),
+    kickoffAt: timestamp("kickoff_at", { withTimezone: true }).notNull(),
+    homeScore: integer("home_score"),
+    awayScore: integer("away_score"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+  },
+  (table) => ({
+    weekIdIdx: index("matches_week_id_idx").on(table.weekId),
+    kickoffAtIdx: index("matches_kickoff_at_idx").on(table.kickoffAt),
+  })
+);
+
+export const prizeDraws = pgTable(
+  "prize_draws",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    weekId: text("week_id").notNull(),
+    waNumber: text("wa_number").notNull(),
+    prizeCode: text("prize_code").notNull(),
+    message: text("message").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => ({
+    weekIdIdx: index("prize_draws_week_id_idx").on(table.weekId),
+    waNumberIdx: index("prize_draws_wa_number_idx").on(table.waNumber),
   })
 );

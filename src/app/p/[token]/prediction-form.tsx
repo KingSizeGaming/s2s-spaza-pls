@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 type SubmitResponse = {
   ok?: boolean;
@@ -15,30 +15,24 @@ type PicksForm = {
   picks: Pick[];
 };
 
-const defaultPicks: Pick[] = ["H", "H", "H", "H", "H", "H", "H"];
-
-const matchLabels = [
-  "Match 1 - Sat 15:00",
-  "Match 2 - Sat 17:30",
-  "Match 3 - Sat 16:00",
-  "Match 4 - Sun 18:00",
-  "Match 5 - Mon 15:00",
-  "Match 6 - Mon 17:30",
-  "Match 7 - Mon 16:00",
-];
+type Match = {
+  id: string;
+  weekId: string;
+  homeTeam: string;
+  awayTeam: string;
+  kickoffAt: string;
+};
 
 export default function PredictionForm({ token }: { token: string }) {
   const [form, setForm] = useState<PicksForm>({
-    picks: defaultPicks,
+    picks: [],
   });
+  const [matches, setMatches] = useState<Match[]>([]);
+  const [matchesLoading, setMatchesLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<SubmitResponse | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [successCountdown, setSuccessCountdown] = useState<number | null>(null);
-
-  const completedCount = useMemo(() => {
-    return form.picks.filter(Boolean).length;
-  }, [form.picks]);
 
   const updatePick = (index: number, value: Pick) => {
     setForm((prev) => {
@@ -96,6 +90,35 @@ export default function PredictionForm({ token }: { token: string }) {
   };
 
   useEffect(() => {
+    let active = true;
+    setMatchesLoading(true);
+    fetch(`/api/matches?token=${encodeURIComponent(token)}`, {
+      cache: "no-store",
+    })
+      .then((res) => res.json())
+      .then((data: { matches?: Match[] }) => {
+        if (!active) return;
+        const nextMatches = Array.isArray(data?.matches) ? data.matches : [];
+        setMatches(nextMatches);
+        setForm({
+          picks: nextMatches.map(() => "H" as Pick),
+        });
+      })
+      .catch(() => {
+        if (!active) return;
+        setMatches([]);
+        setForm({ picks: [] });
+      })
+      .finally(() => {
+        if (!active) return;
+        setMatchesLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [token]);
+
+  useEffect(() => {
     if (result?.leaderboardUrl) {
       setSuccessCountdown(3);
       const timer = window.setInterval(() => {
@@ -119,32 +142,56 @@ export default function PredictionForm({ token }: { token: string }) {
       </div>
 
       <div className="mt-20 flex-1 space-y-3 overflow-y-auto pr-1">
-        {form.picks.map((pick, index) => (
-          <div
-            key={`pick-${index}`}
-            className="relative overflow-hidden rounded-2xl"
-          >
-            <img
-              src="/images/history_player_panel.png"
-              alt="Match panel"
-              className="absolute inset-0 h-full w-full object-cover"
-            />
-            <div className="relative z-10 flex items-center justify-between px-5 py-4 text-base font-semibold text-amber-100">
-              <span>{matchLabels[index] ?? `Match ${index + 1}`}</span>
-              <select
-                className="rounded-full border border-emerald-200/40 bg-black/50 px-3 py-1 text-sm text-white"
-                value={pick}
-                onChange={(event) =>
-                  updatePick(index, event.target.value as Pick)
-                }
-              >
-                <option value="H">H</option>
-                <option value="D">D</option>
-                <option value="A">A</option>
-              </select>
-            </div>
+        {matchesLoading && (
+          <div className="rounded-2xl border border-white/20 bg-white/10 p-4 text-center text-sm text-white/80">
+            Loading matches...
           </div>
-        ))}
+        )}
+        {!matchesLoading && matches.length === 0 && (
+          <div className="rounded-2xl border border-white/20 bg-white/10 p-4 text-center text-sm text-white/80">
+            No matches available for this week yet.
+          </div>
+        )}
+        {matches.map((match, index) => {
+          const pick = form.picks[index] ?? "H";
+          const kickoff = new Date(match.kickoffAt);
+          const kickoffLabel = Number.isNaN(kickoff.getTime())
+            ? "TBD"
+            : kickoff.toLocaleString("en-ZA", {
+                weekday: "short",
+                hour: "2-digit",
+                minute: "2-digit",
+              });
+          return (
+            <div
+              key={match.id}
+              className="relative overflow-hidden rounded-2xl"
+            >
+              <img
+                src="/images/history_player_panel.png"
+                alt="Match panel"
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+              <div className="relative z-10 flex items-center justify-between gap-4 px-5 py-4 text-base font-semibold text-amber-100">
+                <div className="flex flex-col">
+                  <span>{`${match.homeTeam} vs ${match.awayTeam}`}</span>
+                  <span className="text-xs text-amber-100/80">{kickoffLabel}</span>
+                </div>
+                <select
+                  className="rounded-full border border-emerald-200/40 bg-black/50 px-3 py-1 text-sm text-white"
+                  value={pick}
+                  onChange={(event) =>
+                    updatePick(index, event.target.value as Pick)
+                  }
+                >
+                  <option value="H">H</option>
+                  <option value="D">D</option>
+                  <option value="A">A</option>
+                </select>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       {result?.error && (
@@ -156,7 +203,7 @@ export default function PredictionForm({ token }: { token: string }) {
       <button
         type="submit"
         className="mt-4 flex w-40 items-center justify-center self-center disabled:opacity-60"
-        disabled={submitting}
+        disabled={submitting || matchesLoading || matches.length === 0}
       >
         <img
           src="/images/submit_button.png"

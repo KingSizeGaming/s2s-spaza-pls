@@ -32,7 +32,7 @@ if (process.env.NODE_ENV !== "production") {
   const existing = new Set(["ABC", "ABC1"]);
   generateUniqueLeaderboardId("abc", async (id) => existing.has(id)).then(
     (id) => {
-      if (!/^ABC\\d{3}$/.test(id)) {
+      if (!/^ABC\d{3}$/.test(id)) {
         throw new Error(`leaderboard.ts sanity check failed: ${id}`);
       }
     }
