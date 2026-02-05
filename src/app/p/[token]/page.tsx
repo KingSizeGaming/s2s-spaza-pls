@@ -49,7 +49,7 @@ export async function PredictionPage({
   if (link.status !== "VALID" || expired) {
     return renderError(
       "Link Expired",
-      "This prediction link is expired or already used."
+      "This prediction link is expired or already used. Please request a new prediction link."
     );
   }
 

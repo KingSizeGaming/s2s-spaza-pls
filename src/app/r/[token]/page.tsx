@@ -49,7 +49,7 @@ export async function RegistrationPage({
   if (link.status !== "VALID" || expired) {
     return renderError(
       "Link Expired",
-      "This registration link is expired or already used."
+      "This registration link is expired or already used. Please request a new registration link."
     );
   }
 

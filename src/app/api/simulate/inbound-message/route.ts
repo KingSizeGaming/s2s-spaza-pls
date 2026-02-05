@@ -111,7 +111,25 @@ export async function POST(request: Request) {
     .where(eq(users.waNumber, from))
     .limit(1);
 
-  if (user.length === 0 || user[0].state !== "ACTIVE") {
+  if (user.length === 0) {
+    return NextResponse.json({
+      reply: {
+        type: "text",
+        body: "Welcome! To begin, reply with: new <SID>",
+      },
+    });
+  }
+
+  if (user[0].state === "PENDING_REGISTRATION") {
+    return NextResponse.json({
+      reply: {
+        type: "text",
+        body: "You must complete your registration using the link previously sent.",
+      },
+    });
+  }
+
+  if (user[0].state !== "ACTIVE") {
     return NextResponse.json({
       reply: {
         type: "text",
