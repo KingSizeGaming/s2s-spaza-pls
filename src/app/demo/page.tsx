@@ -104,14 +104,27 @@ export default function DemoPage() {
       { id: crypto.randomUUID(), direction: "out", text },
     ]);
 
-    const res = await fetch("/api/simulate/inbound-message", {
+    let res: Response | null = null;
+    try {
+      res = await fetch("/api/simulate/inbound-message", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ from: waNumber, message: text }),
-    });
+      });
+    } catch (error) {
+      setReply("Request failed. Check the server logs.");
+      setBusy(false);
+      return;
+    }
 
-    const data = (await res.json()) as ReplyPayload;
-    const responseText = data.reply?.body ?? "No reply";
+    let responseText = `No reply (status ${res.status})`;
+    const rawText = await res.text();
+    try {
+      const data = JSON.parse(rawText) as ReplyPayload;
+      responseText = data.reply?.body ?? responseText;
+    } catch {
+      responseText = rawText || responseText;
+    }
     setReply(responseText);
     setChat((prev) => [
       ...prev,
@@ -217,7 +230,7 @@ export default function DemoPage() {
                 className="rounded-full border border-zinc-200 px-4 py-2 text-sm"
                 value={message}
                 onChange={(event) => setMessage(event.target.value)}
-                placeholder="Type a message"
+                placeholder="Type a message (e.g., code D124)"
               />
               <button
                 className="rounded-full bg-[#075E54] px-5 py-2 text-sm font-semibold text-white"
@@ -237,21 +250,21 @@ export default function DemoPage() {
               </button>
               <button
                 className="rounded-full border border-zinc-200 px-3 py-1 text-xs"
-                onClick={() => sendMessage("C123")}
+                onClick={() => sendMessage("code C123")}
                 disabled={busy}
               >
                 C123
               </button>
               <button
                 className="rounded-full border border-zinc-200 px-3 py-1 text-xs"
-                onClick={() => sendMessage("D123")}
+                onClick={() => sendMessage("code D123")}
                 disabled={busy}
               >
                 D123
               </button>
               <button
                 className="rounded-full border border-zinc-200 px-3 py-1 text-xs"
-                onClick={() => sendMessage("E123")}
+                onClick={() => sendMessage("code E123")}
                 disabled={busy}
               >
                 E123

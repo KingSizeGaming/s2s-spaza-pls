@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { links, spazaSids, users, vouchers } from "@/db/schema";
 import { generateToken } from "@/lib/tokens";
@@ -8,7 +8,7 @@ import { getCurrentWeekId } from "@/lib/week";
 const NEW_SID_REGEX = /^new\s+(\S+)/i;
 
 function normalizeWaNumber(input: string): string {
-  return input.trim().replace(/\s+/g, "");
+  return input.replace(/[^0-9]/g, "");
 }
 
 function normalizeMessage(input: string): string {
@@ -29,7 +29,33 @@ function getIsoWeekEndUtc(date: Date): Date {
   return utc;
 }
 
+async function lookupVoucher(code: string, weekId: string) {
+  const rows = await db
+    .select({
+      id: vouchers.id,
+      weekId: vouchers.weekId,
+      isUsed: vouchers.isUsed,
+    })
+    .from(vouchers)
+    .where(sql`upper(${vouchers.voucherToken}) = ${code}`)
+    .limit(1);
+
+  if (rows.length === 0) {
+    return { exists: false } as const;
+  }
+
+  const voucher = rows[0];
+  return {
+    exists: true,
+    voucher,
+    weekMatch: voucher.weekId === weekId,
+  } as const;
+}
+
 export async function POST(request: NextRequest) {
+  const debugEnabled =
+    request.nextUrl.searchParams.get("debug") === "1" ||
+    request.headers.get("x-debug") === "1";
   const body = await request.json().catch(() => null);
   const from = normalizeWaNumber(String(body?.from ?? ""));
   const message = normalizeMessage(String(body?.message ?? ""));
@@ -68,7 +94,7 @@ export async function POST(request: NextRequest) {
     const existingUser = await db
       .select({ id: users.id })
       .from(users)
-      .where(eq(users.waNumber, from))
+      .where(sql`regexp_replace(${users.waNumber}, '[^0-9]', '', 'g') = ${from}`)
       .limit(1);
 
     if (existingUser.length === 0) {
@@ -81,7 +107,7 @@ export async function POST(request: NextRequest) {
       const current = await db
         .select({ state: users.state })
         .from(users)
-        .where(eq(users.waNumber, from))
+        .where(sql`regexp_replace(${users.waNumber}, '[^0-9]', '', 'g') = ${from}`)
         .limit(1);
       if (current.length > 0 && current[0].state === "ACTIVE") {
         return NextResponse.json({
@@ -93,8 +119,8 @@ export async function POST(request: NextRequest) {
       }
       await db
         .update(users)
-        .set({ state: "PENDING_REGISTRATION", homeSid: sid })
-        .where(eq(users.waNumber, from));
+        .set({ state: "PENDING_REGISTRATION", homeSid: sid, waNumber: from })
+        .where(sql`regexp_replace(${users.waNumber}, '[^0-9]', '', 'g') = ${from}`);
     }
 
     const token = generateToken("reg");
@@ -121,86 +147,62 @@ export async function POST(request: NextRequest) {
   const user = await db
     .select({ state: users.state })
     .from(users)
-    .where(eq(users.waNumber, from))
+    .where(sql`regexp_replace(${users.waNumber}, '[^0-9]', '', 'g') = ${from}`)
     .limit(1);
 
   if (user.length === 0) {
     return NextResponse.json({
       reply: {
         type: "text",
-        body: "Welcome! To begin, reply with: new <SID>",
+        body:
+          "Get a Spaza Shop code and get a chance to play" +
+          (debugEnabled ? " [debug: user_not_active]" : ""),
       },
     });
   }
 
-  if (user[0].state === "PENDING_REGISTRATION") {
+  const voucherMessage = message.replace(/\s+/g, " ").trim();
+  const codeMatch = voucherMessage.match(/^code\s+(\S+)/i);
+  const voucherToken = (codeMatch ? codeMatch[1] : voucherMessage)
+    .replace(/[^a-zA-Z0-9]/g, "")
+    .toUpperCase();
+  const voucherStatus = await lookupVoucher(voucherToken, weekId);
+
+  if (!voucherStatus.exists) {
     return NextResponse.json({
       reply: {
         type: "text",
-        body: "You must complete your registration using the link previously sent.",
+        body:
+          "This code is not valid or expired. Please get a Spaza Voucher code to play." +
+          (debugEnabled ? " [debug: voucher_not_found]" : ""),
       },
     });
   }
 
-  if (user[0].state !== "ACTIVE") {
+  const voucher = voucherStatus.voucher;
+  if (!voucherStatus.weekMatch || voucher.isUsed) {
     return NextResponse.json({
       reply: {
         type: "text",
-        body: "Welcome! To begin, reply with: new <SID>",
-      },
-    });
-  }
-
-  const voucherToken = message.toUpperCase();
-  const voucherRows = await db
-    .select({
-      id: vouchers.id,
-      weekId: vouchers.weekId,
-      isUsed: vouchers.isUsed,
-    })
-    .from(vouchers)
-    .where(eq(vouchers.voucherToken, voucherToken))
-    .limit(1);
-
-  if (voucherRows.length === 0) {
-    return NextResponse.json({
-      reply: {
-        type: "text",
-        body: "Sorry, that code is invalid or expired.",
-      },
-    });
-  }
-
-  const voucher = voucherRows[0];
-  if (voucher.isUsed || voucher.weekId !== weekId) {
-    return NextResponse.json({
-      reply: {
-        type: "text",
-        body: "Sorry, that code is invalid or expired.",
+        body:
+          "This code is not valid or expired. Please get a Spaza Voucher code to play." +
+          (debugEnabled
+            ? ` [debug: used=${voucher.isUsed} week_match=${voucherStatus.weekMatch}]`
+            : ""),
       },
     });
   }
 
   const replyBody = await db.transaction(async (tx) => {
-    const updated = await tx
+    await tx
       .update(vouchers)
       .set({
         isUsed: true,
         usedByWaNumber: from,
         usedAt: new Date(),
       })
-      .where(
-        and(
-          eq(vouchers.id, voucher.id),
-          eq(vouchers.isUsed, false),
-          eq(vouchers.weekId, weekId)
-        )
-      )
+      .where(and(eq(vouchers.id, voucher.id), eq(vouchers.weekId, weekId)))
       .returning({ id: vouchers.id });
-
-    if (updated.length === 0) {
-      return "Sorry, that code is invalid or expired.";
-    }
 
     const token = generateToken("pred");
     const expiresAt = getIsoWeekEndUtc(new Date());
