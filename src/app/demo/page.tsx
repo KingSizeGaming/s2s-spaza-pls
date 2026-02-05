@@ -63,11 +63,10 @@ export default function DemoPage() {
   }, []);
 
   useEffect(() => {
-    const readStored = () => {
+    const handleOutbound = (raw: string) => {
+      if (!raw || raw === lastOutboundRef.current) return;
+      lastOutboundRef.current = raw;
       try {
-        const raw = localStorage.getItem("demo:lastOutbound");
-        if (!raw || raw === lastOutboundRef.current) return;
-        lastOutboundRef.current = raw;
         const parsed = JSON.parse(raw) as { message?: string };
         if (parsed?.message) {
           pushInboundMessage(parsed.message);
@@ -77,28 +76,17 @@ export default function DemoPage() {
       }
     };
 
-    readStored();
-    const interval = window.setInterval(readStored, 1500);
-
     let channel: BroadcastChannel | null = null;
     if ("BroadcastChannel" in window) {
       channel = new BroadcastChannel("demo-outbound");
       channel.onmessage = (event) => {
         if (typeof event.data === "string") {
-          try {
-            const parsed = JSON.parse(event.data) as { message?: string };
-            if (parsed?.message) {
-              pushInboundMessage(parsed.message);
-            }
-          } catch {
-            // ignore
-          }
+          handleOutbound(event.data);
         }
       };
     }
 
     return () => {
-      window.clearInterval(interval);
       if (channel) channel.close();
     };
   }, []);

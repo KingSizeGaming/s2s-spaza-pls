@@ -53,14 +53,13 @@ export default function RegistrationForm({ token }: { token: string }) {
             message: data.outboundMessage,
             ts: Date.now(),
           });
-          localStorage.setItem("demo:lastOutbound", payload);
           if ("BroadcastChannel" in window) {
             const channel = new BroadcastChannel("demo-outbound");
             channel.postMessage(payload);
             channel.close();
           }
         } catch {
-          // ignore storage errors
+          // ignore
         }
       }
       setResult(data);
