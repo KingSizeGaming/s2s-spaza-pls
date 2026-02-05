@@ -9,6 +9,7 @@ export async function GET(request: NextRequest) {
   const weekId = searchParams.get("weekId") || getCurrentWeekId();
   const token = searchParams.get("token");
 
+  let viewerLeaderboardId: string | null = null;
   if (token) {
     const linkRows = await db
       .select({ waNumber: links.waNumber, type: links.type })
@@ -33,22 +34,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "User not found." }, { status: 404 });
     }
 
-    const rows = await db
-      .select({
-        leaderboardId: users.leaderboardId,
-        entryCount: sql<number>`count(${entries.id})`,
-      })
-      .from(entries)
-      .innerJoin(users, eq(entries.waNumber, users.waNumber))
-      .where(
-        and(
-          eq(entries.weekId, weekId),
-          eq(users.leaderboardId, userRows[0].leaderboardId)
-        )
-      )
-      .groupBy(users.leaderboardId);
-
-    return NextResponse.json({ weekId, leaderboards: rows });
+    viewerLeaderboardId = userRows[0].leaderboardId;
   }
 
   const rows = await db
@@ -64,5 +50,20 @@ export async function GET(request: NextRequest) {
     .groupBy(users.leaderboardId)
     .orderBy(users.leaderboardId);
 
-  return NextResponse.json({ weekId, leaderboards: rows });
+  const leaderboards = rows
+    .map((row) => ({
+      ...row,
+      canView: viewerLeaderboardId
+        ? row.leaderboardId === viewerLeaderboardId
+        : false,
+    }))
+    .sort((a, b) => {
+      if (!viewerLeaderboardId) return 0;
+      const aIsViewer = a.leaderboardId === viewerLeaderboardId;
+      const bIsViewer = b.leaderboardId === viewerLeaderboardId;
+      if (aIsViewer === bIsViewer) return 0;
+      return aIsViewer ? -1 : 1;
+    });
+
+  return NextResponse.json({ weekId, leaderboards });
 }

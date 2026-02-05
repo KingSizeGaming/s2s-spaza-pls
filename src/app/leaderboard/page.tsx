@@ -11,6 +11,7 @@ async function getBaseUrl(): Promise<string> {
 type LeaderboardRow = {
   leaderboardId: string | null;
   entryCount: number;
+  canView?: boolean;
 };
 
 type LeaderboardResponse = {
@@ -36,6 +37,7 @@ export default async function LeaderboardPage({
     { cache: "no-store" }
   );
   const data = (await res.json()) as LeaderboardResponse;
+  const hasToken = Boolean(token);
 
   return (
     <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 px-6 py-16">
@@ -65,7 +67,7 @@ export default async function LeaderboardPage({
                     Entries: {row.entryCount}
                   </p>
                 </div>
-                {row.leaderboardId && (
+                {row.leaderboardId && row.canView && hasToken && (
                   <Link
                     className="text-sm font-medium text-zinc-900"
                     href={`/leaderboard/${row.leaderboardId}?weekId=${data.weekId}${
