@@ -2,7 +2,6 @@ import {
   boolean,
   index,
   integer,
-  jsonb,
   pgEnum,
   pgTable,
   text,
@@ -136,7 +135,9 @@ export const entries = pgTable(
     waNumber: text("wa_number").notNull(),
     weekId: text("week_id").notNull(),
     linkToken: text("link_token").notNull(),
-    picks: jsonb("picks").notNull(),
+    correctPicks: integer("correct_picks"),
+    points: integer("points").notNull().default(0),
+    scoredAt: timestamp("scored_at", { withTimezone: true }),
     submittedAt: timestamp("submitted_at", { withTimezone: true }).notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
@@ -151,6 +152,7 @@ export const entries = pgTable(
     waWeekIdx: index("entries_wa_week_idx").on(table.waNumber, table.weekId),
     linkTokenIdx: index("entries_link_token_idx").on(table.linkToken),
     submittedAtIdx: index("entries_submitted_at_idx").on(table.submittedAt),
+    pointsIdx: index("entries_points_idx").on(table.points),
   })
 );
 
@@ -175,6 +177,32 @@ export const matches = pgTable(
   (table) => ({
     weekIdIdx: index("matches_week_id_idx").on(table.weekId),
     kickoffAtIdx: index("matches_kickoff_at_idx").on(table.kickoffAt),
+  })
+);
+
+export const entryPicks = pgTable(
+  "entry_picks",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    entryId: uuid("entry_id")
+      .notNull()
+      .references(() => entries.id),
+    matchId: uuid("match_id")
+      .notNull()
+      .references(() => matches.id),
+    pick: text("pick").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => ({
+    entryMatchUnique: uniqueIndex("entry_picks_entry_match_uq").on(
+      table.entryId,
+      table.matchId
+    ),
+    entryIdIdx: index("entry_picks_entry_id_idx").on(table.entryId),
+    matchIdIdx: index("entry_picks_match_id_idx").on(table.matchId),
+    pickIdx: index("entry_picks_pick_idx").on(table.pick),
   })
 );
 

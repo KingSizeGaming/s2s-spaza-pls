@@ -11,6 +11,7 @@ async function getBaseUrl(): Promise<string> {
 type LeaderboardRow = {
   leaderboardId: string | null;
   entryCount: number;
+  totalPoints: number;
   canView?: boolean;
 };
 

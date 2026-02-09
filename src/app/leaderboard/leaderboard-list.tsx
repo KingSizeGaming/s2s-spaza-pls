@@ -6,6 +6,7 @@ import { useState } from "react";
 type LeaderboardRow = {
   leaderboardId: string | null;
   entryCount: number;
+  totalPoints: number;
   canView?: boolean;
 };
 
@@ -47,7 +48,7 @@ export default function LeaderboardList({
                   className="h-10 w-16 object-contain"
                 />
                 <span className="absolute inset-0 flex items-center justify-center text-sm font-bold">
-                  0ps
+                  {row.totalPoints}ps
                 </span>
               </div>
             </div>

@@ -1,12 +1,39 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { db } from "@/db";
-import { entries, links, matches, prizeDraws, spazaSids, users, vouchers } from "@/db/schema";
+import {
+  entries,
+  entryPicks,
+  links,
+  matches,
+  prizeDraws,
+  spazaSids,
+  users,
+  vouchers,
+} from "@/db/schema";
 import { getCurrentWeekId } from "@/lib/week";
 
-export async function POST(request: NextRequest) {
-  const weekId = getCurrentWeekId();
+function getIsoWeekYearAndWeek(date: Date): { year: number; week: number } {
+  const utcDate = new Date(
+    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
+  );
+  const day = utcDate.getUTCDay() || 7;
+  utcDate.setUTCDate(utcDate.getUTCDate() + 4 - day);
+  const yearStart = new Date(Date.UTC(utcDate.getUTCFullYear(), 0, 1));
+  const week = Math.ceil(((+utcDate - +yearStart) / 86400000 + 1) / 7);
+  return { year: utcDate.getUTCFullYear(), week };
+}
+
+function getRealCurrentWeekId(date: Date = new Date()): string {
+  const { year, week } = getIsoWeekYearAndWeek(date);
+  return `${year}-W${String(week).padStart(2, "0")}`;
+}
+
+export async function POST() {
+  const weekId = getRealCurrentWeekId();
+  const configuredWeekId = getCurrentWeekId();
 
   const deletedPrizeDraws = await db.delete(prizeDraws).returning({ id: prizeDraws.id });
+  const deletedEntryPicks = await db.delete(entryPicks).returning({ id: entryPicks.id });
   const deletedMatches = await db.delete(matches).returning({ id: matches.id });
   const deletedEntries = await db.delete(entries).returning({ id: entries.id });
   const deletedLinks = await db.delete(links).returning({ id: links.id });
@@ -44,8 +71,10 @@ export async function POST(request: NextRequest) {
   return NextResponse.json({
     ok: true,
     weekId,
+    configuredWeekId,
     cleared: {
       entries: deletedEntries.length,
+      entryPicks: deletedEntryPicks.length,
       matches: deletedMatches.length,
       prizeDraws: deletedPrizeDraws.length,
       links: deletedLinks.length,

@@ -1,18 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { and, eq, sql } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { entries, links, users } from "@/db/schema";
 import { getCurrentWeekId } from "@/lib/week";
-
-function summarizePicks(picks: unknown): string {
-  if (Array.isArray(picks)) {
-    return picks.join(",");
-  }
-  if (picks && typeof picks === "object") {
-    return JSON.stringify(picks);
-  }
-  return String(picks ?? "");
-}
 
 export async function GET(
   request: NextRequest,
@@ -65,9 +55,9 @@ export async function GET(
 
   const rows = await db
     .select({
-      submittedAt: entries.submittedAt,
-      picks: entries.picks,
       weekId: entries.weekId,
+      entriesCount: sql<number>`count(${entries.id})::int`,
+      latestSubmittedAt: sql<Date>`max(${entries.submittedAt})`,
     })
     .from(entries)
     .innerJoin(users, eq(entries.waNumber, users.waNumber))
@@ -77,17 +67,16 @@ export async function GET(
         weekId ? eq(entries.weekId, weekId) : sql`true`
       )
     )
-    .orderBy(sql`${entries.submittedAt} desc`);
-
-  const entriesWithSummary = rows.map((row) => ({
-    submittedAt: row.submittedAt,
-    picks: row.picks,
-    summary: summarizePicks(row.picks),
-  }));
+    .groupBy(entries.weekId)
+    .orderBy(desc(sql`max(${entries.submittedAt})`));
 
   return NextResponse.json({
     weekId: weekId ?? getCurrentWeekId(),
     leaderboardId: normalizedLeaderboardId,
-    entries: entriesWithSummary,
+    weeks: rows.map((row) => ({
+      weekId: row.weekId,
+      entriesCount: row.entriesCount,
+      latestSubmittedAt: row.latestSubmittedAt,
+    })),
   });
 }

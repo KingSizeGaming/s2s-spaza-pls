@@ -4,19 +4,39 @@ import { db } from "@/db";
 import { entries, matches, prizeDraws } from "@/db/schema";
 import { getCurrentWeekId } from "@/lib/week";
 
-function shuffle<T>(input: T[]): T[] {
-  const arr = [...input];
-  for (let i = arr.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
+type Candidate = {
+  waNumber: string;
+  tickets: number;
+};
+
+function pickWeightedWinnerIndex(candidates: Candidate[]): number {
+  const totalTickets = candidates.reduce((sum, row) => sum + row.tickets, 0);
+  let randomTicket = Math.floor(Math.random() * totalTickets) + 1;
+  for (let i = 0; i < candidates.length; i += 1) {
+    randomTicket -= candidates[i].tickets;
+    if (randomTicket <= 0) return i;
   }
-  return arr;
+  return candidates.length - 1;
+}
+
+function drawWeightedUnique(candidates: Candidate[], winnerCount: number): Candidate[] {
+  const pool = candidates.filter((row) => row.tickets > 0);
+  const winners: Candidate[] = [];
+  while (pool.length > 0 && winners.length < winnerCount) {
+    const winnerIndex = pickWeightedWinnerIndex(pool);
+    winners.push(pool[winnerIndex]);
+    pool.splice(winnerIndex, 1);
+  }
+  return winners;
 }
 
 export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => null);
   const weekId = String(body?.weekId ?? "").trim() || getCurrentWeekId();
-  const requiredCorrect = Math.max(1, Number(body?.requiredCorrect ?? 1));
+  const minPoints = Math.max(
+    1,
+    Number(body?.minPoints ?? body?.requiredCorrect ?? 1)
+  );
   const prizeCodes = Array.isArray(body?.prizeCodes)
     ? body.prizeCodes.map((code: string) => String(code).trim()).filter(Boolean)
     : [];
@@ -45,16 +65,10 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const results = matchRows.map((row) => {
-    if ((row.homeScore ?? 0) > (row.awayScore ?? 0)) return "H";
-    if ((row.homeScore ?? 0) < (row.awayScore ?? 0)) return "A";
-    return "D";
-  });
-
   const candidates = await db
     .select({
       waNumber: entries.waNumber,
-      picks: entries.picks,
+      points: entries.points,
     })
     .from(entries)
     .where(eq(entries.weekId, weekId))
@@ -67,47 +81,46 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const bestByWa = new Map<string, number>();
+  const ticketsByWa = new Map<string, number>();
   for (const row of candidates) {
-    const picks = Array.isArray(row.picks) ? row.picks : [];
-    if (picks.length !== results.length) continue;
-    let correct = 0;
-    for (let i = 0; i < results.length; i += 1) {
-      if (picks[i] === results[i]) correct += 1;
-    }
-    const prev = bestByWa.get(row.waNumber) ?? 0;
-    if (correct > prev) bestByWa.set(row.waNumber, correct);
+    const entryPoints = Math.max(0, row.points ?? 0);
+    const prev = ticketsByWa.get(row.waNumber) ?? 0;
+    ticketsByWa.set(row.waNumber, prev + entryPoints);
   }
 
-  const eligible = Array.from(bestByWa.entries())
-    .filter(([, correct]) => correct >= requiredCorrect)
-    .map(([waNumber]) => waNumber);
+  const eligible = Array.from(ticketsByWa.entries())
+    .map(([waNumber, tickets]) => ({ waNumber, tickets }))
+    .filter((row) => row.tickets >= minPoints);
 
   if (eligible.length === 0) {
     return NextResponse.json(
-      { ok: false, error: "No winners met the required correct picks." },
+      { ok: false, error: "No players met the minimum ticket threshold." },
       { status: 404 }
     );
   }
 
-  if (prizeCodes.length < eligible.length) {
-    return NextResponse.json(
-      { ok: false, error: "Not enough prize codes for the winners." },
-      { status: 400 }
-    );
+  if (prizeCodes.length === 0) {
+    return NextResponse.json({ ok: false, error: "No prize codes provided." }, { status: 400 });
   }
 
-  const shuffled = shuffle(eligible);
-  const winners = shuffled.slice(0, Math.min(prizeCodes.length, shuffled.length));
+  const winners = drawWeightedUnique(
+    eligible,
+    Math.min(prizeCodes.length, eligible.length)
+  );
 
-  const notifications = winners.map((waNumber, index) => {
+  const notifications = winners.map((winner, index) => {
     const codePrize = prizeCodes[index];
     const message = [
       "Congratulations you've won on your picks this week.",
       "Please go to your home spaza to claim your prize.",
       codePrize,
     ].join("\n");
-    return { waNumber, codePrize, message };
+    return {
+      waNumber: winner.waNumber,
+      tickets: winner.tickets,
+      codePrize,
+      message,
+    };
   });
 
   await db.insert(prizeDraws).values(
@@ -122,7 +135,7 @@ export async function POST(request: NextRequest) {
   return NextResponse.json({
     ok: true,
     weekId,
-    requiredCorrect,
+    minPoints,
     totalEligible: eligible.length,
     winners: notifications,
   });

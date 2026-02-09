@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { and, eq } from "drizzle-orm";
+import { asc, eq, inArray } from "drizzle-orm";
 import { db } from "@/db";
-import { matches } from "@/db/schema";
+import { entries, entryPicks, matches } from "@/db/schema";
+import {
+  countCorrectPicks,
+  outcomeFromScores,
+  pointsForCorrectPicks,
+} from "@/lib/scoring";
+import type { Pick } from "@/lib/scoring";
 
 type ScoreInput = {
   id: string;
@@ -59,5 +65,88 @@ export async function POST(request: NextRequest) {
     updated.push(row.id);
   }
 
-  return NextResponse.json({ ok: true, updated: updated.length });
+  const updatedMatchRows = await db
+    .select({ id: matches.id, weekId: matches.weekId })
+    .from(matches)
+    .where(inArray(matches.id, updated));
+
+  const affectedWeekIds = Array.from(
+    new Set(updatedMatchRows.map((row) => row.weekId))
+  );
+
+  const scoredWeeks: string[] = [];
+  const pendingWeeks: string[] = [];
+
+  for (const weekId of affectedWeekIds) {
+    const weekMatches = await db
+      .select({
+        id: matches.id,
+        homeScore: matches.homeScore,
+        awayScore: matches.awayScore,
+      })
+      .from(matches)
+      .where(eq(matches.weekId, weekId))
+      .orderBy(asc(matches.kickoffAt));
+
+    if (weekMatches.length === 0) continue;
+
+    const matchOutcomes = new Map<string, Pick>();
+    for (const row of weekMatches) {
+      const outcome = outcomeFromScores(row.homeScore, row.awayScore);
+      if (!outcome) continue;
+      matchOutcomes.set(row.id, outcome);
+    }
+
+    if (matchOutcomes.size !== weekMatches.length) {
+      pendingWeeks.push(weekId);
+    }
+
+    const weekEntries = await db
+      .select({ id: entries.id })
+      .from(entries)
+      .where(eq(entries.weekId, weekId));
+
+    const now = new Date();
+    for (const entry of weekEntries) {
+      const picksRows = await db
+        .select({
+          pick: entryPicks.pick,
+          matchId: entryPicks.matchId,
+        })
+        .from(entryPicks)
+        .where(eq(entryPicks.entryId, entry.id));
+
+      const picks: Pick[] = [];
+      const outcomes: Pick[] = [];
+      for (const row of picksRows) {
+        const outcome = matchOutcomes.get(row.matchId);
+        if (!outcome) continue;
+        if (row.pick === "H" || row.pick === "D" || row.pick === "A") {
+          picks.push(row.pick);
+          outcomes.push(outcome);
+        }
+      }
+
+      const correctPicks =
+        picks.length > 0 ? countCorrectPicks(picks, outcomes) : 0;
+      const points = pointsForCorrectPicks(correctPicks);
+      await db
+        .update(entries)
+        .set({
+          correctPicks,
+          points,
+          scoredAt: matchOutcomes.size > 0 ? now : null,
+        })
+        .where(eq(entries.id, entry.id));
+    }
+    scoredWeeks.push(weekId);
+  }
+
+  return NextResponse.json({
+    ok: true,
+    updated: updated.length,
+    affectedWeeks: affectedWeekIds,
+    scoredWeeks,
+    pendingWeeks,
+  });
 }

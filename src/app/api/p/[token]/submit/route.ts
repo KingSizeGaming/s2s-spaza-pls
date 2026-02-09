@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { and, eq, sql } from "drizzle-orm";
+import { and, asc, desc, eq, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { entries, links, matches, users } from "@/db/schema";
+import { entries, entryPicks, links, matches, users } from "@/db/schema";
+import type { Pick } from "@/lib/scoring";
 import { getCurrentWeekId } from "@/lib/week";
 
 export async function POST(
@@ -9,14 +10,21 @@ export async function POST(
   { params }: { params: Promise<{ token: string }> }
 ) {
   const body = await request.json().catch(() => null);
-  const picks = body?.picks;
+  const picksInput = body?.picks as unknown;
 
-  if (picks === undefined) {
+  if (!Array.isArray(picksInput)) {
     return NextResponse.json(
       { error: "Missing picks." },
       { status: 400 }
     );
   }
+  if (!picksInput.every((pick) => pick === "H" || pick === "D" || pick === "A")) {
+    return NextResponse.json(
+      { error: "Invalid picks. Use H, D, or A." },
+      { status: 400 }
+    );
+  }
+  const picks = picksInput as Pick[];
 
   const { token } = await params;
   const now = new Date();
@@ -63,12 +71,35 @@ export async function POST(
   }
 
   const result = await db.transaction(async (tx) => {
-    const matchRows = await tx
+    let effectiveWeekId = linkWeekId;
+    let matchRows = await tx
       .select({ id: matches.id })
       .from(matches)
-      .where(eq(matches.weekId, linkWeekId));
+      .where(eq(matches.weekId, effectiveWeekId))
+      .orderBy(asc(matches.kickoffAt));
 
-    if (matchRows.length > 0 && matchRows.length !== picks.length) {
+    if (matchRows.length === 0) {
+      const latestWeek = await tx
+        .select({ weekId: matches.weekId })
+        .from(matches)
+        .orderBy(desc(matches.kickoffAt))
+        .limit(1);
+
+      if (latestWeek.length > 0) {
+        effectiveWeekId = latestWeek[0].weekId;
+        matchRows = await tx
+          .select({ id: matches.id })
+          .from(matches)
+          .where(eq(matches.weekId, effectiveWeekId))
+          .orderBy(asc(matches.kickoffAt));
+      }
+    }
+
+    if (matchRows.length === 0) {
+      return { error: "No fixtures available for submission yet." } as const;
+    }
+
+    if (matchRows.length !== picks.length) {
       return { error: "Picks do not match this week's fixtures." } as const;
     }
 
@@ -102,15 +133,29 @@ export async function POST(
       return { error: "User is not registered." } as const;
     }
 
+    let entryId: string;
     try {
-      await tx.insert(entries).values({
+      const inserted = await tx
+        .insert(entries)
+        .values({
         waNumber: latest[0].waNumber,
-        weekId: linkWeekId,
+        weekId: effectiveWeekId,
         linkToken: token,
-        picks,
         submittedAt: now,
-      });
-    } catch (error) {
+        })
+        .returning({ id: entries.id });
+      if (inserted.length === 0) {
+        return { error: "Unable to create entry." } as const;
+      }
+      entryId = inserted[0].id;
+      await tx.insert(entryPicks).values(
+        matchRows.map((match, index) => ({
+          entryId,
+          matchId: match.id,
+          pick: picks[index] as Pick,
+        }))
+      );
+    } catch {
       return { error: "Entry already submitted.", status: 409 } as const;
     }
 

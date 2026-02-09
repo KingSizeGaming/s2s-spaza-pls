@@ -11,9 +11,26 @@ function addDays(date: Date, days: number, hours: number, minutes: number) {
   return next;
 }
 
+function getIsoWeekYearAndWeek(date: Date): { year: number; week: number } {
+  const utcDate = new Date(
+    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
+  );
+  const day = utcDate.getUTCDay() || 7;
+  utcDate.setUTCDate(utcDate.getUTCDate() + 4 - day);
+  const yearStart = new Date(Date.UTC(utcDate.getUTCFullYear(), 0, 1));
+  const week = Math.ceil(((+utcDate - +yearStart) / 86400000 + 1) / 7);
+  return { year: utcDate.getUTCFullYear(), week };
+}
+
+function getRealCurrentWeekId(date: Date = new Date()): string {
+  const { year, week } = getIsoWeekYearAndWeek(date);
+  return `${year}-W${String(week).padStart(2, "0")}`;
+}
+
 export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => null);
-  const weekId = String(body?.weekId ?? "").trim() || getCurrentWeekId();
+  const weekId = String(body?.weekId ?? "").trim() || getRealCurrentWeekId();
+  const configuredWeekId = getCurrentWeekId();
 
   const existing = await db
     .select({ id: matches.id })
@@ -54,6 +71,7 @@ export async function POST(request: NextRequest) {
   return NextResponse.json({
     ok: true,
     weekId,
+    configuredWeekId,
     created: inserted.length,
   });
 }

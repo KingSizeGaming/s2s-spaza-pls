@@ -1,5 +1,7 @@
 import { headers } from "next/headers";
 import Link from "next/link";
+import { getCurrentWeekId } from "@/lib/week";
+import WeekList from "./week-list";
 
 async function getBaseUrl(): Promise<string> {
   const headerList = await headers();
@@ -11,7 +13,7 @@ async function getBaseUrl(): Promise<string> {
 type LeaderboardDetailResponse = {
   weekId: string;
   leaderboardId: string;
-  entries: { submittedAt: string; summary: string; weekId?: string }[];
+  weeks: { weekId: string; entriesCount: number; latestSubmittedAt: string }[];
   error?: string;
 };
 
@@ -24,6 +26,7 @@ export default async function LeaderboardDetailPage({
 }) {
   const resolvedParams = await params;
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const currentWeekId = getCurrentWeekId();
   const weekIdQuery = resolvedSearchParams?.weekId;
   const token = resolvedSearchParams?.token;
   const baseUrl = await getBaseUrl();
@@ -80,33 +83,22 @@ export default async function LeaderboardDetailPage({
           <div className="relative z-10 flex h-full flex-col px-5 py-8 text-white">
             <h1 className="text-center text-3xl font-bold">Your Entries</h1>
             <p className="mt-2 text-center text-sm text-white/80">
-              {data.leaderboardId} - Week {data.weekId}
+              {data.leaderboardId}
+            </p>
+            <p className="mt-1 text-center text-xs uppercase tracking-[0.2em] text-amber-100/90">
+              Current Week: {currentWeekId}
             </p>
 
             <div className="mt-5 flex flex-1 flex-col overflow-hidden rounded-3xl bg-[url('/images/leaderboard_bg.png')] bg-cover bg-center px-3 py-5">
-              {data.entries.length === 0 ? (
+              {data.weeks.length === 0 ? (
                 <p className="text-center text-sm text-white/80">No entries found.</p>
               ) : (
-                <ul className="space-y-3 overflow-y-auto pr-1">
-                  {data.entries.map((entry) => (
-                    <li key={`${entry.submittedAt}-${entry.summary}`}>
-                      <div className="relative flex min-h-[64px] flex-col justify-center overflow-hidden rounded-2xl px-5 py-3">
-                        <img
-                          src="/images/player_panel.png"
-                          alt="Entry"
-                          className="absolute inset-0 h-full w-full object-cover"
-                        />
-                        <div className="relative z-10 text-xs text-white/80">
-                          {entry.submittedAt}
-                          {entry.weekId ? ` - ${entry.weekId}` : ""}
-                        </div>
-                        <div className="relative z-10 text-sm font-semibold text-white">
-                          {entry.summary}
-                        </div>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
+                <WeekList
+                  weeks={data.weeks}
+                  currentWeekId={currentWeekId}
+                  leaderboardId={data.leaderboardId}
+                  token={token}
+                />
               )}
             </div>
 

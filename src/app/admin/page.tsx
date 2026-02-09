@@ -81,6 +81,27 @@ export default function AdminPage() {
   const triggerWeekly = async () => {
     setWeeklyBusy(true);
     const data = await callApi("/api/cron/weekly-start");
+    if (data && Array.isArray((data as { broadcasts?: { message?: string }[] }).broadcasts)) {
+      try {
+        if ("BroadcastChannel" in window) {
+          const channel = new BroadcastChannel("demo-outbound");
+          for (const item of (data as { broadcasts: { message?: string }[] }).broadcasts) {
+            if (item?.message) {
+              channel.postMessage(
+                JSON.stringify({
+                  waNumber: (item as { waNumber?: string }).waNumber,
+                  message: item.message,
+                  ts: Date.now(),
+                })
+              );
+            }
+          }
+          channel.close();
+        }
+      } catch {
+        // ignore
+      }
+    }
     if (data) setResponse(data);
     setWeeklyBusy(false);
   };
@@ -144,9 +165,23 @@ export default function AdminPage() {
       .split(/[\n,]+/g)
       .map((code) => code.trim())
       .filter(Boolean);
+    let effectiveWeekId = drawWeekId.trim();
+    if (!effectiveWeekId) {
+      try {
+        const res = await fetch("/api/matches", { cache: "no-store" });
+        const text = await res.text();
+        const data = JSON.parse(text) as { weekId?: string };
+        if (typeof data.weekId === "string" && data.weekId.trim()) {
+          effectiveWeekId = data.weekId.trim();
+          setDrawWeekId(effectiveWeekId);
+        }
+      } catch {
+        // ignore and let backend validate
+      }
+    }
     const data = await callApi("/api/admin/draws", {
-      weekId: drawWeekId || undefined,
-      requiredCorrect: Number(drawCount) || 1,
+      weekId: effectiveWeekId || undefined,
+      minPoints: Number(drawCount) || 1,
       prizeCodes: codes,
     });
     if (data && Array.isArray((data as { winners?: { message?: string }[] }).winners)) {
@@ -156,7 +191,11 @@ export default function AdminPage() {
           for (const winner of (data as { winners: { message?: string }[] }).winners) {
             if (winner?.message) {
               channel.postMessage(
-                JSON.stringify({ message: winner.message, ts: Date.now() })
+                JSON.stringify({
+                  waNumber: (winner as { waNumber?: string }).waNumber,
+                  message: winner.message,
+                  ts: Date.now(),
+                })
               );
             }
           }
@@ -545,7 +584,7 @@ export default function AdminPage() {
               <>
                 <h2 className="text-lg font-semibold text-zinc-900">Weekly Draw</h2>
                 <p className="mt-1 text-sm text-zinc-600">
-                  Draw winners from weekly entries and generate prize messages.
+                  Draw winners using points as tickets (1 point = 1 ticket).
                 </p>
                 <div className="mt-4 grid gap-4">
                   <label className="text-sm text-zinc-700">
@@ -558,7 +597,7 @@ export default function AdminPage() {
                     />
                   </label>
                   <label className="text-sm text-zinc-700">
-                    Winning Picks Needed (N)
+                    Minimum Points (tickets)
                     <input
                       type="number"
                       min={1}

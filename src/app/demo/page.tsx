@@ -4,6 +4,10 @@ import { useEffect, useState } from "react";
 
 const defaultWaNumber = "+27820001111";
 
+function normalizeWaNumber(input: string): string {
+  return input.replace(/[^0-9]/g, "");
+}
+
 function linkify(text: string): { type: "text" | "link"; value: string }[] {
   const urlRegex = /(https?:\/\/[^\s]+)/g;
   const parts: { type: "text" | "link"; value: string }[] = [];
@@ -66,7 +70,15 @@ export default function DemoPage() {
       channel.onmessage = (event) => {
         if (typeof event.data === "string") {
           try {
-            const parsed = JSON.parse(event.data) as { message?: string };
+            const parsed = JSON.parse(event.data) as {
+              message?: string;
+              waNumber?: string;
+            };
+            const payloadWa = normalizeWaNumber(String(parsed?.waNumber ?? ""));
+            const currentWa = normalizeWaNumber(waNumber);
+            if (payloadWa && payloadWa !== currentWa) {
+              return;
+            }
             if (parsed?.message) {
               pushInboundMessage(parsed.message);
             }
@@ -80,7 +92,7 @@ export default function DemoPage() {
     return () => {
       if (channel) channel.close();
     };
-  }, []);
+  }, [waNumber]);
 
   const sendMessage = async (text: string) => {
     if (!text.trim()) return;
