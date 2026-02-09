@@ -1,6 +1,7 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 type CompletionResponse = {
   leaderboardId?: string;
@@ -122,6 +123,7 @@ export default function RegistrationForm({
 
     setSubmitting(true);
     setResult(null);
+    setSuccessCountdown(null);
 
     const res = await fetch(`/api/r/${token}/complete`, {
       method: "POST",
@@ -155,6 +157,9 @@ export default function RegistrationForm({
           // ignore
         }
       }
+      if (data.leaderboardId && data.predictionUrl) {
+        setSuccessCountdown(3);
+      }
       setResult(data);
     }
 
@@ -162,15 +167,15 @@ export default function RegistrationForm({
   };
 
   useEffect(() => {
-    if (result?.leaderboardId && result?.predictionUrl) {
-      setSuccessCountdown(3);
-      const timer = window.setInterval(() => {
-        setSuccessCountdown((prev) => (prev ? prev - 1 : null));
-      }, 1000);
-      return () => window.clearInterval(timer);
+    if (successCountdown === null || successCountdown <= 0) {
+      return;
     }
-    return;
-  }, [result?.leaderboardId, result?.predictionUrl]);
+
+    const timer = window.setInterval(() => {
+      setSuccessCountdown((prev) => (prev ? prev - 1 : null));
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [successCountdown]);
 
   useEffect(() => {
     if (successCountdown === 0) {
@@ -292,12 +297,16 @@ export default function RegistrationForm({
         className="mx-auto flex w-40 items-center justify-center"
         disabled={submitting}
       >
-        <img
+        <Image
           src="/images/submit_button.png"
           alt="Submit"
+          width={160}
+          height={48}
           className="w-full"
         />
       </button>
     </form>
   );
 }
+
+

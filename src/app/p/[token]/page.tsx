@@ -1,4 +1,5 @@
-﻿import { eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
+import Image from "next/image";
 import { db } from "@/db";
 import { links } from "@/db/schema";
 import PredictionForm from "./prediction-form";
@@ -38,7 +39,7 @@ export async function PredictionPage({
   }
 
   const link = rows[0];
-  const expired = link.expiresAt.getTime() < Date.now();
+  const expired = link.expiresAt.getTime() < new Date().getTime();
   if (link.type !== "PREDICTION") {
     return renderError("Wrong Link", "This link is not for predictions.");
   }
@@ -54,9 +55,11 @@ export async function PredictionPage({
     <main className="min-h-screen bg-white">
       <div className="mx-auto flex min-h-screen w-full max-w-[390px] items-center px-4">
         <div className="relative h-[844px] w-full scale-[1.35] overflow-hidden rounded-3xl bg-white">
-          <img
+          <Image
             src="/images/bg_1.png"
             alt="Background"
+            fill
+            sizes="100vw"
             className="absolute inset-0 h-full w-full object-cover opacity-90"
           />
           <div className="relative z-10 flex h-full flex-col gap-4 px-6 py-8">

@@ -1,4 +1,5 @@
 import { headers } from "next/headers";
+import Image from "next/image";
 import Link from "next/link";
 import { getCurrentWeekId } from "@/lib/week";
 import WeekList from "./week-list";
@@ -48,9 +49,11 @@ export default async function LeaderboardDetailPage({
       <main className="min-h-screen bg-white">
         <div className="mx-auto flex min-h-screen w-full max-w-[390px] items-center px-4 py-6">
           <div className="relative h-[844px] w-full scale-[1.35] overflow-hidden rounded-3xl">
-            <img
+            <Image
               src="/images/bg_1.png"
               alt="Background"
+              fill
+              sizes="100vw"
               className="absolute inset-0 h-full w-full object-cover opacity-90"
             />
             <div className="relative z-10 flex h-full flex-col items-center justify-center px-6 text-white">
@@ -75,9 +78,11 @@ export default async function LeaderboardDetailPage({
     <main className="min-h-screen bg-white">
       <div className="mx-auto flex min-h-screen w-full max-w-[390px] items-center px-4 py-6">
         <div className="relative h-[844px] w-full scale-[1.35] overflow-hidden rounded-3xl">
-          <img
+          <Image
             src="/images/bg_1.png"
             alt="Background"
+            fill
+            sizes="100vw"
             className="absolute inset-0 h-full w-full object-cover opacity-90"
           />
           <div className="relative z-10 flex h-full flex-col px-5 py-8 text-white">

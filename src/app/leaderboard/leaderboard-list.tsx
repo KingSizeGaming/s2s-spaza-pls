@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -33,18 +34,22 @@ export default function LeaderboardList({
         {leaderboards.map((row) => {
           const content = (
             <div className="relative flex h-16 items-center justify-between overflow-hidden rounded-2xl px-5 text-white">
-              <img
+              <Image
                 src="/images/player_panel.png"
                 alt="Player"
+                fill
+                sizes="100vw"
                 className="absolute inset-0 h-full w-full object-cover"
               />
               <div className="relative z-10 text-lg font-semibold">
                 {row.leaderboardId ?? "Unknown"}
               </div>
               <div className="relative z-10 flex items-center">
-                <img
+                <Image
                   src="/images/pts_panel.png"
                   alt="Points"
+                  width={64}
+                  height={40}
                   className="h-10 w-16 object-contain"
                 />
                 <span className="absolute inset-0 flex items-center justify-center text-sm font-bold">

@@ -30,12 +30,6 @@ type ReplyPayload = {
   reply: { type: "text"; body: string };
 };
 
-type HealthPayload = {
-  status: "ok" | "error";
-  db: boolean;
-  weekId: string;
-};
-
 type ChatMessage = {
   id: string;
   direction: "out" | "in" | "system";
@@ -45,7 +39,6 @@ type ChatMessage = {
 export default function DemoPage() {
   const [waNumber, setWaNumber] = useState(defaultWaNumber);
   const [message, setMessage] = useState("");
-  const [health, setHealth] = useState<HealthPayload | null>(null);
   const [busy, setBusy] = useState(false);
   const [chat, setChat] = useState<ChatMessage[]>([]);
 
@@ -55,13 +48,6 @@ export default function DemoPage() {
       { id: crypto.randomUUID(), direction: "in", text },
     ]);
   };
-
-  useEffect(() => {
-    fetch("/api/health", { cache: "no-store" })
-      .then((res) => res.json())
-      .then((data: HealthPayload) => setHealth(data))
-      .catch(() => null);
-  }, []);
 
   useEffect(() => {
     let channel: BroadcastChannel | null = null;

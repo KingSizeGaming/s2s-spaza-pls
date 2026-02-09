@@ -1,5 +1,6 @@
-﻿import { eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import localFont from "next/font/local";
+import Image from "next/image";
 import { db } from "@/db";
 import { links } from "@/db/schema";
 import RegistrationForm from "./registration-form";
@@ -47,7 +48,7 @@ export async function RegistrationPage({
 
   const link = rows[0];
   const expiresAt = new Date(link.expiresAt);
-  const expired = expiresAt.getTime() < Date.now();
+  const expired = expiresAt.getTime() < new Date().getTime();
   if (link.type !== "REGISTRATION") {
     return renderError("Wrong Link", "This link is not for registration.");
   }
@@ -63,13 +64,21 @@ export async function RegistrationPage({
     <main className={`min-h-screen bg-white ${hitRoad.className}`}>
       <div className="mx-auto flex min-h-screen w-full max-w-[390px] items-center px-4">
         <div className="relative h-[844px] w-full scale-[1.35] overflow-hidden rounded-3xl bg-white">
-          <img
+          <Image
             src="/images/bg_1.png"
             alt="Background"
+            fill
+            sizes="100vw"
             className="absolute inset-0 h-full w-full object-cover opacity-90"
           />
           <div className="relative z-20 flex flex-1 flex-col gap-10 px-6 py-16">
-            <img src="/images/logo.png" alt="Weekly Soccer Picks" className="w-full" />
+            <Image
+              src="/images/logo.png"
+              alt="Weekly Soccer Picks"
+              width={320}
+              height={120}
+              className="w-full"
+            />
             <RegistrationForm token={token} fontClassName={hitRoad.className} />
           </div>
         </div>

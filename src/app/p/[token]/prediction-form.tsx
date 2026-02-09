@@ -1,5 +1,6 @@
-﻿"use client";
+"use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 
 type SubmitResponse = {
@@ -51,6 +52,7 @@ export default function PredictionForm({ token }: { token: string }) {
     setConfirmOpen(false);
     setSubmitting(true);
     setResult(null);
+    setSuccessCountdown(null);
 
     const res = await fetch(`/api/p/${token}/submit`, {
       method: "POST",
@@ -83,6 +85,9 @@ export default function PredictionForm({ token }: { token: string }) {
           // ignore
         }
       }
+      if (data.leaderboardUrl) {
+        setSuccessCountdown(3);
+      }
       setResult(data);
     }
 
@@ -91,7 +96,6 @@ export default function PredictionForm({ token }: { token: string }) {
 
   useEffect(() => {
     let active = true;
-    setMatchesLoading(true);
     fetch(`/api/matches?token=${encodeURIComponent(token)}`, {
       cache: "no-store",
     })
@@ -119,15 +123,15 @@ export default function PredictionForm({ token }: { token: string }) {
   }, [token]);
 
   useEffect(() => {
-    if (result?.leaderboardUrl) {
-      setSuccessCountdown(3);
-      const timer = window.setInterval(() => {
-        setSuccessCountdown((prev) => (prev ? prev - 1 : null));
-      }, 1000);
-      return () => window.clearInterval(timer);
+    if (successCountdown === null || successCountdown <= 0) {
+      return;
     }
-    return;
-  }, [result?.leaderboardUrl]);
+
+    const timer = window.setInterval(() => {
+      setSuccessCountdown((prev) => (prev ? prev - 1 : null));
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [successCountdown]);
 
   useEffect(() => {
     if (successCountdown === 0) {
@@ -167,9 +171,11 @@ export default function PredictionForm({ token }: { token: string }) {
               key={match.id}
               className="relative overflow-hidden rounded-2xl"
             >
-              <img
+              <Image
                 src="/images/history_player_panel.png"
                 alt="Match panel"
+                fill
+                sizes="100vw"
                 className="absolute inset-0 h-full w-full object-cover"
               />
               <div className="relative z-10 flex items-center justify-between gap-4 px-5 py-4 text-base font-semibold text-amber-100">
@@ -205,9 +211,11 @@ export default function PredictionForm({ token }: { token: string }) {
         className="mt-4 flex w-40 items-center justify-center self-center disabled:opacity-60"
         disabled={submitting || matchesLoading || matches.length === 0}
       >
-        <img
+        <Image
           src="/images/submit_button.png"
           alt="Submit"
+          width={160}
+          height={48}
           className="w-full"
         />
       </button>
@@ -259,7 +267,8 @@ export default function PredictionForm({ token }: { token: string }) {
           <div className="w-full max-w-sm rounded-2xl bg-white p-6 text-zinc-900 shadow-xl">
             <h3 className="text-lg font-semibold">Entry received</h3>
             <p className="mt-2 text-sm">
-              Your entry has been accepted. Please wait for a message to be sent to you.
+              Your entry has been accepted. Please wait for a message to be sent
+              to you.
             </p>
             <p className="mt-3 text-xs text-zinc-500">
               Closing in {successCountdown ?? 3}s

@@ -1,5 +1,3 @@
-import { headers } from "next/headers";
-
 const statusStyles = {
   ok: "border-emerald-200 bg-emerald-50 text-emerald-900",
   error: "border-rose-200 bg-rose-50 text-rose-900",

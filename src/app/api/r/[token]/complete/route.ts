@@ -144,6 +144,19 @@ export async function POST(
       return { error: "Link expired or already used." } as const;
     }
 
+    const duplicateSaIdRows = await tx
+      .select({ waNumber: users.waNumber })
+      .from(users)
+      .where(eq(users.saIdHash, saIdHash))
+      .limit(1);
+
+    if (
+      duplicateSaIdRows.length > 0 &&
+      duplicateSaIdRows[0].waNumber !== link.waNumber
+    ) {
+      return { error: "SA Identity Number already registered." } as const;
+    }
+
     const existsFn = async (candidate: string) => {
       const rows = await tx
         .select({ id: users.id })

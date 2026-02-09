@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { eq, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import { db } from "@/db";
 import { vouchers } from "@/db/schema";
 import { getCurrentWeekId } from "@/lib/week";

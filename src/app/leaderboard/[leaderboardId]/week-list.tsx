@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -32,9 +33,11 @@ export default function WeekList({
               onClick={() => setLoadingWeekId(week.weekId)}
             >
               <div className="relative flex min-h-[64px] flex-col justify-center overflow-hidden rounded-2xl px-5 py-3">
-                <img
+                <Image
                   src="/images/player_panel.png"
                   alt="Week entry"
+                  fill
+                  sizes="100vw"
                   className="absolute inset-0 h-full w-full object-cover"
                 />
                 <div className="relative z-10 text-xs text-white/80">
@@ -70,4 +73,3 @@ export default function WeekList({
     </div>
   );
 }
-
