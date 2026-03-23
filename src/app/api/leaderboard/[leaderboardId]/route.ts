@@ -3,6 +3,7 @@ import { and, desc, eq, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { entries, links, users } from "@/db/schema";
 import { getCurrentWeekId } from "@/lib/week";
+import { normalizeDesiredLeaderboard } from "@/lib/leaderboard";
 
 export async function GET(
   request: NextRequest,
@@ -12,7 +13,7 @@ export async function GET(
   const weekId = searchParams.get("weekId");
   const token = searchParams.get("token");
   const { leaderboardId } = await params;
-  const normalizedLeaderboardId = leaderboardId.toUpperCase();
+  const normalizedLeaderboardId = normalizeDesiredLeaderboard(leaderboardId);
 
   if (!token) {
     return NextResponse.json(

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { and, asc, desc, eq, sql } from "drizzle-orm";
+import { normalizeDesiredLeaderboard } from "@/lib/leaderboard";
 import { db } from "@/db";
 import { entries, entryPicks, links, matches, users } from "@/db/schema";
 
@@ -14,7 +15,7 @@ export async function GET(
   const { searchParams } = new URL(request.url);
   const token = searchParams.get("token");
   const { leaderboardId, weekId } = await params;
-  const normalizedLeaderboardId = leaderboardId.toUpperCase();
+  const normalizedLeaderboardId = normalizeDesiredLeaderboard(leaderboardId);
 
   if (!token) {
     return NextResponse.json({ error: "Missing token." }, { status: 401 });

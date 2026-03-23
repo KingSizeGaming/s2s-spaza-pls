@@ -1,5 +1,7 @@
 import type { NextRequest } from "next/server";
 
+// Resolves the site base URL from a NextRequest object. Used in API route handlers.
+// Prefers NEXT_PUBLIC_SITE_URL; falls back to host + x-forwarded-proto headers.
 export function getBaseUrlFromRequest(request: NextRequest): string {
   const configured = process.env.NEXT_PUBLIC_SITE_URL;
   if (configured && configured.trim().length > 0) {
@@ -10,6 +12,8 @@ export function getBaseUrlFromRequest(request: NextRequest): string {
   return `${proto}://${host}`;
 }
 
+// Resolves the site base URL using next/headers. Used in server components.
+// Prefers NEXT_PUBLIC_SITE_URL; falls back to host + x-forwarded-proto headers.
 export async function getBaseUrl(): Promise<string> {
   const configured = process.env.NEXT_PUBLIC_SITE_URL;
   if (configured && configured.trim().length > 0) {

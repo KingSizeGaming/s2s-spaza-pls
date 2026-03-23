@@ -1,5 +1,4 @@
-import { createHash } from "crypto";
-
+// Extracts the birth date from a 13-digit SA ID number. Returns null if the number is invalid.
 export function parseSaIdBirthDate(idNumber: string): Date | null {
   if (!/^[0-9]{13}$/.test(idNumber)) return null;
   const yy = Number(idNumber.slice(0, 2));
@@ -22,6 +21,7 @@ export function parseSaIdBirthDate(idNumber: string): Date | null {
   return date;
 }
 
+// Checks whether a birth date meets a minimum age requirement relative to now (or a given date).
 export function isAtLeastAge(birthDate: Date, minAge: number, now = new Date()): boolean {
   const cutoff = new Date(
     now.getFullYear() - minAge,
@@ -29,10 +29,4 @@ export function isAtLeastAge(birthDate: Date, minAge: number, now = new Date()):
     now.getDate()
   );
   return birthDate <= cutoff;
-}
-
-export function hashSaId(idNumber: string): string | null {
-  const salt = process.env.SA_ID_HASH_SALT;
-  if (!salt) return null;
-  return createHash("sha256").update(`${salt}:${idNumber}`).digest("hex");
 }

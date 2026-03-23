@@ -6,7 +6,8 @@ import { generateUniqueLeaderboardId } from "@/lib/leaderboard";
 import { generateToken } from "@/lib/tokens";
 import { getCurrentWeekId, getIsoWeekEndUtc } from "@/lib/week";
 import { getBaseUrlFromRequest } from "@/lib/url";
-import { parseSaIdBirthDate, isAtLeastAge, hashSaId } from "@/lib/sa-id";
+import { parseSaIdBirthDate, isAtLeastAge } from "@/lib/sa-id";
+import { hashSaId } from "@/lib/sa-id-server";
 
 export async function POST(
   request: NextRequest,

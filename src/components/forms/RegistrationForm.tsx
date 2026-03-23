@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { parseSaIdBirthDate, isAtLeastAge } from "@/lib/sa-id";
 
 type CompletionResponse = {
   leaderboardId?: string;
@@ -38,47 +39,38 @@ export default function RegistrationForm({
   const [modalMessage, setModalMessage] = useState<string | null>(null);
   const [successCountdown, setSuccessCountdown] = useState<number | null>(null);
 
-  const onChange = (field: keyof FormState) => (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    setForm((prev) => {
-      switch (field) {
-        case "firstName":
-        case "lastName": {
-          const cleaned = value.replace(/[^a-zA-Z\s]/g, "");
-          const normalized = cleaned.replace(/\s+/g, " ").trimStart();
-          return { ...prev, [field]: normalized };
+  const onChange =
+    (field: keyof FormState) => (event: React.ChangeEvent<HTMLInputElement>) => {
+      const value = event.target.value;
+      setForm((prev) => {
+        switch (field) {
+          case "firstName":
+          case "lastName": {
+            const cleaned = value.replace(/[^a-zA-Z\s]/g, "");
+            return { ...prev, [field]: cleaned.replace(/\s+/g, " ").trimStart() };
+          }
+          case "idNumber":
+            return { ...prev, idNumber: value.replace(/[^0-9]/g, "").slice(0, 13) };
+          case "desiredLeaderboardName":
+            return {
+              ...prev,
+              desiredLeaderboardName: value.replace(/[^a-zA-Z]/g, "").toUpperCase().slice(0, 3),
+            };
+          default:
+            return { ...prev, [field]: value };
         }
-        case "idNumber":
-          return { ...prev, idNumber: value.replace(/[^0-9]/g, "").slice(0, 13) };
-        case "desiredLeaderboardName":
-          return {
-            ...prev,
-            desiredLeaderboardName: value
-              .replace(/[^a-zA-Z]/g, "")
-              .toUpperCase()
-              .slice(0, 3),
-          };
-        default:
-          return { ...prev, [field]: value };
-      }
-    });
-  };
+      });
+    };
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
     setValidationError(null);
     setModalMessage(null);
 
-    if (
-      !form.firstName ||
-      !form.lastName ||
-      !form.idNumber ||
-      !form.desiredLeaderboardName
-    ) {
+    if (!form.firstName || !form.lastName || !form.idNumber || !form.desiredLeaderboardName) {
       setModalMessage("All fields must be fulfilled.");
       return;
     }
-
     if (!/^[A-Za-z]+( [A-Za-z]+)*$/.test(form.firstName.trim())) {
       setValidationError("First Name must contain letters only.");
       return;
@@ -92,27 +84,12 @@ export default function RegistrationForm({
       return;
     }
 
-    const yy = Number(form.idNumber.slice(0, 2));
-    const mm = Number(form.idNumber.slice(2, 4));
-    const dd = Number(form.idNumber.slice(4, 6));
-    const now = new Date();
-    const currentYY = now.getFullYear() % 100;
-    const year = yy <= currentYY ? 2000 + yy : 1900 + yy;
-    const birthDate = new Date(year, mm - 1, dd);
-    if (
-      birthDate.getFullYear() !== year ||
-      birthDate.getMonth() !== mm - 1 ||
-      birthDate.getDate() !== dd
-    ) {
+    const birthDate = parseSaIdBirthDate(form.idNumber);
+    if (!birthDate) {
       setModalMessage("SA Identity Number is invalid.");
       return;
     }
-    const cutoff = new Date(
-      now.getFullYear() - 18,
-      now.getMonth(),
-      now.getDate()
-    );
-    if (birthDate > cutoff) {
+    if (!isAtLeastAge(birthDate, 18)) {
       setModalMessage("You must be at least 18 years old to register.");
       return;
     }
@@ -144,10 +121,7 @@ export default function RegistrationForm({
     } else {
       if (data.outboundMessage) {
         try {
-          const payload = JSON.stringify({
-            message: data.outboundMessage,
-            ts: Date.now(),
-          });
+          const payload = JSON.stringify({ message: data.outboundMessage, ts: Date.now() });
           if ("BroadcastChannel" in window) {
             const channel = new BroadcastChannel("demo-outbound");
             channel.postMessage(payload);
@@ -157,9 +131,7 @@ export default function RegistrationForm({
           // ignore
         }
       }
-      if (data.leaderboardId && data.predictionUrl) {
-        setSuccessCountdown(3);
-      }
+      if (data.leaderboardId && data.predictionUrl) setSuccessCountdown(3);
       setResult(data);
     }
 
@@ -167,10 +139,7 @@ export default function RegistrationForm({
   };
 
   useEffect(() => {
-    if (successCountdown === null || successCountdown <= 0) {
-      return;
-    }
-
+    if (successCountdown === null || successCountdown <= 0) return;
     const timer = window.setInterval(() => {
       setSuccessCountdown((prev) => (prev ? prev - 1 : null));
     }, 1000);
@@ -178,69 +147,36 @@ export default function RegistrationForm({
   }, [successCountdown]);
 
   useEffect(() => {
-    if (successCountdown === 0) {
-      window.close();
-    }
+    if (successCountdown === 0) window.close();
   }, [successCountdown]);
 
   const fieldBg = "bg-[url('/images/reg_info_panel.png')]";
 
   return (
     <form onSubmit={submit} className={`space-y-4 ${fontClassName}`}>
-      <label className={`flex flex-col gap-2 text-sm text-white ${fontClassName}`}>
-        First Name
-        <div className={`rounded-full ${fieldBg} bg-cover bg-center p-[3px]`}>
-          <input
-            className={`w-full rounded-full bg-black/40 px-4 py-2 text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-emerald-300 ${fontClassName}`}
-            value={form.firstName}
-            onChange={onChange("firstName")}
-            inputMode="text"
-            pattern="[A-Za-z ]+"
-            required
-          />
-        </div>
-      </label>
-      <label className={`flex flex-col gap-2 text-sm text-white ${fontClassName}`}>
-        Last Name
-        <div className={`rounded-full ${fieldBg} bg-cover bg-center p-[3px]`}>
-          <input
-            className={`w-full rounded-full bg-black/40 px-4 py-2 text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-emerald-300 ${fontClassName}`}
-            value={form.lastName}
-            onChange={onChange("lastName")}
-            inputMode="text"
-            pattern="[A-Za-z ]+"
-            required
-          />
-        </div>
-      </label>
-      <label className={`flex flex-col gap-2 text-sm text-white ${fontClassName}`}>
-        SA Identity Number
-        <div className={`rounded-full ${fieldBg} bg-cover bg-center p-[3px]`}>
-          <input
-            className={`w-full rounded-full bg-black/40 px-4 py-2 text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-emerald-300 ${fontClassName}`}
-            value={form.idNumber}
-            onChange={onChange("idNumber")}
-            inputMode="numeric"
-            pattern="[0-9]{13}"
-            maxLength={13}
-            required
-          />
-        </div>
-      </label>
-      <label className={`flex flex-col gap-2 text-sm text-white ${fontClassName}`}>
-        Leaderboard ID
-        <div className={`rounded-full ${fieldBg} bg-cover bg-center p-[3px]`}>
-          <input
-            className={`w-full rounded-full bg-black/40 px-4 py-2 text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-emerald-300 ${fontClassName}`}
-            value={form.desiredLeaderboardName}
-            onChange={onChange("desiredLeaderboardName")}
-            inputMode="text"
-            pattern="[A-Z]{3}"
-            maxLength={3}
-            required
-          />
-        </div>
-      </label>
+      {(["firstName", "lastName", "idNumber", "desiredLeaderboardName"] as const).map((field) => (
+        <label key={field} className={`flex flex-col gap-2 text-sm text-white ${fontClassName}`}>
+          {field === "firstName" ? "First Name"
+            : field === "lastName" ? "Last Name"
+            : field === "idNumber" ? "SA Identity Number"
+            : "Leaderboard ID"}
+          <div className={`rounded-full ${fieldBg} bg-cover bg-center p-[3px]`}>
+            <input
+              className={`w-full rounded-full bg-black/40 px-4 py-2 text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-emerald-300 ${fontClassName}`}
+              value={form[field]}
+              onChange={onChange(field)}
+              inputMode={field === "idNumber" ? "numeric" : "text"}
+              pattern={
+                field === "idNumber" ? "[0-9]{13}"
+                : field === "desiredLeaderboardName" ? "[A-Z]{3}"
+                : "[A-Za-z ]+"
+              }
+              maxLength={field === "idNumber" ? 13 : field === "desiredLeaderboardName" ? 3 : undefined}
+              required
+            />
+          </div>
+        </label>
+      ))}
 
       {result?.error && (
         <p className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-900">
@@ -276,9 +212,7 @@ export default function RegistrationForm({
             <p className="mt-2 text-sm">
               Registration complete please wait for a message to be sent to you.
             </p>
-            <p className="mt-3 text-xs text-zinc-500">
-              Closing in {successCountdown ?? 3}s
-            </p>
+            <p className="mt-3 text-xs text-zinc-500">Closing in {successCountdown ?? 3}s</p>
           </div>
         </div>
       )}
@@ -297,16 +231,8 @@ export default function RegistrationForm({
         className="mx-auto flex w-40 items-center justify-center"
         disabled={submitting}
       >
-        <Image
-          src="/images/submit_button.png"
-          alt="Submit"
-          width={160}
-          height={48}
-          className="w-full"
-        />
+        <Image src="/images/submit_button.png" alt="Submit" width={160} height={48} className="w-full" />
       </button>
     </form>
   );
 }
-
-

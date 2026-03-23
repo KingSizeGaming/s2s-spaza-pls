@@ -3,7 +3,7 @@ import Image from "next/image";
 import { db } from "@/db";
 import { links } from "@/db/schema";
 import ErrorCard from "@/components/ErrorCard";
-import PredictionForm from "@/app/p/[token]/prediction-form";
+import PredictionForm from "@/components/forms/PredictionForm";
 
 export async function PredictionPage({
   params,

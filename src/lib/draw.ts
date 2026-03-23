@@ -3,6 +3,7 @@ export type DrawCandidate = {
   tickets: number;
 };
 
+// Picks one index from the candidates array, weighted by each candidate's ticket count.
 export function pickWeightedWinnerIndex(candidates: DrawCandidate[]): number {
   const totalTickets = candidates.reduce((sum, row) => sum + row.tickets, 0);
   let randomTicket = Math.floor(Math.random() * totalTickets) + 1;
@@ -13,6 +14,7 @@ export function pickWeightedWinnerIndex(candidates: DrawCandidate[]): number {
   return candidates.length - 1;
 }
 
+// Picks N unique winners from the candidate pool without replacement, weighted by ticket count.
 export function drawWeightedUnique(
   candidates: DrawCandidate[],
   winnerCount: number

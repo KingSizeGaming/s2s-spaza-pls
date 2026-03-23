@@ -1,5 +1,5 @@
 import Image from "next/image";
-import LeaderboardList from "@/app/leaderboard/leaderboard-list";
+import LeaderboardList from "@/components/LeaderboardList";
 import { getBaseUrl } from "@/lib/url";
 
 type LeaderboardRow = {

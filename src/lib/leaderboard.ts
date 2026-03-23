@@ -1,8 +1,11 @@
+// Strips non-alphanumeric characters and uppercases a leaderboard name input for consistent storage.
 export function normalizeDesiredLeaderboard(input: string): string {
   if (!input) return "";
   return input.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
 }
 
+// Generates a unique leaderboard ID: 3-letter base from the desired name + 3 random digits.
+// Retries up to 1000 times using the provided existsFn to check for collisions.
 export async function generateUniqueLeaderboardId(
   desired: string,
   existsFn: (id: string) => Promise<boolean>

@@ -11,11 +11,7 @@ type SubmitResponse = {
 };
 
 type Pick = "H" | "D" | "A";
-
-type PicksForm = {
-  picks: Pick[];
-};
-
+type PicksForm = { picks: Pick[] };
 type Match = {
   id: string;
   weekId: string;
@@ -25,9 +21,7 @@ type Match = {
 };
 
 export default function PredictionForm({ token }: { token: string }) {
-  const [form, setForm] = useState<PicksForm>({
-    picks: [],
-  });
+  const [form, setForm] = useState<PicksForm>({ picks: [] });
   const [matches, setMatches] = useState<Match[]>([]);
   const [matchesLoading, setMatchesLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -67,15 +61,13 @@ export default function PredictionForm({ token }: { token: string }) {
     } catch {
       data = { error: rawText || "Something went wrong." };
     }
+
     if (!res.ok) {
       setResult({ error: data.error ?? "Something went wrong." });
     } else {
       if (data.outboundMessage) {
         try {
-          const payload = JSON.stringify({
-            message: data.outboundMessage,
-            ts: Date.now(),
-          });
+          const payload = JSON.stringify({ message: data.outboundMessage, ts: Date.now() });
           if ("BroadcastChannel" in window) {
             const channel = new BroadcastChannel("demo-outbound");
             channel.postMessage(payload);
@@ -85,9 +77,7 @@ export default function PredictionForm({ token }: { token: string }) {
           // ignore
         }
       }
-      if (data.leaderboardUrl) {
-        setSuccessCountdown(3);
-      }
+      if (data.leaderboardUrl) setSuccessCountdown(3);
       setResult(data);
     }
 
@@ -96,17 +86,13 @@ export default function PredictionForm({ token }: { token: string }) {
 
   useEffect(() => {
     let active = true;
-    fetch(`/api/matches?token=${encodeURIComponent(token)}`, {
-      cache: "no-store",
-    })
+    fetch(`/api/matches?token=${encodeURIComponent(token)}`, { cache: "no-store" })
       .then((res) => res.json())
       .then((data: { matches?: Match[] }) => {
         if (!active) return;
         const nextMatches = Array.isArray(data?.matches) ? data.matches : [];
         setMatches(nextMatches);
-        setForm({
-          picks: nextMatches.map(() => "H" as Pick),
-        });
+        setForm({ picks: nextMatches.map(() => "H" as Pick) });
       })
       .catch(() => {
         if (!active) return;
@@ -123,10 +109,7 @@ export default function PredictionForm({ token }: { token: string }) {
   }, [token]);
 
   useEffect(() => {
-    if (successCountdown === null || successCountdown <= 0) {
-      return;
-    }
-
+    if (successCountdown === null || successCountdown <= 0) return;
     const timer = window.setInterval(() => {
       setSuccessCountdown((prev) => (prev ? prev - 1 : null));
     }, 1000);
@@ -134,9 +117,7 @@ export default function PredictionForm({ token }: { token: string }) {
   }, [successCountdown]);
 
   useEffect(() => {
-    if (successCountdown === 0) {
-      window.close();
-    }
+    if (successCountdown === 0) window.close();
   }, [successCountdown]);
 
   return (
@@ -161,16 +142,9 @@ export default function PredictionForm({ token }: { token: string }) {
           const kickoff = new Date(match.kickoffAt);
           const kickoffLabel = Number.isNaN(kickoff.getTime())
             ? "TBD"
-            : kickoff.toLocaleString("en-ZA", {
-                weekday: "short",
-                hour: "2-digit",
-                minute: "2-digit",
-              });
+            : kickoff.toLocaleString("en-ZA", { weekday: "short", hour: "2-digit", minute: "2-digit" });
           return (
-            <div
-              key={match.id}
-              className="relative overflow-hidden rounded-2xl"
-            >
+            <div key={match.id} className="relative overflow-hidden rounded-2xl">
               <Image
                 src="/images/history_player_panel.png"
                 alt="Match panel"
@@ -186,9 +160,7 @@ export default function PredictionForm({ token }: { token: string }) {
                 <select
                   className="rounded-full border border-emerald-200/40 bg-black/50 px-3 py-1 text-sm text-white"
                   value={pick}
-                  onChange={(event) =>
-                    updatePick(index, event.target.value as Pick)
-                  }
+                  onChange={(event) => updatePick(index, event.target.value as Pick)}
                 >
                   <option value="H">H</option>
                   <option value="D">D</option>
@@ -211,13 +183,7 @@ export default function PredictionForm({ token }: { token: string }) {
         className="mt-4 flex w-40 items-center justify-center self-center disabled:opacity-60"
         disabled={submitting || matchesLoading || matches.length === 0}
       >
-        <Image
-          src="/images/submit_button.png"
-          alt="Submit"
-          width={160}
-          height={48}
-          className="w-full"
-        />
+        <Image src="/images/submit_button.png" alt="Submit" width={160} height={48} className="w-full" />
       </button>
 
       {submitting && (
@@ -232,12 +198,8 @@ export default function PredictionForm({ token }: { token: string }) {
       {confirmOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
-            <p className="text-sm uppercase tracking-[0.2em] text-zinc-500">
-              Confirm Entry
-            </p>
-            <h3 className="mt-2 text-xl font-semibold text-zinc-900">
-              Submit final picks?
-            </h3>
+            <p className="text-sm uppercase tracking-[0.2em] text-zinc-500">Confirm Entry</p>
+            <h3 className="mt-2 text-xl font-semibold text-zinc-900">Submit final picks?</h3>
             <p className="mt-2 text-sm text-zinc-600">
               Your entry is final and cannot be changed after submission.
             </p>
@@ -267,12 +229,9 @@ export default function PredictionForm({ token }: { token: string }) {
           <div className="w-full max-w-sm rounded-2xl bg-white p-6 text-zinc-900 shadow-xl">
             <h3 className="text-lg font-semibold">Entry received</h3>
             <p className="mt-2 text-sm">
-              Your entry has been accepted. Please wait for a message to be sent
-              to you.
+              Your entry has been accepted. Please wait for a message to be sent to you.
             </p>
-            <p className="mt-3 text-xs text-zinc-500">
-              Closing in {successCountdown ?? 3}s
-            </p>
+            <p className="mt-3 text-xs text-zinc-500">Closing in {successCountdown ?? 3}s</p>
           </div>
         </div>
       )}

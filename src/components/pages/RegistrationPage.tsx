@@ -4,7 +4,7 @@ import Image from "next/image";
 import { db } from "@/db";
 import { links } from "@/db/schema";
 import ErrorCard from "@/components/ErrorCard";
-import RegistrationForm from "@/app/r/[token]/registration-form";
+import RegistrationForm from "@/components/forms/RegistrationForm";
 
 const hitRoad = localFont({
   src: "../../../public/fonts/hit_the_road/hitroad.ttf",

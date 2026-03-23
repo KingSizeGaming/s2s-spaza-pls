@@ -5,10 +5,10 @@ import AdminPage from '@/components/pages/AdminPage';
 import HealthPage from '@/components/pages/HealthPage';
 import LeaderboardPage from '@/components/pages/LeaderboardPage';
 import LeaderboardDetailPage from '@/components/pages/LeaderboardDetailPage';
+import LeaderboardWeekDetailPage from '@/components/pages/LeaderboardWeekDetailPage';
 import PredictionPage from '@/components/pages/PredictionPage';
-import PredictPage from '@/components/pages/PredictPage';
 import RegistrationPage from '@/components/pages/RegistrationPage';
-import RegisterPage from '@/components/pages/RegisterPage';
+import NewRegistrationPage from '@/components/pages/NewRegistrationPage';
 
 export interface SearchParams {
   weekId?: string;
@@ -24,7 +24,8 @@ type ParamsSearchComponent<T extends Record<string, string>> = ComponentType<{
 }>;
 
 type TokenParams = { token: string };
-type LeaderboardParams = { leaderboardId: string; weekId: string };
+type LeaderboardParams = { leaderboardId: string };
+type LeaderboardWeekParams = { leaderboardId: string; weekId: string };
 
 type ComponentUnion =
   | SimpleComponent
@@ -45,6 +46,12 @@ export interface RouteConfig {
   nestedMatcher?: (slug: string[]) => NestedMatchResult;
 }
 
+// Typed leaderboard page components used as JSX elements in the catch-all dispatcher.
+export const LeaderboardDetailComponent = LeaderboardDetailPage as ParamsSearchComponent<LeaderboardParams>;
+export const LeaderboardWeekDetailComponent = LeaderboardWeekDetailPage as ParamsSearchComponent<LeaderboardWeekParams>;
+
+// Maps the first URL slug segment to its page component and routing config.
+// The catch-all page (src/app/[...slug]/page.tsx) reads this to dispatch requests.
 export const routes: Record<string, RouteConfig> = {
   // Root
   '': {
@@ -66,15 +73,16 @@ export const routes: Record<string, RouteConfig> = {
   leaderboard: {
     component: LeaderboardPage as ParamsSearchComponent<Record<string, string>>,
     requiresSearchParams: true,
+    // Matches /leaderboard, /leaderboard/:id, and /leaderboard/:id/week/:weekId
     nestedMatcher: (slug): NestedMatchResult => {
       const [, leaderboardId, third, weekId] = slug;
 
       // /leaderboard/[leaderboardId]/week/[weekId]
-      if (third === 'week' && weekId) {
+      if (leaderboardId && third === 'week' && weekId) {
         return {
           success: true,
           params: { leaderboardId, weekId },
-          component: 'leaderboard-detail',
+          component: 'leaderboard-week',
         };
       }
 
@@ -82,7 +90,7 @@ export const routes: Record<string, RouteConfig> = {
       if (leaderboardId && slug.length === 2) {
         return {
           success: true,
-          params: { leaderboardId, weekId: '' },
+          params: { leaderboardId },
           component: 'leaderboard-detail',
         };
       }
@@ -96,31 +104,27 @@ export const routes: Record<string, RouteConfig> = {
     },
   },
 
-  // Token-based routes
+  // New registration page design preview
+  'new-registration': {
+    component: NewRegistrationPage as SimpleComponent,
+  },
+
+  // Token-based routes — /p/:token and /predict/:token both render PredictionPage
   p: {
     component: PredictionPage as ParamsComponent<{ token: string }>,
     requiresParams: true,
   },
   predict: {
-    component: PredictPage as ParamsComponent<{ token: string }>,
+    component: PredictionPage as ParamsComponent<{ token: string }>,
     requiresParams: true,
   },
+  // /r/:token and /register/:token both render RegistrationPage
   r: {
     component: RegistrationPage as ParamsComponent<{ token: string }>,
     requiresParams: true,
   },
   register: {
-    component: RegisterPage as ParamsComponent<{ token: string }>,
+    component: RegistrationPage as ParamsComponent<{ token: string }>,
     requiresParams: true,
   },
-};
-
-// Special case for leaderboard detail
-export const leaderboardDetailRoute = {
-  component: LeaderboardDetailPage as ParamsSearchComponent<{
-    leaderboardId: string;
-    weekId: string;
-  }>,
-  requiresParams: true,
-  requiresSearchParams: true,
 };
