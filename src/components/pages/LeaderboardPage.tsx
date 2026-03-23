@@ -1,13 +1,6 @@
-import { headers } from "next/headers";
 import Image from "next/image";
-import LeaderboardList from "./leaderboard-list";
-
-async function getBaseUrl(): Promise<string> {
-  const headerList = await headers();
-  const host = headerList.get("host") ?? "localhost:3000";
-  const proto = headerList.get("x-forwarded-proto") ?? "http";
-  return `${proto}://${host}`;
-}
+import LeaderboardList from "@/app/leaderboard/leaderboard-list";
+import { getBaseUrl } from "@/lib/url";
 
 type LeaderboardRow = {
   leaderboardId: string | null;

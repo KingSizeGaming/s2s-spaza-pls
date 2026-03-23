@@ -4,10 +4,10 @@ import Image from "next/image";
 import { db } from "@/db";
 import { links } from "@/db/schema";
 import ErrorCard from "@/components/ErrorCard";
-import RegistrationForm from "./registration-form";
+import RegistrationForm from "@/app/r/[token]/registration-form";
 
 const hitRoad = localFont({
-  src: "../../../../public/fonts/hit_the_road/hitroad.ttf",
+  src: "../../../public/fonts/hit_the_road/hitroad.ttf",
   display: "swap",
 });
 

@@ -3,31 +3,11 @@ import { and, eq, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { links, spazaSids, users, vouchers } from "@/db/schema";
 import { generateToken } from "@/lib/tokens";
-import { getCurrentWeekId } from "@/lib/week";
+import { getCurrentWeekId, getIsoWeekEndUtc } from "@/lib/week";
+import { getBaseUrlFromRequest } from "@/lib/url";
+import { normalizeWaNumber, normalizeMessage } from "@/lib/normalize";
 
 const NEW_SID_REGEX = /^new\s+(\S+)/i;
-
-function normalizeWaNumber(input: string): string {
-  return input.replace(/[^0-9]/g, "");
-}
-
-function normalizeMessage(input: string): string {
-  return input.trim().replace(/\s+/g, " ");
-}
-
-function getBaseUrl(request: NextRequest): string {
-  const host = request.headers.get("host") ?? "localhost:3000";
-  const proto = request.headers.get("x-forwarded-proto") ?? "http";
-  return `${proto}://${host}`;
-}
-
-function getIsoWeekEndUtc(date: Date): Date {
-  const utc = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
-  const day = utc.getUTCDay() || 7;
-  utc.setUTCDate(utc.getUTCDate() + (7 - day));
-  utc.setUTCHours(23, 59, 59, 999);
-  return utc;
-}
 
 async function lookupVoucher(code: string, weekId: string) {
   const rows = await db
@@ -69,7 +49,7 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  const baseUrl = getBaseUrl(request);
+  const baseUrl = getBaseUrlFromRequest(request);
   const weekId = getCurrentWeekId();
 
   const newMatch = message.match(NEW_SID_REGEX);

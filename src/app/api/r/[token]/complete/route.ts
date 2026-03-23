@@ -4,59 +4,9 @@ import { db } from "@/db";
 import { links, users } from "@/db/schema";
 import { generateUniqueLeaderboardId } from "@/lib/leaderboard";
 import { generateToken } from "@/lib/tokens";
-import { getCurrentWeekId } from "@/lib/week";
-import { createHash } from "crypto";
-
-function getBaseUrl(request: NextRequest): string {
-  const host = request.headers.get("host") ?? "localhost:3000";
-  const proto = request.headers.get("x-forwarded-proto") ?? "http";
-  return `${proto}://${host}`;
-}
-
-function getIsoWeekEndUtc(date: Date): Date {
-  const utc = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
-  const day = utc.getUTCDay() || 7;
-  utc.setUTCDate(utc.getUTCDate() + (7 - day));
-  utc.setUTCHours(23, 59, 59, 999);
-  return utc;
-}
-
-function parseSaIdBirthDate(idNumber: string): Date | null {
-  if (!/^[0-9]{13}$/.test(idNumber)) return null;
-  const yy = Number(idNumber.slice(0, 2));
-  const mm = Number(idNumber.slice(2, 4));
-  const dd = Number(idNumber.slice(4, 6));
-  if (Number.isNaN(yy) || Number.isNaN(mm) || Number.isNaN(dd)) return null;
-  if (mm < 1 || mm > 12 || dd < 1 || dd > 31) return null;
-
-  const now = new Date();
-  const currentYY = now.getFullYear() % 100;
-  const year = yy <= currentYY ? 2000 + yy : 1900 + yy;
-  const date = new Date(year, mm - 1, dd);
-  if (
-    date.getFullYear() !== year ||
-    date.getMonth() !== mm - 1 ||
-    date.getDate() !== dd
-  ) {
-    return null;
-  }
-  return date;
-}
-
-function isAtLeastAge(birthDate: Date, minAge: number, now = new Date()): boolean {
-  const cutoff = new Date(
-    now.getFullYear() - minAge,
-    now.getMonth(),
-    now.getDate()
-  );
-  return birthDate <= cutoff;
-}
-
-function hashSaId(idNumber: string): string | null {
-  const salt = process.env.SA_ID_HASH_SALT;
-  if (!salt) return null;
-  return createHash("sha256").update(`${salt}:${idNumber}`).digest("hex");
-}
+import { getCurrentWeekId, getIsoWeekEndUtc } from "@/lib/week";
+import { getBaseUrlFromRequest } from "@/lib/url";
+import { parseSaIdBirthDate, isAtLeastAge, hashSaId } from "@/lib/sa-id";
 
 export async function POST(
   request: NextRequest,
@@ -99,7 +49,7 @@ export async function POST(
 
   const { token } = await params;
   const now = new Date();
-  const baseUrl = getBaseUrl(request);
+  const baseUrl = getBaseUrlFromRequest(request);
 
   const linkRows = await db
     .select({

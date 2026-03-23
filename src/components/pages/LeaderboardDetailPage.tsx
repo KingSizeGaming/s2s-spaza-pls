@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { getCurrentWeekId } from "@/lib/week";
 import { getBaseUrl } from "@/lib/url";
-import WeekList from "./week-list";
+import WeekList from "@/app/leaderboard/[leaderboardId]/week-list";
 
 type LeaderboardDetailResponse = {
   weekId: string;

@@ -1,14 +1,7 @@
-import { headers } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
 import { getCurrentWeekId } from "@/lib/week";
-
-async function getBaseUrl(): Promise<string> {
-  const headerList = await headers();
-  const host = headerList.get("host") ?? "localhost:3000";
-  const proto = headerList.get("x-forwarded-proto") ?? "http";
-  return `${proto}://${host}`;
-}
+import { getBaseUrl } from "@/lib/url";
 
 type WeekDetailResponse = {
   leaderboardId: string;
