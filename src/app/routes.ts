@@ -8,7 +8,6 @@ import LeaderboardDetailPage from '@/components/pages/LeaderboardDetailPage';
 import LeaderboardWeekDetailPage from '@/components/pages/LeaderboardWeekDetailPage';
 import PredictionPage from '@/components/pages/PredictionPage';
 import RegistrationPage from '@/components/pages/RegistrationPage';
-import NewRegistrationPage from '@/components/pages/NewRegistrationPage';
 
 export interface SearchParams {
   weekId?: string;
@@ -102,11 +101,6 @@ export const routes: Record<string, RouteConfig> = {
 
       return { success: false };
     },
-  },
-
-  // New registration page design preview
-  'new-registration': {
-    component: NewRegistrationPage as SimpleComponent,
   },
 
   // Token-based routes — /p/:token and /predict/:token both render PredictionPage

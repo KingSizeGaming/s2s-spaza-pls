@@ -1,9 +1,9 @@
 import { eq } from "drizzle-orm";
-import Image from "next/image";
 import { db } from "@/db";
 import { links } from "@/db/schema";
 import ErrorCard from "@/components/ErrorCard";
 import PredictionForm from "@/components/forms/PredictionForm";
+import Logo from "../ui/Logo";
 
 export async function PredictionPage({
   params,
@@ -42,19 +42,11 @@ export async function PredictionPage({
   }
 
   return (
-    <main className="min-h-screen bg-white">
-      <div className="mx-auto flex min-h-screen w-full max-w-[390px] items-center px-4">
-        <div className="relative h-[844px] w-full scale-[1.35] overflow-hidden rounded-3xl bg-white">
-          <Image
-            src="/images/bg_1.png"
-            alt="Background"
-            fill
-            sizes="100vw"
-            className="absolute inset-0 h-full w-full object-cover opacity-90"
-          />
-          <div className="relative z-10 flex h-full flex-col gap-4 px-6 py-8">
-            <PredictionForm token={token} />
-          </div>
+    <main className="flex justify-center h-screen ">
+      <div className="bg-[#072610] w-full max-w-125 px-2 py-10 flex flex-col items-center gap-8">
+        <Logo />
+        <div className="w-full flex-1 flex flex-col min-h-0">
+          <PredictionForm token={token} />
         </div>
       </div>
     </main>

@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Image from "next/image";
+import { useState, useEffect } from "react";
+import Button from "@/components/ui/Button";
+import FormField from "@/components/ui/FormField";
+import Logo from "@/components/ui/Logo";
 import { parseSaIdBirthDate, isAtLeastAge } from "@/lib/sa-id";
 
 type CompletionResponse = {
@@ -11,59 +13,38 @@ type CompletionResponse = {
   error?: string;
 };
 
-type FormState = {
-  firstName: string;
-  lastName: string;
-  idNumber: string;
-  desiredLeaderboardName: string;
-};
-
-const initialState: FormState = {
-  firstName: "",
-  lastName: "",
-  idNumber: "",
-  desiredLeaderboardName: "",
-};
-
-export default function RegistrationForm({
-  token,
-  fontClassName,
-}: {
-  token: string;
-  fontClassName: string;
-}) {
-  const [form, setForm] = useState<FormState>(initialState);
+export default function NewRegistrationForm({ token }: { token: string }) {
+  const [form, setForm] = useState({
+    firstName: "",
+    lastName: "",
+    idNumber: "",
+    desiredLeaderboardName: "",
+  });
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<CompletionResponse | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
   const [modalMessage, setModalMessage] = useState<string | null>(null);
   const [successCountdown, setSuccessCountdown] = useState<number | null>(null);
 
-  const onChange =
-    (field: keyof FormState) => (event: React.ChangeEvent<HTMLInputElement>) => {
-      const value = event.target.value;
-      setForm((prev) => {
-        switch (field) {
-          case "firstName":
-          case "lastName": {
-            const cleaned = value.replace(/[^a-zA-Z\s]/g, "");
-            return { ...prev, [field]: cleaned.replace(/\s+/g, " ").trimStart() };
-          }
-          case "idNumber":
-            return { ...prev, idNumber: value.replace(/[^0-9]/g, "").slice(0, 13) };
-          case "desiredLeaderboardName":
-            return {
-              ...prev,
-              desiredLeaderboardName: value.replace(/[^a-zA-Z]/g, "").toUpperCase().slice(0, 3),
-            };
-          default:
-            return { ...prev, [field]: value };
-        }
-      });
-    };
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const { name, value } = e.target;
+    setForm((prev) => {
+      switch (name) {
+        case "firstName":
+        case "lastName":
+          return { ...prev, [name]: value.replace(/[^a-zA-Z\s]/g, "").replace(/\s+/g, " ").trimStart() };
+        case "idNumber":
+          return { ...prev, idNumber: value.replace(/[^0-9]/g, "").slice(0, 13) };
+        case "desiredLeaderboardName":
+          return { ...prev, desiredLeaderboardName: value.replace(/[^a-zA-Z]/g, "").toUpperCase().slice(0, 3) };
+        default:
+          return { ...prev, [name]: value };
+      }
+    });
+  }
 
-  const submit = async (event: React.FormEvent) => {
-    event.preventDefault();
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
     setValidationError(null);
     setModalMessage(null);
 
@@ -83,7 +64,6 @@ export default function RegistrationForm({
       setValidationError("SA Identity Number must be exactly 13 digits.");
       return;
     }
-
     const birthDate = parseSaIdBirthDate(form.idNumber);
     if (!birthDate) {
       setModalMessage("SA Identity Number is invalid.");
@@ -136,7 +116,7 @@ export default function RegistrationForm({
     }
 
     setSubmitting(false);
-  };
+  }
 
   useEffect(() => {
     if (successCountdown === null || successCountdown <= 0) return;
@@ -150,89 +130,61 @@ export default function RegistrationForm({
     if (successCountdown === 0) window.close();
   }, [successCountdown]);
 
-  const fieldBg = "bg-[url('/images/reg_info_panel.png')]";
-
   return (
-    <form onSubmit={submit} className={`space-y-4 ${fontClassName}`}>
-      {(["firstName", "lastName", "idNumber", "desiredLeaderboardName"] as const).map((field) => (
-        <label key={field} className={`flex flex-col gap-2 text-sm text-white ${fontClassName}`}>
-          {field === "firstName" ? "First Name"
-            : field === "lastName" ? "Last Name"
-            : field === "idNumber" ? "SA Identity Number"
-            : "Leaderboard ID"}
-          <div className={`rounded-full ${fieldBg} bg-cover bg-center p-[3px]`}>
-            <input
-              className={`w-full rounded-full bg-black/40 px-4 py-2 text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-emerald-300 ${fontClassName}`}
-              value={form[field]}
-              onChange={onChange(field)}
-              inputMode={field === "idNumber" ? "numeric" : "text"}
-              pattern={
-                field === "idNumber" ? "[0-9]{13}"
-                : field === "desiredLeaderboardName" ? "[A-Z]{3}"
-                : "[A-Za-z ]+"
-              }
-              maxLength={field === "idNumber" ? 13 : field === "desiredLeaderboardName" ? 3 : undefined}
-              required
-            />
-          </div>
-        </label>
-      ))}
-
-      {result?.error && (
-        <p className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-900">
-          {result.error}
-        </p>
-      )}
-      {validationError && (
-        <p className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-900">
-          {validationError}
-        </p>
-      )}
-
+    <>
       {modalMessage && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-          <div className="w-full max-w-sm rounded-2xl bg-white p-6 text-zinc-900 shadow-xl">
-            <h3 className="text-lg font-semibold">Missing Information</h3>
-            <p className="mt-2 text-sm">{modalMessage}</p>
-            <button
-              type="button"
-              className="mt-4 rounded-full bg-emerald-700 px-4 py-2 text-sm font-semibold text-white"
-              onClick={() => setModalMessage(null)}
-            >
-              OK
-            </button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="bg-[#072610] border border-white/20 rounded-2xl px-8 py-10 flex flex-col items-center gap-6 max-w-sm w-full mx-4 text-center shadow-2xl">
+            <h2 className="text-white font-extrabold text-2xl tracking-wide">Missing Information</h2>
+            <p className="text-white/80 text-base leading-relaxed">{modalMessage}</p>
+            <Button onClick={() => setModalMessage(null)}>OK</Button>
           </div>
         </div>
       )}
 
       {result?.leaderboardId && result?.predictionUrl && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
-          <div className="w-full max-w-sm rounded-2xl bg-white p-6 text-zinc-900 shadow-xl">
-            <h3 className="text-lg font-semibold">Registration complete</h3>
-            <p className="mt-2 text-sm">
-              Registration complete please wait for a message to be sent to you.
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="bg-[#072610] border border-white/20 rounded-2xl px-8 py-10 flex flex-col items-center gap-6 max-w-sm w-full mx-4 text-center shadow-2xl">
+            <h2 className="text-white font-extrabold text-2xl tracking-wide">Registration Complete</h2>
+            <p className="text-white/80 text-base leading-relaxed">
+              Your registration is complete. Please wait for a message to be sent to you.
             </p>
-            <p className="mt-3 text-xs text-zinc-500">Closing in {successCountdown ?? 3}s</p>
+            <p className="text-white/50 text-sm">Closing in {successCountdown ?? 3}s</p>
           </div>
         </div>
       )}
 
       {submitting && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-          <div className="flex flex-col items-center gap-3 rounded-2xl bg-white/90 p-6 text-zinc-900 shadow-xl">
-            <div className="h-10 w-10 animate-spin rounded-full border-4 border-emerald-200 border-t-emerald-600" />
-            <p className="text-sm font-semibold">Processing...</p>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="flex flex-col items-center gap-3 rounded-2xl bg-[#072610] border border-white/20 p-8 shadow-2xl">
+            <div className="h-10 w-10 animate-spin rounded-full border-4 border-white/20 border-t-white" />
+            <p className="text-white text-sm font-semibold">Processing...</p>
           </div>
         </div>
       )}
 
-      <button
-        type="submit"
-        className="mx-auto flex w-40 items-center justify-center"
-        disabled={submitting}
-      >
-        <Image src="/images/submit_button.png" alt="Submit" width={160} height={48} className="w-full" />
-      </button>
-    </form>
+      <div className="flex justify-center h-screen">
+        <div className="bg-[#072610] w-full max-w-125 px-6 py-10 flex flex-col items-center gap-8 ">
+          <Logo />
+
+          <form onSubmit={handleSubmit} className="w-full py-8 flex flex-col gap-5">
+            <FormField label="First Name" name="firstName" value={form.firstName} onChange={handleChange} autoComplete="given-name" />
+            <FormField label="Last Name" name="lastName" value={form.lastName} onChange={handleChange} autoComplete="family-name" />
+            <FormField label="SA Identity Number" name="idNumber" value={form.idNumber} onChange={handleChange} inputMode="numeric" maxLength={13} />
+            <FormField label="Leaderboard ID" hint="(Maximum 3 Characters eg: ABC)" name="desiredLeaderboardName" value={form.desiredLeaderboardName} onChange={handleChange} maxLength={3} className="uppercase" />
+
+            {(result?.error || validationError) && (
+              <p className="rounded-lg border border-rose-400/50 bg-rose-950/50 px-3 py-2 text-sm text-rose-300">
+                {result?.error ?? validationError}
+              </p>
+            )}
+
+            <Button type="submit" color="green" size="md" className="w-fit mx-auto" disabled={submitting}>
+              Submit
+            </Button>
+          </form>
+        </div>
+      </div>
+    </>
   );
 }
