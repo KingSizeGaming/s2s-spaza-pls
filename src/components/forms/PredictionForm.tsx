@@ -195,7 +195,7 @@ export default function PredictionForm({ token }: { token: string }) {
           />
         )}
 
-        {result?.leaderboardUrl && <EntryReceivedModal />}
+        {result?.leaderboardUrl && <EntryReceivedModal onClose={() => setResult(null)} />}
       </form>
   );
 }
