@@ -32,7 +32,7 @@ export default function WeekList({
               href={`/leaderboard/${leaderboardId}/week/${week.weekId}${token ? `?token=${token}` : ""}`}
               onClick={() => setLoadingWeekId(week.weekId)}
             >
-              <div className="relative flex min-h-[64px] flex-col justify-center overflow-hidden rounded-2xl px-5 py-3">
+              <div className="relative flex min-h-16 flex-col justify-center overflow-hidden rounded-2xl px-5 py-3">
                 <Image
                   src="/images/player_panel.png"
                   alt="Week entry"
