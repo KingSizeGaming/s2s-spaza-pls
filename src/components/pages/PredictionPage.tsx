@@ -42,8 +42,8 @@ export async function PredictionPage({
   }
 
   return (
-    <main className="flex justify-center h-screen ">
-      <div className="bg-[#072610] w-full max-w-125 px-2 py-10 flex flex-col items-center gap-8">
+    <main className="flex justify-center h-screen">
+      <div className="bg-green-dark w-full max-w-125 px-2 py-10 flex flex-col items-center gap-8">
         <Logo />
         <div className="w-full flex-1 flex flex-col min-h-0">
           <PredictionForm token={token} />

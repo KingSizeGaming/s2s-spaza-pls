@@ -134,7 +134,7 @@ export default function NewRegistrationForm({ token }: { token: string }) {
     <>
       {modalMessage && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-          <div className="bg-[#072610] border border-white/20 rounded-2xl px-8 py-10 flex flex-col items-center gap-6 max-w-sm w-full mx-4 text-center shadow-2xl">
+          <div className="bg-green-dark border border-white/20 rounded-2xl px-8 py-10 flex flex-col items-center gap-6 max-w-sm w-full mx-4 text-center shadow-2xl">
             <h2 className="text-white font-extrabold text-2xl tracking-wide">Missing Information</h2>
             <p className="text-white/80 text-base leading-relaxed">{modalMessage}</p>
             <Button onClick={() => setModalMessage(null)}>OK</Button>
@@ -144,7 +144,7 @@ export default function NewRegistrationForm({ token }: { token: string }) {
 
       {result?.leaderboardId && result?.predictionUrl && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-          <div className="bg-[#072610] border border-white/20 rounded-2xl px-8 py-10 flex flex-col items-center gap-6 max-w-sm w-full mx-4 text-center shadow-2xl">
+          <div className="bg-green-dark border border-white/20 rounded-2xl px-8 py-10 flex flex-col items-center gap-6 max-w-sm w-full mx-4 text-center shadow-2xl">
             <h2 className="text-white font-extrabold text-2xl tracking-wide">Registration Complete</h2>
             <p className="text-white/80 text-base leading-relaxed">
               Your registration is complete. Please wait for a message to be sent to you.
@@ -156,7 +156,7 @@ export default function NewRegistrationForm({ token }: { token: string }) {
 
       {submitting && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-          <div className="flex flex-col items-center gap-3 rounded-2xl bg-[#072610] border border-white/20 p-8 shadow-2xl">
+          <div className="flex flex-col items-center gap-3 rounded-2xl bg-green-dark border border-white/20 p-8 shadow-2xl">
             <div className="h-10 w-10 animate-spin rounded-full border-4 border-white/20 border-t-white" />
             <p className="text-white text-sm font-semibold">Processing...</p>
           </div>
@@ -164,7 +164,7 @@ export default function NewRegistrationForm({ token }: { token: string }) {
       )}
 
       <div className="flex justify-center h-screen">
-        <div className="bg-[#072610] w-full max-w-125 px-6 py-10 flex flex-col items-center gap-8 ">
+        <div className="bg-green-dark w-full max-w-125 px-6 py-10 flex flex-col items-center gap-8 ">
           <Logo />
 
           <form onSubmit={handleSubmit} className="w-full py-8 flex flex-col gap-5">

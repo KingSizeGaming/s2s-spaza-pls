@@ -74,8 +74,8 @@ export default async function LeaderboardWeekDetailPage({
 
   return (
     <main className="min-h-screen bg-white">
-      <div className="mx-auto flex min-h-screen w-full max-w-97.5ems-center px-4 py-6">
-        <div className="relative h-211 w-full scale-[1.35] overflow-hidden rounded-3xl">
+      <div className="mx-auto flex min-h-screen w-full max-w-97.5 px-4 py-6">
+        <div className="relative h-211 w-full overflow-hidden rounded-3xl">
           <Image
             src="/images/bg_1.png"
             alt="Background"

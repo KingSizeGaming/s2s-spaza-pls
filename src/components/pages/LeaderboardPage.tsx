@@ -1,4 +1,3 @@
-import Image from "next/image";
 import LeaderboardList from "@/components/LeaderboardList";
 import { getBaseUrl } from "@/lib/url";
 
@@ -37,36 +36,25 @@ export default async function LeaderboardPage({
   const hasToken = Boolean(token);
 
   return (
-    <main className="min-h-screen bg-white">
-      <div className="mx-auto flex min-h-screen w-full max-w-97.5 items-center px-4 py-6">
-        <div className="relative h-211 w-full scale-[1.35] overflow-hidden rounded-3xl">
-          <Image
-            src="/images/bg_1.png"
-            alt="Background"
-            fill
-            sizes="100vw"
-            className="absolute inset-0 h-full w-full object-cover opacity-90"
-          />
-          <div className="relative z-10 flex h-full flex-col px-5 py-8">
-            <h1 className="text-center text-3xl font-bold text-white">
-              This Week&apos;s
-              <br />
-              Leaderboard
-            </h1>
+    <main className="flex justify-center h-screen overflow-hidden">
+      <div className="bg-green-dark w-full max-w-125 px-6 py-10 flex flex-col gap-6">
+        <h1 className="text-center text-3xl font-bold text-white">
+          This Week&apos;s
+          <br />
+          Leaderboard
+        </h1>
 
-            <div className="mt-5 flex flex-1 flex-col overflow-hidden rounded-3xl bg-[url('/images/leaderboard_bg.png')] bg-cover bg-center px-3 py-5">
-              {leaderboards.length === 0 ? (
-                <p className="text-center text-sm text-white/80">No entries yet.</p>
-              ) : (
-                <LeaderboardList
-                  leaderboards={leaderboards}
-                  weekId={data.weekId}
-                  token={token}
-                  hasToken={hasToken}
-                />
-              )}
-            </div>
-          </div>
+        <div className="flex-1 min-h-0 flex flex-col rounded-3xl bg-green-700 px-3 py-5 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {leaderboards.length === 0 ? (
+            <p className="text-center text-sm text-white/80">No entries yet.</p>
+          ) : (
+            <LeaderboardList
+              leaderboards={leaderboards}
+              weekId={data.weekId}
+              token={token}
+              hasToken={hasToken}
+            />
+          )}
         </div>
       </div>
     </main>
