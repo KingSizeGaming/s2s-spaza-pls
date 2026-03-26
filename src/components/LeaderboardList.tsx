@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { TrophyIcon } from "@/components/ui/icons";
+import { TrophyGoldIcon, TrophySilverIcon, TrophyBronzeIcon } from "@/components/ui/icons";
 import LoadingModal from "@/components/modals/LoadingModal";
 
 type LeaderboardRow = {
@@ -32,7 +32,8 @@ export default function LeaderboardList({
   return (
     <div className="relative">
       <ul className="space-y-3 overflow-y-auto pr-1">
-        {leaderboards.map((row) => {
+        {leaderboards.map((row, index) => {
+          const TrophyComponent = index === 0 ? TrophyGoldIcon : index === 1 ? TrophySilverIcon : index === 2 ? TrophyBronzeIcon : null;
           const content = (
             <div className="relative flex h-16 bg-green-dark items-center justify-between overflow-hidden rounded-2xl px-5 text-white">
               {/* <Image
@@ -57,7 +58,7 @@ export default function LeaderboardList({
                   {row.totalPoints}ps
                 </span>
 
-                <span className="absolute -top-2 -right-5"><TrophyIcon size={40} /></span>
+                {TrophyComponent && <span className="absolute -top-2 -right-5"><TrophyComponent size={40} /></span>}
 
               </div>
             </div>

@@ -32,24 +32,23 @@ export default function WeekList({
               href={`/leaderboard/${leaderboardId}/week/${week.weekId}?entryId=${week.id}${token ? `&token=${token}` : ""}`}
               onClick={() => setLoadingWeekId(week.weekId)}
             >
-              <div className="relative bg-green-dark flex min-h-16 flex-col justify-center overflow-hidden rounded-2xl px-5 py-3">
-    
-                <div className="relative z-10 text-xs text-white/80">
-                  {new Date(week.submittedAt).toLocaleString("en-ZA", {
-                    day: "2-digit",
-                    month: "short",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
+              <div className="relative bg-green-dark flex min-h-16 items-center justify-between overflow-hidden rounded-2xl px-5 py-3">
+                <div className="relative z-10 flex flex-col">
+                  <span className="text-xs text-white/80">
+                    {new Date(week.submittedAt).toLocaleString("en-ZA", {
+                      day: "2-digit",
+                      month: "short",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </span>
+                  <span className="text-sm font-semibold text-white">{week.weekId}</span>
                 </div>
-                <div className="relative z-10 flex items-center justify-between gap-3 text-sm font-semibold text-white">
-                  <span>{week.weekId}</span>
-                  {week.weekId === currentWeekId && (
-                    <span className="rounded-full border border-amber-100/70 bg-amber-200/25 px-2 py-0.5 text-[10px] uppercase tracking-[0.12em] text-amber-100">
-                      Current
-                    </span>
-                  )}
-                </div>
+                {week.weekId === currentWeekId && (
+                  <span className="rounded-xl font-bold text-black tracking-wider border border-yellow-500 bg-yellow-600 px-7 py-1">
+                    CURRENT
+                  </span>
+                )}
               </div>
             </Link>
           </li>

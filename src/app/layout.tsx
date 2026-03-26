@@ -1,11 +1,5 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
 import "./globals.css";
-
-const hitRoad = localFont({
-  src: "../../public/fonts/hit_the_road/hitroad.ttf",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "Wina Kasi Wina",
@@ -18,9 +12,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${hitRoad.className} antialiased`}
-      >
+      <body className="antialiased">
         {/* <div className="bg-amber-100 text-amber-900">
           <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-3 text-sm">
             <span>
