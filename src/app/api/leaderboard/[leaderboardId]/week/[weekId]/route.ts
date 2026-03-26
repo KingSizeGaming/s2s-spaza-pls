@@ -14,6 +14,7 @@ export async function GET(
 ) {
   const { searchParams } = new URL(request.url);
   const token = searchParams.get("token");
+  const entryId = searchParams.get("entryId");
   const { leaderboardId, weekId } = await params;
   const normalizedLeaderboardId = normalizeDesiredLeaderboard(leaderboardId);
 
@@ -53,9 +54,12 @@ export async function GET(
       submittedAt: entries.submittedAt,
     })
     .from(entries)
-    .innerJoin(users, eq(entries.waNumber, users.waNumber))
     .where(
-      and(eq(users.leaderboardId, normalizedLeaderboardId), eq(entries.weekId, weekId))
+      and(
+        eq(entries.waNumber, linkRows[0].waNumber),
+        eq(entries.weekId, weekId),
+        entryId ? eq(entries.id, entryId) : sql`true`
+      )
     )
     .orderBy(desc(entries.submittedAt))
     .limit(1);

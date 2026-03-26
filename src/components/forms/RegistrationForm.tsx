@@ -5,6 +5,7 @@ import Button from "@/components/ui/Button";
 import FormField from "@/components/ui/FormField";
 import Logo from "@/components/ui/Logo";
 import { parseSaIdBirthDate, isAtLeastAge } from "@/lib/sa-id";
+import LoadingModal from "@/components/modals/LoadingModal";
 
 type CompletionResponse = {
   leaderboardId?: string;
@@ -154,14 +155,7 @@ export default function NewRegistrationForm({ token }: { token: string }) {
         </div>
       )}
 
-      {submitting && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-          <div className="flex flex-col items-center gap-3 rounded-2xl bg-green-dark border border-white/20 p-8 shadow-2xl">
-            <div className="h-10 w-10 animate-spin rounded-full border-4 border-white/20 border-t-white" />
-            <p className="text-white text-sm font-semibold">Processing...</p>
-          </div>
-        </div>
-      )}
+      {submitting && <LoadingModal />}
 
       <div className="flex justify-center h-screen">
         <div className="bg-green-dark w-full max-w-125 px-6 py-10 flex flex-col items-center gap-8 ">

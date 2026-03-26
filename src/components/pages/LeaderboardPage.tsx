@@ -1,5 +1,6 @@
 import LeaderboardList from "@/components/LeaderboardList";
 import { getBaseUrl } from "@/lib/url";
+import Logo from "../ui/Logo";
 
 type LeaderboardRow = {
   leaderboardId: string | null;
@@ -37,14 +38,16 @@ export default async function LeaderboardPage({
 
   return (
     <main className="flex justify-center h-screen overflow-hidden">
-      <div className="bg-green-dark w-full max-w-125 px-6 py-10 flex flex-col gap-6">
-        <h1 className="text-center text-3xl font-bold text-white">
-          This Week&apos;s
-          <br />
-          Leaderboard
-        </h1>
+      <div className="bg-green-dark w-full max-w-125 px-6 py-10 flex flex-col items-center gap-6">
+        <Logo />
+        
 
-        <div className="flex-1 min-h-0 flex flex-col rounded-3xl bg-green-700 px-3 py-5 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="relative w-full flex-1 min-h-0 flex flex-col rounded-3xl bg-green-700 px-3 pt-12 mt-15 overflow-visible">
+          <div className="flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {/* Page Title */}
+          <h1 className="absolute -top-8 left-1/2 -translate-x-1/2 text-xl font-extrabold text-white tracking-wide border-2 border-yellow-500 rounded-xl bg-green-700 px-8 py-1 text-center z-10">
+            This Week&apos;s <br></br>Leaderboard
+          </h1>
           {leaderboards.length === 0 ? (
             <p className="text-center text-sm text-white/80">No entries yet.</p>
           ) : (
@@ -55,6 +58,7 @@ export default async function LeaderboardPage({
               hasToken={hasToken}
             />
           )}
+          </div>
         </div>
       </div>
     </main>

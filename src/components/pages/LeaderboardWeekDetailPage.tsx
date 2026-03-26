@@ -25,16 +25,18 @@ export default async function LeaderboardWeekDetailPage({
   searchParams,
 }: {
   params: Promise<{ leaderboardId: string; weekId: string }>;
-  searchParams?: Promise<{ token?: string }>;
+  searchParams?: Promise<{ token?: string; entryId?: string }>;
 }) {
   const resolvedParams = await params;
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const currentWeekId = getCurrentWeekId();
   const token = resolvedSearchParams?.token;
+  const entryId = resolvedSearchParams?.entryId;
 
   const baseUrl = await getBaseUrl();
   const query = new URLSearchParams();
   if (token) query.set("token", token);
+  if (entryId) query.set("entryId", entryId);
 
   const res = await fetch(
     `${baseUrl}/api/leaderboard/${resolvedParams.leaderboardId}/week/${resolvedParams.weekId}?${query.toString()}`,

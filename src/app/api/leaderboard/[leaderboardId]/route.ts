@@ -56,28 +56,26 @@ export async function GET(
 
   const rows = await db
     .select({
+      id: entries.id,
       weekId: entries.weekId,
-      entriesCount: sql<number>`count(${entries.id})::int`,
-      latestSubmittedAt: sql<Date>`max(${entries.submittedAt})`,
+      submittedAt: entries.submittedAt,
     })
     .from(entries)
-    .innerJoin(users, eq(entries.waNumber, users.waNumber))
     .where(
       and(
-        eq(users.leaderboardId, normalizedLeaderboardId),
+        eq(entries.waNumber, userRows[0].waNumber),
         weekId ? eq(entries.weekId, weekId) : sql`true`
       )
     )
-    .groupBy(entries.weekId)
-    .orderBy(desc(sql`max(${entries.submittedAt})`));
+    .orderBy(desc(entries.submittedAt));
 
   return NextResponse.json({
     weekId: weekId ?? getCurrentWeekId(),
     leaderboardId: normalizedLeaderboardId,
     weeks: rows.map((row) => ({
+      id: row.id,
       weekId: row.weekId,
-      entriesCount: row.entriesCount,
-      latestSubmittedAt: row.latestSubmittedAt,
+      submittedAt: row.submittedAt,
     })),
   });
 }
