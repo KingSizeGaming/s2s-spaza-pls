@@ -3,6 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { TrophyGoldIcon, TrophySilverIcon, TrophyBronzeIcon } from "@/components/ui/icons";
+import LoadingModal from "@/components/modals/LoadingModal";
 
 type LeaderboardRow = {
   leaderboardId: string | null;
@@ -30,16 +32,17 @@ export default function LeaderboardList({
   return (
     <div className="relative">
       <ul className="space-y-3 overflow-y-auto pr-1">
-        {leaderboards.map((row) => {
+        {leaderboards.map((row, index) => {
+          const TrophyComponent = index === 0 ? TrophyGoldIcon : index === 1 ? TrophySilverIcon : index === 2 ? TrophyBronzeIcon : null;
           const content = (
-            <div className="relative flex h-16 items-center justify-between overflow-hidden rounded-2xl px-5 text-white">
-              <Image
+            <div className="relative flex h-16 bg-green-dark items-center justify-between overflow-hidden rounded-2xl px-5 text-white">
+              {/* <Image
                 src="/images/player_panel.png"
                 alt="Player"
                 fill
                 sizes="100vw"
                 className="absolute inset-0 h-full w-full object-cover"
-              />
+              /> */}
               <div className="relative z-10 text-lg font-semibold">
                 {row.leaderboardId ?? "Unknown"}
               </div>
@@ -54,6 +57,9 @@ export default function LeaderboardList({
                 <span className="absolute inset-0 flex items-center justify-center text-sm font-bold">
                   {row.totalPoints}ps
                 </span>
+
+                {TrophyComponent && <span className="absolute -top-2 -right-5"><TrophyComponent size={40} /></span>}
+
               </div>
             </div>
           );
@@ -72,14 +78,7 @@ export default function LeaderboardList({
         })}
       </ul>
 
-      {loadingId && (
-        <div className="absolute inset-0 z-40 flex items-center justify-center rounded-3xl bg-black/40">
-          <div className="flex flex-col items-center gap-3 rounded-2xl bg-white/90 p-5 text-zinc-900 shadow-xl">
-            <div className="h-10 w-10 animate-spin rounded-full border-4 border-emerald-200 border-t-emerald-600" />
-            <p className="text-sm font-semibold">Loading...</p>
-          </div>
-        </div>
-      )}
+      {loadingId && <LoadingModal />}
     </div>
   );
 }

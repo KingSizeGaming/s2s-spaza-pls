@@ -13,8 +13,7 @@ export default function FormField({ label, hint, className = "", ...inputProps }
         {hint && <span className="text-white/60 font-normal text-xs">{hint}</span>}
       </label>
       <input
-        className={`w-full rounded-full px-5 py-3 text-white text-sm outline-none border border-white/10 focus:border-white/30 transition ${className}`}
-        style={{ backgroundColor: "#072610" }}
+        className={`w-full rounded-full px-5 py-3 text-white text-sm outline-none border border-white/10 focus:border-white/30 transition bg-green-dark ${className}`}
         {...inputProps}
       />
     </div>

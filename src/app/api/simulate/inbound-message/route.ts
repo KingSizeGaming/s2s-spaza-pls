@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { and, eq, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { links, spazaSids, users, vouchers } from "@/db/schema";
+import { links, matches, spazaSids, users, vouchers } from "@/db/schema";
 import { generateToken } from "@/lib/tokens";
 import { getCurrentWeekId, getIsoWeekEndUtc } from "@/lib/week";
 import { getBaseUrlFromRequest } from "@/lib/url";
 import { normalizeWaNumber, normalizeMessage } from "@/lib/normalize";
 
 const NEW_SID_REGEX = /^new\s+(\S+)/i;
+const LEADERBOARD_REGEX = /^leaderboard\s+(\S+)/i;
 
 async function lookupVoucher(code: string, weekId: string) {
   const rows = await db
@@ -51,6 +52,57 @@ export async function POST(request: NextRequest) {
 
   const baseUrl = getBaseUrlFromRequest(request);
   const weekId = getCurrentWeekId();
+
+  const leaderboardMatch = message.match(LEADERBOARD_REGEX);
+  if (leaderboardMatch) {
+    const requestedId = leaderboardMatch[1].toUpperCase();
+
+    const userRow = await db
+      .select({ leaderboardId: users.leaderboardId })
+      .from(users)
+      .where(and(
+        sql`regexp_replace(${users.waNumber}, '[^0-9]', '', 'g') = ${from}`,
+        eq(users.state, "ACTIVE"),
+        eq(users.leaderboardId, requestedId)
+      ))
+      .limit(1);
+
+    if (userRow.length === 0) {
+      return NextResponse.json({ reply: { type: "text", body: "Leaderboard ID not found for your number." } });
+    }
+
+    const matchCount = await db
+      .select({ id: matches.id })
+      .from(matches)
+      .where(eq(matches.weekId, weekId))
+      .limit(1);
+
+    if (matchCount.length === 0) {
+      return NextResponse.json({ reply: { type: "text", body: "No matches available for this week yet." } });
+    }
+
+    const existingLink = await db
+      .select({ id: links.id, token: links.token })
+      .from(links)
+      .where(and(
+        sql`regexp_replace(${links.waNumber}, '[^0-9]', '', 'g') = ${from}`,
+        eq(links.type, "PREDICTION"),
+        eq(links.weekId, weekId)
+      ))
+      .limit(1);
+
+    if (existingLink.length === 0) {
+      return NextResponse.json({ reply: { type: "text", body: "You have not played this week yet. Get a Spaza voucher code to play." } });
+    }
+
+    await db
+      .update(links)
+      .set({ status: "VALID" })
+      .where(eq(links.id, existingLink[0].id));
+
+    const url = `${baseUrl}/leaderboard?token=${existingLink[0].token}`;
+    return NextResponse.json({ reply: { type: "text", body: `Here is your leaderboard link: ${url}` } });
+  }
 
   const newMatch = message.match(NEW_SID_REGEX);
   if (newMatch) {

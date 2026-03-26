@@ -1,7 +1,9 @@
-import Image from "next/image";
 import Link from "next/link";
-import { getCurrentWeekId } from "@/lib/week";
+
 import { getBaseUrl } from "@/lib/url";
+import Logo from "../ui/Logo";
+
+type Pick = "H" | "D" | "A";
 
 type WeekDetailResponse = {
   leaderboardId: string;
@@ -12,7 +14,7 @@ type WeekDetailResponse = {
     homeTeam: string;
     awayTeam: string;
     kickoffAt: string;
-    pick: "H" | "D" | "A" | null;
+    pick: Pick | null;
     homeScore: number | null;
     awayScore: number | null;
     isFinished: boolean;
@@ -25,16 +27,17 @@ export default async function LeaderboardWeekDetailPage({
   searchParams,
 }: {
   params: Promise<{ leaderboardId: string; weekId: string }>;
-  searchParams?: Promise<{ token?: string }>;
+  searchParams?: Promise<{ token?: string; entryId?: string }>;
 }) {
   const resolvedParams = await params;
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
-  const currentWeekId = getCurrentWeekId();
   const token = resolvedSearchParams?.token;
+  const entryId = resolvedSearchParams?.entryId;
 
   const baseUrl = await getBaseUrl();
   const query = new URLSearchParams();
   if (token) query.set("token", token);
+  if (entryId) query.set("entryId", entryId);
 
   const res = await fetch(
     `${baseUrl}/api/leaderboard/${resolvedParams.leaderboardId}/week/${resolvedParams.weekId}?${query.toString()}`,
@@ -42,99 +45,73 @@ export default async function LeaderboardWeekDetailPage({
   );
   const data = (await res.json()) as WeekDetailResponse;
 
+  const backHref = `/leaderboard/${resolvedParams.leaderboardId}${token ? `?token=${token}` : ""}`;
+
   if (!res.ok) {
     return (
-      <main className="min-h-screen bg-white">
-        <div className="mx-auto flex min-h-screen w-full max-w-[390px] items-center px-4 py-6">
-          <div className="relative h-[844px] w-full scale-[1.35] overflow-hidden rounded-3xl">
-            <Image
-              src="/images/bg_1.png"
-              alt="Background"
-              fill
-              sizes="100vw"
-              className="absolute inset-0 h-full w-full object-cover opacity-90"
-            />
-            <div className="relative z-10 flex h-full flex-col items-center justify-center px-6 text-white">
-              <h1 className="text-center text-2xl font-bold">Unable to load week</h1>
-              <p className="mt-3 text-center text-sm text-white/80">
-                {data.error ?? "No picks available for this week."}
-              </p>
-              <Link
-                className="mt-6 text-sm font-semibold text-white"
-                href={`/leaderboard/${resolvedParams.leaderboardId}${token ? `?token=${token}` : ""}`}
-              >
-                Back to your weeks
-              </Link>
-            </div>
-          </div>
+      <main className="flex justify-center h-screen overflow-hidden">
+        <div className="bg-green-dark w-full max-w-125 px-6 py-10 flex flex-col items-center justify-center gap-4 text-white">
+          <h1 className="text-center text-2xl font-bold">Unable to load week</h1>
+          <p className="text-center text-sm text-white/80">{data.error ?? "No picks available for this week."}</p>
+          <Link className="text-sm font-medium text-white" href={backHref}>
+            Back to your entries
+          </Link>
         </div>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-white">
-      <div className="mx-auto flex min-h-screen w-full max-w-[390px] items-center px-4 py-6">
-        <div className="relative h-[844px] w-full scale-[1.35] overflow-hidden rounded-3xl">
-          <Image
-            src="/images/bg_1.png"
-            alt="Background"
-            fill
-            sizes="100vw"
-            className="absolute inset-0 h-full w-full object-cover opacity-90"
-          />
-          <div className="relative z-10 flex h-full flex-col px-5 py-8 text-white">
-            <h1 className="text-center text-3xl font-bold">Your Picks</h1>
-            <p className="mt-2 text-center text-sm text-white/80">{data.weekId}</p>
-            <p className="mt-1 text-center text-xs uppercase tracking-[0.2em] text-amber-100/90">
-              Current Week: {currentWeekId}
-            </p>
+    <main className="flex justify-center h-screen overflow-hidden">
+      <div className="bg-green-dark w-full max-w-125 px-6 py-10 flex flex-col items-center gap-8">
+        <Logo />
 
-            <div className="mt-5 flex-1 space-y-3 overflow-y-auto pr-1">
-              {data.matches.map((match) => {
-                const kickoff = new Date(match.kickoffAt);
-                const kickoffLabel = Number.isNaN(kickoff.getTime())
-                  ? "TBD"
-                  : kickoff.toLocaleString("en-ZA", {
-                      weekday: "short",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    });
-                return (
-                  <div key={match.id} className="relative overflow-hidden rounded-2xl">
-                    <Image
-                      src="/images/history_player_panel.png"
-                      alt="Match panel"
-                      fill
-                      sizes="100vw"
-                      className="absolute inset-0 h-full w-full object-cover"
-                    />
-                    <div className="relative z-10 flex items-center justify-between gap-4 px-5 py-4 text-base font-semibold text-amber-100">
-                      <div className="flex flex-col">
-                        <span>{`${match.homeTeam} vs ${match.awayTeam}`}</span>
-                        <span className="text-xs text-amber-100/80">{kickoffLabel}</span>
-                        {match.isFinished && (
-                          <span className="text-xs text-amber-100/80">
-                            Score: {match.homeScore} - {match.awayScore}
-                          </span>
-                        )}
-                      </div>
-                      <div className="rounded-full border border-emerald-200/40 bg-black/50 px-3 py-1 text-sm text-white">
-                        {match.pick ?? "-"}
-                      </div>
-                    </div>
+        <div className="relative w-full flex-1 min-h-0 flex flex-col rounded-3xl bg-green-600 px-3 pt-8 mt-12 overflow-visible">
+          <h1 className="absolute -top-5 left-1/2 -translate-x-1/2 whitespace-nowrap text-xl font-extrabold text-white tracking-wide border-2 border-yellow-500 rounded-xl bg-green-600 px-8 py-2 text-center z-10">Your Picks</h1>
+
+          <div className="flex-1 min-h-0 mx-3 my-2 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden space-y-3">
+            {data.matches.map((match) => {
+              const kickoff = new Date(match.kickoffAt);
+              const kickoffLabel = Number.isNaN(kickoff.getTime())
+                ? "TBD"
+                : kickoff.toLocaleString("en-ZA", { weekday: "short", hour: "2-digit", minute: "2-digit" });
+              return (
+                <div key={match.id} className="rounded-2xl bg-green-950 px-4 py-3 mb-2 text-center">
+                  <p className="font-extrabold text-white text-base">{`${match.homeTeam} vs ${match.awayTeam}`}</p>
+                  <p className="text-white/70 text-xs mb-2">{kickoffLabel}</p>
+                  {match.isFinished && (
+                    <p className="text-white/60 text-xs mb-2">Score: {match.homeScore} - {match.awayScore}</p>
+                  )}
+                  <div className="flex justify-center gap-2">
+                    {(["H", "D", "A"] as Pick[]).map((option) => (
+                      <button
+                        key={option}
+                        type="button"
+                        disabled
+                        className={`rounded-full px-4 py-1 text-sm font-bold ${
+                          match.pick === option
+                            ? "bg-cyan-500 text-white shadow-[0_3px_0_#0e7490]"
+                            : "bg-cyan-700/60 text-white/80"
+                        }`}
+                      >
+                        {option === "H" ? "HOME" : option === "D" ? "DRAW" : "AWAY"}
+                      </button>
+                    ))}
                   </div>
-                );
-              })}
-            </div>
-
-            <Link
-              className="mt-4 text-center text-sm font-semibold text-white"
-              href={`/leaderboard/${data.leaderboardId}${token ? `?token=${token}` : ""}`}
-            >
-              Back to your weeks
-            </Link>
+                </div>
+              );
+            })}
           </div>
+        </div>
+
+        <div className="flex justify-center">
+          <Link
+            href={backHref}
+            className="rounded-full py-3 px-12 font-extrabold text-white text-base tracking-wide shadow-lg"
+            style={{ background: "linear-gradient(180deg, #4caf50 0%, #1b5e20 100%)", boxShadow: "0 4px 0 #0a3d0c" }}
+          >
+            Back
+          </Link>
         </div>
       </div>
     </main>
