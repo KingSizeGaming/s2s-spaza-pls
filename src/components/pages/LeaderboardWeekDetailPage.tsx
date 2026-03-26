@@ -1,14 +1,7 @@
-import { headers } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
 import { getCurrentWeekId } from "@/lib/week";
-
-async function getBaseUrl(): Promise<string> {
-  const headerList = await headers();
-  const host = headerList.get("host") ?? "localhost:3000";
-  const proto = headerList.get("x-forwarded-proto") ?? "http";
-  return `${proto}://${host}`;
-}
+import { getBaseUrl } from "@/lib/url";
 
 type WeekDetailResponse = {
   leaderboardId: string;
@@ -92,9 +85,7 @@ export default async function LeaderboardWeekDetailPage({
           />
           <div className="relative z-10 flex h-full flex-col px-5 py-8 text-white">
             <h1 className="text-center text-3xl font-bold">Your Picks</h1>
-            <p className="mt-2 text-center text-sm text-white/80">
-              {data.weekId}
-            </p>
+            <p className="mt-2 text-center text-sm text-white/80">{data.weekId}</p>
             <p className="mt-1 text-center text-xs uppercase tracking-[0.2em] text-amber-100/90">
               Current Week: {currentWeekId}
             </p>

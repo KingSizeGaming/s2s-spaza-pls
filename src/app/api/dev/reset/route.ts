@@ -10,23 +10,7 @@ import {
   users,
   vouchers,
 } from "@/db/schema";
-import { getCurrentWeekId } from "@/lib/week";
-
-function getIsoWeekYearAndWeek(date: Date): { year: number; week: number } {
-  const utcDate = new Date(
-    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
-  );
-  const day = utcDate.getUTCDay() || 7;
-  utcDate.setUTCDate(utcDate.getUTCDate() + 4 - day);
-  const yearStart = new Date(Date.UTC(utcDate.getUTCFullYear(), 0, 1));
-  const week = Math.ceil(((+utcDate - +yearStart) / 86400000 + 1) / 7);
-  return { year: utcDate.getUTCFullYear(), week };
-}
-
-function getRealCurrentWeekId(date: Date = new Date()): string {
-  const { year, week } = getIsoWeekYearAndWeek(date);
-  return `${year}-W${String(week).padStart(2, "0")}`;
-}
+import { getCurrentWeekId, getRealCurrentWeekId } from "@/lib/week";
 
 export async function POST() {
   const weekId = getRealCurrentWeekId();

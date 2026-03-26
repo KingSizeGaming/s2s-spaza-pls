@@ -3,74 +3,18 @@ import { and, desc, eq, ne, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { links, users } from "@/db/schema";
 import { generateToken } from "@/lib/tokens";
-import { getCurrentWeekId } from "@/lib/week";
-
-function getBaseUrl(request: NextRequest): string {
-  const configured = process.env.NEXT_PUBLIC_SITE_URL;
-  if (configured && configured.trim().length > 0) {
-    return configured.trim();
-  }
-
-  const host = request.headers.get("host") ?? "localhost:3000";
-  const proto = request.headers.get("x-forwarded-proto") ?? "http";
-  return `${proto}://${host}`;
-}
-
-function getIsoWeekEndUtc(date: Date): Date {
-  const utc = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
-  const day = utc.getUTCDay() || 7;
-  utc.setUTCDate(utc.getUTCDate() + (7 - day));
-  utc.setUTCHours(23, 59, 59, 999);
-  return utc;
-}
-
-function getIsoWeekYearAndWeek(date: Date): { year: number; week: number } {
-  const utcDate = new Date(
-    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
-  );
-  const day = utcDate.getUTCDay() || 7;
-  utcDate.setUTCDate(utcDate.getUTCDate() + 4 - day);
-  const yearStart = new Date(Date.UTC(utcDate.getUTCFullYear(), 0, 1));
-  const week = Math.ceil(((+utcDate - +yearStart) / 86400000 + 1) / 7);
-  return { year: utcDate.getUTCFullYear(), week };
-}
-
-function toWeekId(date: Date): string {
-  const { year, week } = getIsoWeekYearAndWeek(date);
-  return `${year}-W${String(week).padStart(2, "0")}`;
-}
-
-function parseWeekId(weekId: string): { year: number; week: number } | null {
-  const match = weekId.match(/^(\d{4})-W(\d{2})$/);
-  if (!match) return null;
-  const year = Number(match[1]);
-  const week = Number(match[2]);
-  if (!Number.isInteger(year) || !Number.isInteger(week)) return null;
-  if (week < 1 || week > 53) return null;
-  return { year, week };
-}
-
-function isoWeekStartUtc(year: number, week: number): Date {
-  const jan4 = new Date(Date.UTC(year, 0, 4));
-  const jan4Day = jan4.getUTCDay() || 7;
-  const week1Monday = new Date(jan4);
-  week1Monday.setUTCDate(jan4.getUTCDate() - (jan4Day - 1));
-  const target = new Date(week1Monday);
-  target.setUTCDate(week1Monday.getUTCDate() + (week - 1) * 7);
-  return target;
-}
-
-function incrementWeekId(weekId: string): string {
-  const parsed = parseWeekId(weekId);
-  if (!parsed) return toWeekId(new Date(Date.now() + 7 * 86400000));
-  const start = isoWeekStartUtc(parsed.year, parsed.week);
-  start.setUTCDate(start.getUTCDate() + 7);
-  return toWeekId(start);
-}
+import {
+  getCurrentWeekId,
+  getIsoWeekEndUtc,
+  incrementWeekId,
+  isoWeekStartUtc,
+  parseWeekId,
+} from "@/lib/week";
+import { getBaseUrlFromRequest } from "@/lib/url";
 
 export async function POST(request: NextRequest) {
   const currentWeekId = getCurrentWeekId();
-  const baseUrl = getBaseUrl(request);
+  const baseUrl = getBaseUrlFromRequest(request);
   const now = new Date();
   const latestPredictionWeek = await db
     .select({ weekId: links.weekId })

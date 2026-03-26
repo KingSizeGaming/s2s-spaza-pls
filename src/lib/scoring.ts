@@ -1,5 +1,6 @@
 export type Pick = "H" | "D" | "A";
 
+// Derives the match outcome (H/D/A) from home and away scores. Returns null if scores are not yet available.
 export function outcomeFromScores(
   homeScore: number | null,
   awayScore: number | null
@@ -10,6 +11,7 @@ export function outcomeFromScores(
   return "D";
 }
 
+// Returns the point value for a given number of correct picks, following the game's scoring table.
 export function pointsForCorrectPicks(correctPicks: number): number {
   if (correctPicks <= 0) return 0;
   if (correctPicks === 1) return 1;
@@ -24,6 +26,7 @@ export function pointsForCorrectPicks(correctPicks: number): number {
   return 1600;
 }
 
+// Counts how many picks in the user's submission match the actual match outcomes.
 export function countCorrectPicks(picks: Pick[], outcomes: Pick[]): number {
   let correct = 0;
   for (let i = 0; i < outcomes.length; i += 1) {

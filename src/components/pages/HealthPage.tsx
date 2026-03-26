@@ -11,7 +11,9 @@ type HealthResponse = {
 };
 
 async function getHealth(): Promise<HealthResponse> {
-  const res = await fetch("/api/health", { cache: "no-store" });
+  const { getBaseUrl } = await import("@/lib/url");
+  const baseUrl = await getBaseUrl();
+  const res = await fetch(`${baseUrl}/api/health`, { cache: "no-store" });
   try {
     return await res.json();
   } catch {

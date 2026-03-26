@@ -3,32 +3,7 @@ import { asc, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { entries, matches, prizeDraws } from "@/db/schema";
 import { getCurrentWeekId } from "@/lib/week";
-
-type Candidate = {
-  waNumber: string;
-  tickets: number;
-};
-
-function pickWeightedWinnerIndex(candidates: Candidate[]): number {
-  const totalTickets = candidates.reduce((sum, row) => sum + row.tickets, 0);
-  let randomTicket = Math.floor(Math.random() * totalTickets) + 1;
-  for (let i = 0; i < candidates.length; i += 1) {
-    randomTicket -= candidates[i].tickets;
-    if (randomTicket <= 0) return i;
-  }
-  return candidates.length - 1;
-}
-
-function drawWeightedUnique(candidates: Candidate[], winnerCount: number): Candidate[] {
-  const pool = candidates.filter((row) => row.tickets > 0);
-  const winners: Candidate[] = [];
-  while (pool.length > 0 && winners.length < winnerCount) {
-    const winnerIndex = pickWeightedWinnerIndex(pool);
-    winners.push(pool[winnerIndex]);
-    pool.splice(winnerIndex, 1);
-  }
-  return winners;
-}
+import { drawWeightedUnique } from "@/lib/draw";
 
 export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => null);

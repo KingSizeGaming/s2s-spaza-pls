@@ -1,12 +1,9 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
+import { normalizeWaNumber } from "@/lib/normalize";
 
 const defaultWaNumber = "+27820001111";
-
-function normalizeWaNumber(input: string): string {
-  return input.replace(/[^0-9]/g, "");
-}
 
 function linkify(text: string): { type: "text" | "link"; value: string }[] {
   const urlRegex = /(https?:\/\/[^\s]+)/g;
@@ -202,10 +199,10 @@ export default function DemoPage() {
             <div className="border-t border-emerald-100 bg-white p-4">
               <div className="grid gap-3 md:grid-cols-[1fr_auto]">
                 <input
-                  className="rounded-full border border-emerald-100 bg-white px-4 py-2 text-sm shadow-sm"
+                  className="rounded-full border border-emerald-100 bg-white px-4 py-2 text-sm text-black shadow-sm"
                   value={message}
                   onChange={(event) => setMessage(event.target.value)}
-                  placeholder="Type a message ( e.g., code <voucher>, new <spazaId> ...)"
+                  placeholder="Type a message"
                 />
                 <button
                   className="rounded-full bg-[#075E54] px-5 py-2 text-sm font-semibold text-white"

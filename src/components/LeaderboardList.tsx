@@ -24,9 +24,8 @@ export default function LeaderboardList({
 }) {
   const [loadingId, setLoadingId] = useState<string | null>(null);
 
-  const buildHref = (leaderboardId: string) => {
-    return `/leaderboard/${leaderboardId}?weekId=${weekId}${token ? `&token=${token}` : ""}`;
-  };
+  const buildHref = (leaderboardId: string) =>
+    `/leaderboard/${leaderboardId}?weekId=${weekId}${token ? `&token=${token}` : ""}`;
 
   return (
     <div className="relative">
@@ -62,10 +61,7 @@ export default function LeaderboardList({
           if (row.leaderboardId && row.canView && hasToken) {
             return (
               <li key={row.leaderboardId}>
-                <Link
-                  href={buildHref(row.leaderboardId)}
-                  onClick={() => setLoadingId(row.leaderboardId)}
-                >
+                <Link href={buildHref(row.leaderboardId)} onClick={() => setLoadingId(row.leaderboardId)}>
                   {content}
                 </Link>
               </li>
