@@ -336,7 +336,7 @@ export default function AdminPage() {
                   weekly entry.
                 </p>
                 <button
-                  className="mt-6 w-full rounded-2xl bg-[#075E54] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-200 transition hover:translate-y-[-1px] hover:bg-[#0B6E63] disabled:cursor-not-allowed disabled:opacity-60 md:w-auto"
+                  className="mt-6 w-full rounded-2xl bg-[#075E54] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-200 transition hover:-translate-y-px hover:bg-[#0B6E63] disabled:cursor-not-allowed disabled:opacity-60 md:w-auto"
                   onClick={triggerWeekly}
                   disabled={weeklyBusy}
                 >
@@ -380,7 +380,7 @@ export default function AdminPage() {
                     Active
                   </label>
                   <button
-                    className="rounded-2xl bg-[#075E54] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-200 transition hover:translate-y-[-1px] hover:bg-[#0B6E63] disabled:cursor-not-allowed disabled:opacity-60"
+                    className="rounded-2xl bg-[#075E54] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-200 transition hover:-translate-y-px hover:bg-[#0B6E63] disabled:cursor-not-allowed disabled:opacity-60"
                     onClick={createSpaza}
                     disabled={spazaBusy}
                   >
@@ -418,14 +418,14 @@ export default function AdminPage() {
                   <label className="text-sm text-zinc-700">
                     Voucher Tokens
                     <textarea
-                      className="mt-2 min-h-[120px] w-full resize-none rounded-xl border border-emerald-200 bg-white px-4 py-2 text-sm text-zinc-900 outline-none transition focus:border-emerald-500"
+                      className="flex w-full mt-2 min-h-30ll resize-none rounded-xl border border-emerald-200 bg-white px-4 py-2 text-sm text-zinc-900 outline-none transition focus:border-emerald-500"
                       placeholder="A123, B123, C123"
                       value={voucherTokens}
                       onChange={(event) => setVoucherTokens(event.target.value)}
                     />
                   </label>
                   <button
-                    className="rounded-2xl bg-[#075E54] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-200 transition hover:translate-y-[-1px] hover:bg-[#0B6E63] disabled:cursor-not-allowed disabled:opacity-60"
+                    className="rounded-2xl bg-[#075E54] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-200 transition hover:-translate-y-px hover:bg-[#0B6E63] disabled:cursor-not-allowed disabled:opacity-60"
                     onClick={createVouchers}
                     disabled={voucherBusy}
                   >
@@ -480,14 +480,14 @@ export default function AdminPage() {
                   </label>
                   <div className="flex flex-wrap gap-2">
                     <button
-                      className="rounded-2xl bg-[#075E54] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-200 transition hover:translate-y-[-1px] hover:bg-[#0B6E63] disabled:cursor-not-allowed disabled:opacity-60"
+                      className="rounded-2xl bg-[#075E54] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-200 transition hover:-translate-y-px hover:bg-[#0B6E63] disabled:cursor-not-allowed disabled:opacity-60"
                       onClick={createMatch}
                       disabled={matchBusy}
                     >
                       {matchBusy ? "Saving..." : "Add Match"}
                     </button>
                     <button
-                      className="rounded-2xl border border-emerald-200 px-6 py-3 text-sm font-semibold text-emerald-900 shadow-lg shadow-emerald-100 transition hover:translate-y-[-1px] hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-60"
+                      className="rounded-2xl border border-emerald-200 px-6 py-3 text-sm font-semibold text-emerald-900 shadow-lg shadow-emerald-100 transition hover:-translate-y-px hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-60"
                       onClick={preseedMatches}
                       disabled={preseedBusy}
                     >
@@ -515,14 +515,14 @@ export default function AdminPage() {
                     />
                   </label>
                   <button
-                    className="rounded-2xl border border-emerald-200 px-6 py-3 text-sm font-semibold text-emerald-900 shadow-lg shadow-emerald-100 transition hover:translate-y-[-1px] hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="rounded-2xl border border-emerald-200 px-6 py-3 text-sm font-semibold text-emerald-900 shadow-lg shadow-emerald-100 transition hover:-translate-y-px hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-60"
                     onClick={loadScores}
                     disabled={scoreLoading}
                   >
                     {scoreLoading ? "Loading..." : "Load Matches"}
                   </button>
 
-                  <div className="max-h-[320px] space-y-3 overflow-auto rounded-2xl border border-emerald-200 bg-[#EFEAE2] p-3">
+                  <div className="max-h-80 space-y-3 overflow-auto rounded-2xl border border-emerald-200 bg-[#EFEAE2] p-3">
                     {scoreMatches.length === 0 ? (
                       <p className="text-sm text-zinc-600">
                         No matches loaded.
@@ -570,7 +570,7 @@ export default function AdminPage() {
                     )}
                   </div>
                   <button
-                    className="rounded-2xl bg-[#075E54] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-200 transition hover:translate-y-[-1px] hover:bg-[#0B6E63] disabled:cursor-not-allowed disabled:opacity-60"
+                    className="rounded-2xl bg-[#075E54] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-200 transition hover:-translate-y-px hover:bg-[#0B6E63] disabled:cursor-not-allowed disabled:opacity-60"
                     onClick={saveScores}
                     disabled={scoreBusy || scoreMatches.length === 0}
                   >
@@ -609,14 +609,14 @@ export default function AdminPage() {
                   <label className="text-sm text-zinc-700">
                     Prize Codes
                     <textarea
-                      className="mt-2 min-h-[120px] w-full resize-none rounded-xl border border-emerald-200 bg-white px-4 py-2 text-sm text-zinc-900 outline-none transition focus:border-emerald-500"
+                      className="mt-2 min-h-30 w-full resize-none rounded-xl border border-emerald-200 bg-white px-4 py-2 text-sm text-zinc-900 outline-none transition focus:border-emerald-500"
                       placeholder="PRIZE-001, PRIZE-002"
                       value={drawCodes}
                       onChange={(event) => setDrawCodes(event.target.value)}
                     />
                   </label>
                   <button
-                    className="rounded-2xl bg-[#075E54] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-200 transition hover:translate-y-[-1px] hover:bg-[#0B6E63] disabled:cursor-not-allowed disabled:opacity-60"
+                    className="rounded-2xl bg-[#075E54] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-200 transition hover:-translate-y-px hover:bg-[#0B6E63] disabled:cursor-not-allowed disabled:opacity-60"
                     onClick={runDraw}
                     disabled={drawBusy}
                   >
@@ -633,7 +633,7 @@ export default function AdminPage() {
                   Clears demo data and reseeds the POC defaults. Use only in local/dev.
                 </p>
                 <button
-                  className="mt-6 w-full rounded-2xl border border-rose-200 bg-white px-6 py-3 text-sm font-semibold text-rose-700 shadow-lg shadow-rose-100 transition hover:translate-y-[-1px] hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-60 md:w-auto"
+                  className="mt-6 w-full rounded-2xl border border-rose-200 bg-white px-6 py-3 text-sm font-semibold text-rose-700 shadow-lg shadow-rose-100 transition hover:-translate-y-px hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-60 md:w-auto"
                   onClick={resetDatabase}
                   disabled={resetBusy}
                 >
