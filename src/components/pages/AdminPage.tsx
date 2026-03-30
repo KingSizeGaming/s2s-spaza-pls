@@ -32,8 +32,22 @@ export default function AdminPage() {
   const [resetBusy, setResetBusy] = useState(false);
   const [response, setResponse] = useState<ApiResult | null>(null);
   const [activePanel, setActivePanel] = useState<
-    "weekly" | "spaza" | "vouchers" | "matches" | "scores" | "draws" | "reset"
+    "weekly" | "spaza" | "vouchers" | "matches" | "scores" | "draws" | "users" | "reset"
   >("weekly");
+
+  const [userQuery, setUserQuery] = useState("");
+  const [userResults, setUserResults] = useState<{
+    id: string;
+    waNumber: string;
+    state: string;
+    firstName: string | null;
+    lastName: string | null;
+    leaderboardId: string | null;
+    homeSid: string | null;
+    createdAt: string;
+  }[]>([]);
+  const [userSearchBusy, setUserSearchBusy] = useState(false);
+  const [userSearchError, setUserSearchError] = useState<string | null>(null);
 
   const [spazaSid, setSpazaSid] = useState("");
   const [spazaName, setSpazaName] = useState("");
@@ -261,6 +275,25 @@ export default function AdminPage() {
     setScoreBusy(false);
   };
 
+  const searchUsers = async () => {
+    if (!userQuery.trim()) return;
+    setUserSearchBusy(true);
+    setUserSearchError(null);
+    const res = await fetch(`/api/admin/users?q=${encodeURIComponent(userQuery.trim())}`, { cache: "no-store" });
+    const text = await res.text();
+    try {
+      const data = JSON.parse(text) as { ok: boolean; users?: typeof userResults; error?: string };
+      if (data.ok && data.users) {
+        setUserResults(data.users);
+      } else {
+        setUserSearchError(data.error ?? "Search failed.");
+      }
+    } catch {
+      setUserSearchError("Unexpected response.");
+    }
+    setUserSearchBusy(false);
+  };
+
   const resetDatabase = async () => {
     setResetBusy(true);
     const res = await fetch("/api/dev/reset", { method: "POST" });
@@ -274,7 +307,7 @@ export default function AdminPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#EFEAE2] text-zinc-900">
+    <main className="min-h-screen bg-[#EFEAE2] text-zinc-900 font-[system-ui,sans-serif]">
       <div className="mx-auto flex min-h-screen max-w-6xl flex-col gap-8 px-6 py-10">
         <header className="flex flex-col gap-4">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
@@ -305,6 +338,7 @@ export default function AdminPage() {
               { id: "matches", label: "Matches" },
               { id: "scores", label: "Scores" },
               { id: "draws", label: "Draws" },
+              { id: "users", label: "Users" },
               { id: "reset", label: "Reset" },
             ].map((item) => (
               <button
@@ -622,6 +656,64 @@ export default function AdminPage() {
                   >
                     {drawBusy ? "Drawing..." : "Run Draw"}
                   </button>
+                </div>
+              </>
+            )}
+
+            {activePanel === "users" && (
+              <>
+                <h2 className="text-lg font-semibold text-zinc-900">Users</h2>
+                <p className="mt-1 text-sm text-zinc-600">
+                  Search by phone number, leaderboard ID, or name.
+                </p>
+                <div className="mt-4 flex gap-2">
+                  <input
+                    className="flex-1 rounded-xl border border-emerald-200 bg-white px-4 py-2 text-sm text-zinc-900 outline-none transition focus:border-emerald-500"
+                    placeholder="27820001111 / KAY482 / John Doe"
+                    value={userQuery}
+                    onChange={(e) => setUserQuery(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && searchUsers()}
+                  />
+                  <button
+                    className="rounded-2xl bg-[#075E54] px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-200 transition hover:-translate-y-px hover:bg-[#0B6E63] disabled:cursor-not-allowed disabled:opacity-60"
+                    onClick={searchUsers}
+                    disabled={userSearchBusy}
+                  >
+                    {userSearchBusy ? "..." : "Search"}
+                  </button>
+                </div>
+
+                {userSearchError && (
+                  <p className="mt-3 text-sm text-rose-600">{userSearchError}</p>
+                )}
+
+                <div className="mt-4 max-h-96 space-y-2 overflow-auto">
+                  {userResults.map((user) => (
+                    <div key={user.id} className="rounded-xl border border-emerald-200 bg-[#EFEAE2] p-3 text-sm text-zinc-700">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-semibold text-zinc-900">
+                          {user.firstName || user.lastName
+                            ? `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim()
+                            : <span className="text-zinc-400 italic">No name</span>}
+                        </span>
+                        <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${
+                          user.state === "ACTIVE"
+                            ? "bg-emerald-100 text-emerald-800"
+                            : user.state === "PENDING_REGISTRATION"
+                            ? "bg-amber-100 text-amber-800"
+                            : "bg-zinc-100 text-zinc-500"
+                        }`}>
+                          {user.state}
+                        </span>
+                      </div>
+                      <p className="mt-1 font-mono text-xs text-zinc-500">{user.waNumber}</p>
+                      <div className="mt-1 flex gap-4 text-xs text-zinc-500">
+                        {user.leaderboardId && <span>ID: <span className="font-semibold text-zinc-700">{user.leaderboardId}</span></span>}
+                        {user.homeSid && <span>Spaza: <span className="font-semibold text-zinc-700">{user.homeSid}</span></span>}
+                        <span>Joined: {new Date(user.createdAt).toLocaleDateString("en-ZA")}</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </>
             )}
