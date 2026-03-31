@@ -1,10 +1,12 @@
 'use client';
 import Image from 'next/image';
+// import SideMenu from '@/components/ui/SideMenu';
 
 export default function Logo() {
   return (
-    <div className="w-56 h-28 flex items-center justify-center px-5">
-      <Image src="/images/logo2.png" alt="Weekly Soccer Picks" width={320} height={120} className="w-full" />
+    <div className="relative py-5 flex items-center justify-center w-full">
+      {/* <SideMenu /> */}
+      <Image src="/images/logo2.webp" alt="Wina Kasi Wina" width={350} height={200} className="w-full" />
     </div>
   );
 }

@@ -4,12 +4,20 @@
   --background: #ffffff;
   --foreground: #171717;
   --green-dark: #072610;
+  --violet-dark: #3c004d;
+  --black-dark: #001200;
+  --purple-dark: #220037;
+  --purple-light: #71009a;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-green-dark: var(--green-dark);
+  --color-violet-dark: var(--violet-dark);
+  --color-black-dark: var(--black);
+  --color-purple-dark: var(--purple-dark);
+  --color-purple-light: var(--purple-light);
   --font-sans: "Hit the Road", sans-serif;
 }
 
