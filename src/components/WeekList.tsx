@@ -25,7 +25,7 @@ export default function WeekList({
 
   return (
     <div className="relative flex-1 overflow-hidden">
-      <ul className="space-y-3 overflow-y-auto pr-1">
+      <ul className=" overflow-y-auto pr-1">
         {weeks.map((week) => (
           <li key={week.id}>
             <Link

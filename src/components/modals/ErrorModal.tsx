@@ -17,7 +17,7 @@ export default function ErrorModal({title, message, onClose}: {title: string; me
         <div className="relative">
           <Image src="/images/pop_up_no_text_frame_panel.png" alt="" width={320} height={200} className="max-w-xs" />
           <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
-            <h2 className="font-extrabold text-2xl tracking-wide">{title}</h2>
+            <h2 className="font-semibold text-3xl tracking-wider">{title}</h2>
             <p className="text-xl mt-1">{message}</p>
           </div>
         </div>
