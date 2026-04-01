@@ -1,6 +1,12 @@
 import LeaderboardList from "@/components/LeaderboardList";
 import { getBaseUrl } from "@/lib/url";
 import Logo from "../ui/Logo";
+import localFont from 'next/font/local';
+
+const hitRoad = localFont({
+  src: "../../../public/fonts/hitroad.ttf",
+  display: "swap",
+});
 
 type LeaderboardRow = {
   leaderboardId: string | null;
@@ -37,7 +43,7 @@ export default async function LeaderboardPage({
   const hasToken = Boolean(token);
 
   return (
-    <main className="flex justify-center h-screen overflow-hidden">
+    <main className={'flex justify-center h-screen overflow-hidden ' + hitRoad.className}>
       <div className="bg-green-dark w-full max-w-125 px-6 py-10 flex flex-col items-center gap-6">
         <Logo />
         

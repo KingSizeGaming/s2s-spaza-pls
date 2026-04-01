@@ -1,8 +1,14 @@
 import Link from 'next/link';
+import localFont from 'next/font/local';
 import {getCurrentWeekId} from '@/lib/week';
 import {getBaseUrl} from '@/lib/url';
 import WeekList from '@/components/WeekList';
 import Logo from '../ui/Logo';
+
+const hitRoad = localFont({
+  src: "../../../public/fonts/hitroad.ttf",
+  display: "swap",
+});
 
 type LeaderboardDetailResponse = {
   weekId: string;
@@ -41,23 +47,36 @@ export default async function LeaderboardDetailPage({params, searchParams}: {par
   }
 
   return (
-    <main className="flex justify-center h-screen overflow-hidden">
-      <div className="bg-green-dark w-full max-w-125 px-6 py-10 flex flex-col items-center gap-6">
+    <main className={'flex justify-center min-h-screen ' + hitRoad.className}>
+      <div className={`w-full max-w-125 px-6 flex flex-col items-center bg-[url('/images/bg-purple.webp')] bg-cover bg-center `}>
         <Logo />
 
-        <div className="relative w-full flex-1 flex flex-col rounded-3xl bg-green-700 px-3 pt-10 mt-12 overflow-visible">
-          <h1 className="absolute -top-5 left-1/2 -translate-x-1/2 whitespace-nowrap text-xl font-extrabold text-white tracking-wide border-2 border-yellow-500 rounded-xl bg-green-700 px-8 py-2 text-center z-10">Your Entries</h1>
-
-          <div className="text-center text-2xl">{data.leaderboardId}</div>
-          <div className="text-center text-lg uppercase text-amber-100/90 mb-3">Current Week: {currentWeekId}</div>
-
-          <div className="flex-1 min-h-0 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {data.weeks.length === 0 ? <p className="text-center text-sm text-white/80">No entries found.</p> : <WeekList weeks={data.weeks} currentWeekId={currentWeekId} leaderboardId={data.leaderboardId} token={token} />}
+        <div className="relative w-full flex flex-col h-[70vh] mt-2">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/images/entry_big_frame_panel.png" alt="" className="absolute inset-0 w-full h-full object-fill" />
+          <div className="relative z-10 flex flex-col px-3 flex-1 min-h-0">
+            <div className="mx-auto -mt-4 relative shrink-0">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/images/entry_header_text_bg_panel.png" alt="" className="w-48 h-auto" />
+              <span className="absolute inset-0 flex items-center justify-center text-xl font-extrabold tracking-wide"></span>
+            </div>
+            <div className="text-center text-2xl shrink-0">{data.leaderboardId}</div>
+            <div className="relative mx-auto shrink-0 mb-2">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              {/* <img src="/images/current_frame_panel.png" alt="" className="w-56 h-auto" /> */}
+              <span className=" flex items-center text-yellow-200 font-semibold justify-center text-sm uppercase">Current Week: {currentWeekId}</span>
+            </div>
+            <div className="flex-1 max-h-[60%] mx-6 overflow-y-auto wkw-scrollbar">
+              {data.weeks.length === 0 ? <p className="text-center text-sm text-white/80">No entries found.</p> : <WeekList weeks={data.weeks} currentWeekId={currentWeekId} leaderboardId={data.leaderboardId} token={token} />}
+            </div>
           </div>
         </div>
-        <Link className="text-center text-sm font-medium text-white " href={`/leaderboard?weekId=${data.weekId}${token ? `&token=${token}` : ''}`}>
-          Back to Leaderboards
-        </Link>
+        <div className="flex justify-center -mt-3">
+          <Link
+            href={`/leaderboard?weekId=${data.weekId}${token ? `&token=${token}` : ''}`}
+            className="w-40 h-14 bg-[url('/images/back_button_untapped.png')] bg-contain bg-center bg-no-repeat active:bg-[url('/images/back_button_tapped.png')] block"
+          />
+        </div>
       </div>
     </main>
   );
