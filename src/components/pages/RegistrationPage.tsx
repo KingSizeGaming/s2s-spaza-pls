@@ -5,8 +5,8 @@ import { links } from "@/db/schema";
 import ErrorCard from "@/components/ErrorCard";
 import RegistrationForm from "@/components/forms/RegistrationForm";
 
-const hitRoad = localFont({
-  src: "../../../public/fonts/hitroad.ttf",
+const arlrdbd = localFont({
+  src: "../../../public/fonts/arlrdbd.ttf",
   display: "swap",
 });
 
@@ -29,7 +29,7 @@ export default async function RegistrationPage({
     .limit(1);
 
   if (rows.length === 0) {
-    return <ErrorCard title="Invalid Link" message="This registration link is not valid." titleClassName={hitRoad.className} />;
+    return <ErrorCard title="Invalid Link" message="This registration link is not valid." titleClassName={arlrdbd.className} />;
   }
 
   const link = rows[0];
@@ -37,7 +37,7 @@ export default async function RegistrationPage({
   const expired = new Date(link.expiresAt).getTime() < now.getTime();
 
   if (link.type !== "REGISTRATION") {
-    return <ErrorCard title="Wrong Link" message="This link is not for registration." titleClassName={hitRoad.className} />;
+    return <ErrorCard title="Wrong Link" message="This link is not for registration." titleClassName={arlrdbd.className} />;
   }
 
   if (link.status !== "VALID" || expired) {
@@ -45,7 +45,7 @@ export default async function RegistrationPage({
       <ErrorCard
         title="Link Expired"
         message="This registration link is expired or already used. Please request a new registration link."
-        titleClassName={hitRoad.className}
+        titleClassName={arlrdbd.className}
       />
     );
   }

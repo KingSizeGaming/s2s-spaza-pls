@@ -176,7 +176,9 @@ export default function PredictionClient({token, fontClass}: {token: string; fon
       {submitting && <LoadingModal />}
       {confirmOpen && <ConfirmPicksModal onConfirm={confirmSubmit} onCancel={() => setConfirmOpen(false)} submitting={submitting} />}
       {result?.error && <ErrorModal title="Error" message={result.error} onClose={() => setResult(null)} />}
-      {result?.leaderboardUrl && <EntryReceivedModal onClose={() => window.close()} />}
+      {/* {result?.leaderboardUrl && <EntryReceivedModal onClose={() => window.close()} />} */}
+              {true && <EntryReceivedModal onClose={() => window.close()} />}
+
     </main>
   );
 }

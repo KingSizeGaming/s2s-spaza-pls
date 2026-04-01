@@ -5,8 +5,8 @@ import { links } from "@/db/schema";
 import ErrorCard from "@/components/ErrorCard";
 import PredictionClient from "@/components/forms/PredictionClient";
 
-const hitRoad = localFont({
-  src: "../../../public/fonts/hitroad.ttf",
+const arlrdbd = localFont({
+  src: "../../../public/fonts/arlrdbd.ttf",
   display: "swap",
 });
 
@@ -46,7 +46,7 @@ export async function PredictionPage({
     );
   }
 
-  return <PredictionClient token={token} fontClass={hitRoad.className} />;
+  return <PredictionClient token={token} fontClass={arlrdbd.className} />;
 }
 
 export default PredictionPage;

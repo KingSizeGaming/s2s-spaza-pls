@@ -21,7 +21,7 @@ export default function PredictionForm({
   onUpdatePickAction: (index: number, value: Pick) => void;
 }) {
   return (
-    <div className="font-hitroad">
+    <div className="font-arlrdbd">
       {matchesLoading && (
         <div className="p-4 text-center text-sm text-white/80">Loading matches...</div>
       )}
