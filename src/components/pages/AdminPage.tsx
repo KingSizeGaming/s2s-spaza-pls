@@ -307,7 +307,7 @@ export default function AdminPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#EFEAE2] text-zinc-900 font-[system-ui,sans-serif]">
+    <main className="min-h-screen bg-[#EFEAE2] text-zinc-900 font-arial-rounded">
       <div className="mx-auto flex min-h-screen max-w-6xl flex-col gap-8 px-6 py-10">
         <header className="flex flex-col gap-4">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">

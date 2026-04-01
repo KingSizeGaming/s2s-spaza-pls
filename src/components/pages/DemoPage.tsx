@@ -113,7 +113,7 @@ export default function DemoPage() {
   };
 
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen bg-white font-arial-rounded">
       <div className="mx-auto flex min-h-screen max-w-5xl flex-col items-center px-4 py-6">
         <header className="mb-4 flex w-full max-w-screen-sm items-center justify-between px-2">
           <div>

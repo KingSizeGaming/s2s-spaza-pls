@@ -33,7 +33,7 @@ export default async function HealthPage() {
   const style = statusStyles[status];
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 px-6 py-16">
+    <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 px-6 py-16 font-arial-rounded">
       <header className="space-y-2">
         <p className="text-sm uppercase tracking-[0.2em] text-zinc-500">
           S2S Spaza PSL POC

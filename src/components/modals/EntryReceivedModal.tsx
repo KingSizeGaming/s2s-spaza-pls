@@ -1,6 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
+// import Button from '../ui/Button';
+
 interface EntryReceivedModalProps {
   onClose: () => void;
 }
@@ -11,7 +14,7 @@ export default function EntryReceivedModal({onClose}: EntryReceivedModalProps) {
   useEffect(() => {
     const timer = window.setInterval(() => {
       setCountdown(prev => prev - 1);
-    }, 5000);
+    }, 1000);
     return () => window.clearInterval(timer);
   }, []);
 
@@ -21,13 +24,25 @@ export default function EntryReceivedModal({onClose}: EntryReceivedModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-      <div className="bg-purple-light p-3 rounded-2xl max-w-100">
+      {/* <div className="bg-purple-light p-3 rounded-2xl max-w-100">
         <div className="bg-purple-dark rounded-xl px-2 py-6 pb-10 relative flex flex-col items-center gap-2 text-center shadow-2xl">
-          <span className="rounded-full px-2 border-2 border-white text-3xl bg-green-700 font-extrabold absolute -top-4">✓</span>
           <h2 className="pt-4 font-extrabold text-2xl tracking-wide">Entry Received</h2>
           <p className="text-xl">Your entry has been accepted. Please wait for a message to be sent to you.</p>
           <p className="text-white/50 text-sm">Closing in {countdown}s</p>
+          <span className="absolute -bottom-6">
+            <Button onClick={onClose}>EXIT</Button>
+          </span>
         </div>
+      </div> */}
+      <div className="relative">
+        <Image src="/images/received_pop_up.png" alt="Entry Received" width={320} height={200} className="max-w-xs" />
+        <p className="text-white/50 text-sm text-center mt-2">Closing in {countdown}s</p>
+        <span className="absolute -bottom-6 left-1/2 -translate-x-1/2">
+          <button
+            onClick={onClose}
+            className="w-28 h-12 bg-[url('/images/exit_button_untapped.png')] bg-contain bg-center bg-no-repeat active:bg-[url('/images/exit_button_tapped.png')]"
+          />
+        </span>
       </div>
     </div>
   );

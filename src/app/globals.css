@@ -18,7 +18,7 @@
   --color-black-dark: var(--black);
   --color-purple-dark: var(--purple-dark);
   --color-purple-light: var(--purple-light);
-  --font-sans: "Hit the Road", sans-serif;
+  --font-sans: "Protest Strike", sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -31,18 +31,26 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: "Hit the Road", sans-serif;
+  font-family: "Protest Strike", sans-serif;
 }
 @font-face {
-  font-family: "Hit the Road";
-  src: url("/fonts/hit_the_road/hitroad.ttf") format("truetype");
+  font-family: "Protest Strike";
+  src: url("/fonts/ProtestStrike-Regular.ttf") format("truetype");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
-.font-hitroad {
-  font-family: "Hit the Road", sans-serif;
+@font-face {
+  font-family: "Arial Rounded";
+  src: url("/fonts/arial.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+.font-arial-rounded {
+  font-family: "Arial Rounded", sans-serif;
 }
 
 .wkw-scrollbar {

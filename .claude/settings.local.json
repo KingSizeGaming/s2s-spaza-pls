@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls \"c:/Users/Spencer/OneDrive/Desktop/King Size Games/s2s-spaza-pls/public/images/\"*pop_up_no_text*)"
+    ]
+  }
+}

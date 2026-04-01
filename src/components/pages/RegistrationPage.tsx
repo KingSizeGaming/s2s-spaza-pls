@@ -6,7 +6,7 @@ import ErrorCard from "@/components/ErrorCard";
 import RegistrationForm from "@/components/forms/RegistrationForm";
 
 const hitRoad = localFont({
-  src: "../../../public/fonts/hit_the_road/hitroad.ttf",
+  src: "../../../public/fonts/hitroad.ttf",
   display: "swap",
 });
 

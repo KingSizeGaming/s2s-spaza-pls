@@ -8,7 +8,7 @@ interface FormFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
 export default function FormField({ label, hint, className = "", ...inputProps }: FormFieldProps) {
   return (
     <div className="flex flex-col gap-1">
-      <label className="text-white font-bold text-xl flex items-baseline gap-2">
+      <label className="text-white font-medium text-xl flex items-baseline gap-2">
         {label}
         {hint && <span className="text-white/60 font-normal text-xs">{hint}</span>}
       </label>
