@@ -25,16 +25,18 @@ export default function WeekList({
 
   return (
     <div className="relative flex-1 overflow-hidden">
-      <ul className="space-y-3 overflow-y-auto pr-1">
+      <ul className=" overflow-y-auto pr-1">
         {weeks.map((week) => (
           <li key={week.id}>
             <Link
               href={`/leaderboard/${leaderboardId}/week/${week.weekId}?entryId=${week.id}${token ? `&token=${token}` : ""}`}
               onClick={() => setLoadingWeekId(week.weekId)}
             >
-              <div className="relative bg-green-dark flex min-h-16 items-center justify-between overflow-hidden rounded-2xl px-5 py-3">
+              <div className="relative flex min-h-16 items-center justify-between px-5 py-4">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/images/entry_content_frame_panel.png" alt="" className="absolute inset-0 w-full h-full object-fill" />
                 <div className="relative z-10 flex flex-col">
-                  <span className="text-xs text-white/80">
+                  <span className="text-sm font-semibold text-white">
                     {new Date(week.submittedAt).toLocaleString("en-ZA", {
                       day: "2-digit",
                       month: "short",
@@ -42,12 +44,14 @@ export default function WeekList({
                       minute: "2-digit",
                     })}
                   </span>
-                  <span className="text-sm font-semibold text-white">{week.weekId}</span>
+                  <span className="text-sm ms-2 font-semibold text-white">{week.weekId}</span>
                 </div>
                 {week.weekId === currentWeekId && (
-                  <span className="rounded-xl font-bold text-black tracking-wider border border-yellow-500 bg-yellow-600 px-7 py-1">
-                    CURRENT
-                  </span>
+                  <div className="relative z-10">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="/images/current_frame_panel.png" alt="" className="w-26 h-auto" />
+                    <span className="absolute inset-0 flex items-center justify-center text-xs font-bold tracking-wider"></span>
+                  </div>
                 )}
               </div>
             </Link>

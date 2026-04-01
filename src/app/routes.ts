@@ -4,8 +4,8 @@ import DemoPage from '@/components/pages/DemoPage';
 import AdminPage from '@/components/pages/AdminPage';
 import HealthPage from '@/components/pages/HealthPage';
 import LeaderboardPage from '@/components/pages/LeaderboardPage';
-import LeaderboardDetailPage from '@/components/pages/LeaderboardDetailPage';
-import LeaderboardWeekDetailPage from '@/components/pages/LeaderboardWeekDetailPage';
+import EntriesPage from '@/components/pages/EntriesPage';
+import EntryDetailPage from '@/components/pages/EntryDetailPage';
 import PredictionPage from '@/components/pages/PredictionPage';
 import RegistrationPage from '@/components/pages/RegistrationPage';
 
@@ -46,8 +46,8 @@ export interface RouteConfig {
 }
 
 // Typed leaderboard page components used as JSX elements in the catch-all dispatcher.
-export const LeaderboardDetailComponent = LeaderboardDetailPage as ParamsSearchComponent<LeaderboardParams>;
-export const LeaderboardWeekDetailComponent = LeaderboardWeekDetailPage as ParamsSearchComponent<LeaderboardWeekParams>;
+export const EntriesPageComponent = EntriesPage as ParamsSearchComponent<LeaderboardParams>;
+export const EntryDetailComponent = EntryDetailPage as ParamsSearchComponent<LeaderboardWeekParams>;
 
 // Maps the first URL slug segment to its page component and routing config.
 // The catch-all page (src/app/[...slug]/page.tsx) reads this to dispatch requests.

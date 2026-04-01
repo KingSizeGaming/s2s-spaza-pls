@@ -57,3 +57,13 @@ export function TrophyBronzeIcon({ size = 24 }: { size?: number }) {
     </svg>
   );
 }
+
+export function Menu () {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" version="1.2" viewBox="0 0 136 118" width="50" height="50">
+      <path fill="#ffffff" d="m14.5 1h79c6.9 0 12.5 5.6 12.5 12.5 0 6.9-5.6 12.5-12.5 12.5h-79c-6.9 0-12.5-5.6-12.5-12.5 0-6.9 5.6-12.5 12.5-12.5z"/>
+      <path fill="#ffffff" d="m40.5 46h81c6.9 0 12.5 5.6 12.5 12.5 0 6.9-5.6 12.5-12.5 12.5h-81c-6.9 0-12.5-5.6-12.5-12.5 0-6.9 5.6-12.5 12.5-12.5z"/>
+      <path fill="#ffffff" d="m14.5 91h79c6.9 0 12.5 5.6 12.5 12.5 0 6.9-5.6 12.5-12.5 12.5h-79c-6.9 0-12.5-5.6-12.5-12.5 0-6.9 5.6-12.5 12.5-12.5z"/>
+    </svg>
+  );
+}

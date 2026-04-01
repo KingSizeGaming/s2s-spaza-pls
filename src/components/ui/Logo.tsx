@@ -1,10 +1,21 @@
 'use client';
 import Image from 'next/image';
+// import SideMenu from '@/components/ui/SideMenu';
 
 export default function Logo() {
   return (
-    <div className="w-56 h-28 flex items-center justify-center px-5">
-      <Image src="/images/logo2.png" alt="Weekly Soccer Picks" width={320} height={120} className="w-full" />
+    <div className="relative pt-4 flex items-center justify-center w-full">
+      {/* <SideMenu /> */}
+      <Image
+        src="/images/wkw_logo.png"
+        alt="Wina Kasi Wina"
+        width={500}
+        height={500}
+        sizes="(max-width: 250px) 100vw, 250px"
+        className="w-3xs h-auto mx-auto"
+        loading="eager"
+        priority
+      />
     </div>
   );
 }

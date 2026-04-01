@@ -6,6 +6,8 @@ import PredictionForm from '@/components/forms/PredictionForm';
 import ConfirmPicksModal from '@/components/modals/ConfirmPicksModal';
 import LoadingModal from '@/components/modals/LoadingModal';
 import EntryReceivedModal from '@/components/modals/EntryReceivedModal';
+import ErrorModal from '@/components/modals/ErrorModal';
+// import Button from '../ui/Button';
 
 type SubmitResponse = {
   ok?: boolean;
@@ -23,8 +25,8 @@ type Match = {
   kickoffAt: string;
 };
 
-export default function PredictionClient({token}: {token: string}) {
-  const [picks, setPicks] = useState<Pick[]>([]);
+export default function PredictionClient({token, fontClass}: {token: string; fontClass: string}) {
+  const [picks, setPicks] = useState<(Pick | null)[]>([]);
   const [matches, setMatches] = useState<Match[]>([]);
   const [matchesLoading, setMatchesLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -46,6 +48,8 @@ export default function PredictionClient({token}: {token: string}) {
     setResult(null);
     setSuccessCountdown(null);
 
+    console.log('[submit] sending picks:', picks);
+
     const res = await fetch(`/api/p/${token}/submit`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
@@ -53,6 +57,8 @@ export default function PredictionClient({token}: {token: string}) {
     });
 
     const rawText = await res.text();
+    console.log('[submit] response status:', res.status, 'body:', rawText);
+
     let data: SubmitResponse = {};
     try {
       data = JSON.parse(rawText) as SubmitResponse;
@@ -61,8 +67,10 @@ export default function PredictionClient({token}: {token: string}) {
     }
 
     if (!res.ok) {
+      console.error('[submit] failed:', data.error);
       setResult({error: data.error ?? 'Something went wrong.'});
     } else {
+      console.log('[submit] success:', data);
       if (data.outboundMessage) {
         try {
           const payload = JSON.stringify({message: data.outboundMessage, ts: Date.now()});
@@ -90,7 +98,7 @@ export default function PredictionClient({token}: {token: string}) {
         if (!active) return;
         const nextMatches = Array.isArray(data?.matches) ? data.matches : [];
         setMatches(nextMatches);
-        setPicks(nextMatches.map(() => 'H' as Pick));
+        setPicks(nextMatches.map(() => null));
       })
       .catch(() => {
         if (!active) return;
@@ -119,37 +127,58 @@ export default function PredictionClient({token}: {token: string}) {
   }, [successCountdown]);
 
   return (
-    <main className="flex justify-center h-screen overflow-hidden">
-      <div className="bg-green-dark w-full max-w-125 px-2 py-10 flex flex-col items-center gap-8">
+    <main className="flex justify-center min-h-screen">
+      <div className="w-full max-w-125 px-6 flex flex-col items-center bg-[url('/images/bg-purple.webp')] bg-cover bg-center">
         <Logo />
 
-        <div className="relative w-full flex-1 min-h-0 flex flex-col rounded-3xl bg-green-600 px-3 pt-8 mt-12 overflow-visible">
-          <h1 className="absolute -top-5 left-1/2 -translate-x-1/2 whitespace-nowrap text-xl font-extrabold text-white tracking-wide border-2 border-yellow-500 rounded-xl bg-green-600 px-8 py-2 text-center z-10">Your Picks</h1>
-
-          {/* Scrollable matches list */}
-          <div className="flex-1 min-h-0 mx-3 my-2">
+        {/* <div className="relative w-full flex flex-col border-3 border-purple-light rounded-3xl bg-violet-dark px-3 pt-8 max-h-[60vh]">
+          <h1 className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap text-2xl font-extrabold tracking-wide border-3 border-purple-light shadow-2xl rounded-2xl bg-violet-dark px-4 py-2 text-center z-10">Your Picks</h1>
+          <div className="text-xl text-center font-medium text-white">Make Your Selections</div>
+          <div className="flex-1 min-h-0 mx-3 rounded-xl my-2 wkw-scrollbar">
             <PredictionForm matches={matches} picks={picks} matchesLoading={matchesLoading} onUpdatePickAction={updatePick} />
           </div>
-
-          {/* Submit button — always visible */}
-          {result?.error && <p className="mx-3 mb-2 rounded-lg border border-rose-400/50 bg-rose-950/50 px-3 py-2 text-sm text-rose-300">{result.error}</p>}
         </div>
         <div className=" flex justify-center">
+          <Button onClick={() => setConfirmOpen(true)}
+            className="disabled:opacity-50"
+            disabled={submitting || matchesLoading || matches.length === 0}
+            color='purple'
+          >
+            Submit
+          </Button>
+        </div> */}
+
+        <div className={`relative w-full flex flex-col max-h-[80vh] mt-2 ${fontClass}`}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/images/big_frame_panel.png" alt="" className="absolute inset-0 w-full h-full object-fill" />
+          <div className="relative z-10 flex flex-col px-3 flex-1 min-h-0">
+            <div className="mx-auto -mt-2 relative shrink-0">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/images/header_text_bg_panel.png" alt="" className="w-48 h-auto" />
+              <span className="absolute inset-0 flex items-center justify-center text-xl font-extrabold tracking-wide"></span>
+            </div>
+            <div className="text-xl text-center font-medium text-white shrink-0">Make Your Selections</div>
+            <div className="flex-1 max-h-[78%] mx-6 overflow-y-auto wkw-scrollbar">
+              <PredictionForm matches={matches} picks={picks} matchesLoading={matchesLoading} onUpdatePickAction={updatePick} />
+            </div>
+          </div>
+        </div>
+        <div className="flex justify-center">
           <button
             type="button"
             onClick={() => setConfirmOpen(true)}
-            className="rounded-full py-3 px-12 font-extrabold text-white text-base tracking-wide shadow-lg transition active:scale-95 disabled:opacity-50"
-            style={{background: 'linear-gradient(180deg, #4caf50 0%, #1b5e20 100%)', boxShadow: '0 4px 0 #0a3d0c'}}
             disabled={submitting || matchesLoading || matches.length === 0}
-          >
-            Submit
-          </button>
+            className="-mt-5 w-40 h-14 bg-[url('/images/submit_button_untapped.png')] bg-contain bg-center bg-no-repeat active:bg-[url('/images/submit_button_tapped.png')] disabled:opacity-50 transition"
+          />
         </div>
       </div>
 
       {submitting && <LoadingModal />}
       {confirmOpen && <ConfirmPicksModal onConfirm={confirmSubmit} onCancel={() => setConfirmOpen(false)} submitting={submitting} />}
-      {result?.leaderboardUrl && <EntryReceivedModal onClose={() => setResult(null)} />}
+      {result?.error && <ErrorModal title="Error" message={result.error} onClose={() => setResult(null)} />}
+      {/* {result?.leaderboardUrl && <EntryReceivedModal onClose={() => window.close()} />} */}
+              {true && <EntryReceivedModal onClose={() => window.close()} />}
+
     </main>
   );
 }

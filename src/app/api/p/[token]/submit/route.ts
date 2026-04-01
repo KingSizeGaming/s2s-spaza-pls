@@ -52,11 +52,20 @@ export async function POST(
 
   const link = linkRows[0];
   const linkWeekId = link.weekId ?? weekId;
+  console.log('[submit] link found:', { token, status: link.status, type: link.type, expiresAt: link.expiresAt, waNumber: link.waNumber, weekId: linkWeekId });
+
   if (link.type !== "PREDICTION") {
     return NextResponse.json({ error: "Invalid link type." }, { status: 400 });
   }
 
   if (link.status !== "VALID") {
+    // Fetch any existing entry for this token to diagnose
+    const existingEntry = await db
+      .select({ id: entries.id, waNumber: entries.waNumber, weekId: entries.weekId, submittedAt: entries.submittedAt })
+      .from(entries)
+      .where(eq(entries.linkToken, token))
+      .limit(1);
+    console.log('[submit] link is not VALID (status=%s) — existing entry in DB:', link.status, JSON.stringify(existingEntry));
     return NextResponse.json(
       { error: "Entry already submitted." },
       { status: 409 }
@@ -130,8 +139,10 @@ export async function POST(
       .limit(1);
 
     if (userRows.length === 0 || !userRows[0].leaderboardId) {
+      console.log('[submit] user not found for waNumber:', latest[0].waNumber);
       return { error: "User is not registered." } as const;
     }
+    console.log('[submit] user found:', userRows[0]);
 
     let entryId: string;
     try {
@@ -145,9 +156,11 @@ export async function POST(
         })
         .returning({ id: entries.id });
       if (inserted.length === 0) {
+        console.log('[submit] entry insert returned no rows');
         return { error: "Unable to create entry." } as const;
       }
       entryId = inserted[0].id;
+      console.log('[submit] entry inserted, id:', entryId);
       await tx.insert(entryPicks).values(
         matchRows.map((match, index) => ({
           entryId,
@@ -155,7 +168,9 @@ export async function POST(
           pick: picks[index] as Pick,
         }))
       );
-    } catch {
+      console.log('[submit] entry picks inserted:', picks.length, 'picks');
+    } catch (e) {
+      console.error('[submit] insert failed:', e);
       return { error: "Entry already submitted.", status: 409 } as const;
     }
 
@@ -190,6 +205,22 @@ export async function POST(
       { status: result.status ?? 400 }
     );
   }
+
+  // Fetch back the saved entry and picks to confirm DB write
+  const savedEntry = await db
+    .select({
+      entryId: entries.id,
+      waNumber: entries.waNumber,
+      weekId: entries.weekId,
+      submittedAt: entries.submittedAt,
+      pick: entryPicks.pick,
+      matchId: entryPicks.matchId,
+    })
+    .from(entries)
+    .innerJoin(entryPicks, eq(entryPicks.entryId, entries.id))
+    .where(eq(entries.linkToken, token));
+
+  console.log('[submit] saved entry from DB:', JSON.stringify(savedEntry, null, 2));
 
   return NextResponse.json(result);
 }

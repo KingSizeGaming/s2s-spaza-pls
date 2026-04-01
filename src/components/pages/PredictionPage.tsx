@@ -1,8 +1,14 @@
 import { eq } from "drizzle-orm";
+import localFont from "next/font/local";
 import { db } from "@/db";
 import { links } from "@/db/schema";
 import ErrorCard from "@/components/ErrorCard";
 import PredictionClient from "@/components/forms/PredictionClient";
+
+const arlrdbd = localFont({
+  src: "../../../public/fonts/arlrdbd.ttf",
+  display: "swap",
+});
 
 export async function PredictionPage({
   params,
@@ -40,7 +46,7 @@ export async function PredictionPage({
     );
   }
 
-  return <PredictionClient token={token} />;
+  return <PredictionClient token={token} fontClass={arlrdbd.className} />;
 }
 
 export default PredictionPage;

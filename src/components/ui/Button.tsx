@@ -1,6 +1,6 @@
 "use client";
 
-type ButtonColor = "red" | "green" | "blue";
+type ButtonColor = "red" | "green" | "blue" | "purple";
 type ButtonSize = "sm" | "md" | "lg";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -8,32 +8,41 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   size?: ButtonSize;
 }
 
-const colorStyles: Record<ButtonColor, { background: string; boxShadow: string }> = {
+const colorStyles: Record<ButtonColor, { background: string; border?: string }> = {
   red: {
     background: "linear-gradient(180deg, #ef5350 0%, #b71c1c 100%)",
-    boxShadow: "0 4px 0 #7f0000",
+    
+    border: "3px solid #ffffff",
   },
   green: {
     background: "linear-gradient(180deg, #4caf50 0%, #1b5e20 100%)",
-    boxShadow: "0 4px 0 #0a3d0c",
+    border: "3px solid #ffffff",
   },
   blue: {
     background: "linear-gradient(180deg, #42a5f5 0%, #0d47a1 100%)",
-    boxShadow: "0 4px 0 #062a6e",
+    border: "3px solid #ffffff",
   },
+  purple: {
+    background: "linear-gradient(180deg, #5a096d 0%, #000000 100%)",
+    border: "3px solid #ffffff",
+  }
 };
 
-const sizeStyles: Record<ButtonSize, string> = {
-  sm: "py-2 px-6 text-sm",
-  md: "py-3 px-10 text-base",
-  lg: "py-4 px-14 text-lg",
-};
+export default function Button({ color = "red", className = "", onKeyDown, onClick, children, ...props }: ButtonProps) {
+  function handleKeyDown(e: React.KeyboardEvent<HTMLButtonElement>) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      onClick?.(e as unknown as React.MouseEvent<HTMLButtonElement>);
+    }
+    onKeyDown?.(e);
+  }
 
-export default function Button({ color = "red", size = "md", className = "", children, ...props }: ButtonProps) {
   return (
     <button
-      className={`rounded-full font-extrabold text-white tracking-wide shadow-lg transition active:scale-95 ${sizeStyles[size]} ${className}`}
+      className={`rounded-2xl font-extrabold text-white tracking-wide py-1 px-6 text-lg ${className}`}
       style={colorStyles[color]}
+      onKeyDown={handleKeyDown}
+      onClick={onClick}
       {...props}
     >
       {children}
