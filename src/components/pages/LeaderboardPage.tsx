@@ -3,8 +3,8 @@ import { getBaseUrl } from "@/lib/url";
 import Logo from "../ui/Logo";
 import localFont from 'next/font/local';
 
-const hitRoad = localFont({
-  src: "../../../public/fonts/hitroad.ttf",
+const arlrdbd = localFont({
+  src: "../../../public/fonts/arlrdbd.ttf",
   display: "swap",
 });
 
@@ -43,7 +43,7 @@ export default async function LeaderboardPage({
   const hasToken = Boolean(token);
 
   return (
-    <main className={'flex justify-center min-h-screen ' + hitRoad.className}>
+    <main className={'flex justify-center min-h-screen ' + arlrdbd.className}>
       <div className="w-full max-w-125 px-10 flex flex-col items-center bg-[url('/images/bg-purple.webp')] bg-cover bg-center">
         <Logo />
 
