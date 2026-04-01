@@ -4,6 +4,7 @@ import {getCurrentWeekId} from '@/lib/week';
 import {getBaseUrl} from '@/lib/url';
 import WeekList from '@/components/WeekList';
 import Logo from '../ui/Logo';
+import EntriesErrorModal from '@/components/modals/EntriesErrorModal';
 
 const hitRoad = localFont({
   src: "../../../public/fonts/hitroad.ttf",
@@ -17,7 +18,7 @@ type LeaderboardDetailResponse = {
   error?: string;
 };
 
-export default async function LeaderboardDetailPage({params, searchParams}: {params: Promise<{leaderboardId: string}>; searchParams?: Promise<{weekId?: string; token?: string}>}) {
+export default async function EntriesPage({params, searchParams}: {params: Promise<{leaderboardId: string}>; searchParams?: Promise<{weekId?: string; token?: string}>}) {
   const resolvedParams = await params;
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const currentWeekId = getCurrentWeekId();
@@ -33,17 +34,8 @@ export default async function LeaderboardDetailPage({params, searchParams}: {par
   const data = (await res.json()) as LeaderboardDetailResponse;
 
   if (!res.ok) {
-    return (
-      <main className="flex justify-center h-screen overflow-hidden">
-        <div className="bg-green-dark w-full max-w-125 px-6 py-10 flex flex-col items-center justify-center gap-4 text-white">
-          <h1 className="text-center text-2xl font-bold">Access denied</h1>
-          <p className="text-center text-sm text-white/80">{data.error ?? 'Unable to view this leaderboard.'}</p>
-          <Link className="text-sm font-medium text-white" href={`/leaderboard${weekIdQuery ? `?weekId=${weekIdQuery}` : ''}`}>
-            Back to Leaderboards
-          </Link>
-        </div>
-      </main>
-    );
+    const backHref = `/leaderboard${weekIdQuery ? `?weekId=${weekIdQuery}` : ''}`;
+    return <EntriesErrorModal message={data.error ?? 'Unable to view this leaderboard.'} backHref={backHref} />;
   }
 
   return (

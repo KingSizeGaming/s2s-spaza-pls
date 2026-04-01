@@ -1,4 +1,4 @@
-import { routes, LeaderboardDetailComponent, LeaderboardWeekDetailComponent, type SearchParams } from '../routes';
+import { routes, EntryDetailComponent, EntriesPageComponent, type SearchParams } from '../routes';
 
 interface RouteParams {
   slug: string[];
@@ -53,7 +53,7 @@ export default async function CatchAllPage({
     if (nestedMatch.component === 'leaderboard-week' && nestedMatch.params) {
       const { leaderboardId, weekId } = nestedMatch.params;
       return (
-        <LeaderboardWeekDetailComponent
+        <EntryDetailComponent
           params={Promise.resolve({ leaderboardId, weekId })}
           searchParams={resolvedSearch}
         />
@@ -64,7 +64,7 @@ export default async function CatchAllPage({
     if (nestedMatch.component === 'leaderboard-detail' && nestedMatch.params) {
       const { leaderboardId } = nestedMatch.params;
       return (
-        <LeaderboardDetailComponent
+        <EntriesPageComponent
           params={Promise.resolve({ leaderboardId })}
           searchParams={resolvedSearch}
         />
