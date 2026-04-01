@@ -62,7 +62,6 @@ export default async function LeaderboardDetailPage({params, searchParams}: {par
             </div>
             <div className="text-center text-2xl shrink-0">{data.leaderboardId}</div>
             <div className="relative mx-auto shrink-0 mb-2">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               {/* <img src="/images/current_frame_panel.png" alt="" className="w-56 h-auto" /> */}
               <span className=" flex items-center text-yellow-200 font-semibold justify-center text-sm uppercase">Current Week: {currentWeekId}</span>
             </div>

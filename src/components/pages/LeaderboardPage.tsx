@@ -43,27 +43,31 @@ export default async function LeaderboardPage({
   const hasToken = Boolean(token);
 
   return (
-    <main className={'flex justify-center h-screen overflow-hidden ' + hitRoad.className}>
-      <div className="bg-green-dark w-full max-w-125 px-6 py-10 flex flex-col items-center gap-6">
+    <main className={'flex justify-center min-h-screen ' + hitRoad.className}>
+      <div className="w-full max-w-125 px-10 flex flex-col items-center bg-[url('/images/bg-purple.webp')] bg-cover bg-center">
         <Logo />
-        
 
-        <div className="relative w-full flex-1 min-h-0 flex flex-col rounded-3xl bg-green-700 px-3 pt-12 mt-15 overflow-visible">
-          <div className="flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {/* Page Title */}
-          <h1 className="absolute -top-8 left-1/2 -translate-x-1/2 text-xl font-extrabold text-white tracking-wide border-2 border-yellow-500 rounded-xl bg-green-700 px-8 py-1 text-center z-10">
-            This Week&apos;s <br></br>Leaderboard
-          </h1>
-          {leaderboards.length === 0 ? (
-            <p className="text-center text-sm text-white/80">No entries yet.</p>
-          ) : (
-            <LeaderboardList
-              leaderboards={leaderboards}
-              weekId={data.weekId}
-              token={token}
-              hasToken={hasToken}
-            />
-          )}
+        <div className="relative w-full flex flex-col h-[70vh] mt-2">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/images/leaderboard_big_frame_panel.png" alt="" className="absolute inset-0 w-full h-full object-fill" />
+          <div className="relative z-10 flex flex-col px-3 flex-1 min-h-0">
+            <div className="mx-auto -mt-6 relative shrink-0">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/images/header_week_leaderboard_panel.png" alt="" className="w-48 h-auto" />
+              <span className="absolute inset-0 flex items-center justify-center text-xl font-extrabold tracking-wide"></span>
+            </div>
+            <div className="flex-1 max-h-[78%] mx-6 overflow-y-auto wkw-scrollbar">
+              {leaderboards.length === 0 ? (
+                <p className="text-center text-sm text-white/80">No entries yet.</p>
+              ) : (
+                <LeaderboardList
+                  leaderboards={leaderboards}
+                  weekId={data.weekId}
+                  token={token}
+                  hasToken={hasToken}
+                />
+              )}
+            </div>
           </div>
         </div>
       </div>
