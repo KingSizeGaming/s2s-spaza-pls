@@ -112,6 +112,14 @@ export default function DemoPage() {
     setBusy(false);
   };
 
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      sendMessage(message);
+      setMessage("");
+    }
+  }
+
   return (
     <main className="min-h-screen bg-white font-arial-rounded">
       <div className="mx-auto flex min-h-screen max-w-5xl flex-col items-center px-4 py-6">
@@ -202,11 +210,12 @@ export default function DemoPage() {
                   className="rounded-full border border-emerald-100 bg-white px-4 py-2 text-sm text-black shadow-sm"
                   value={message}
                   onChange={(event) => setMessage(event.target.value)}
+                  onKeyDown={handleKeyDown}
                   placeholder="Type a message"
                 />
                 <button
                   className="rounded-full bg-[#075E54] px-5 py-2 text-sm font-semibold text-white"
-                  onClick={() => sendMessage(message)}
+                  onClick={() => { sendMessage(message); setMessage(""); }}
                   disabled={busy}
                 >
                   Send
