@@ -49,8 +49,20 @@ body {
   font-display: swap;
 }
 
+@font-face {
+  font-family: "Hit the Road";
+  src: url("/fonts/hitroad.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 .font-arial-rounded {
   font-family: "Arial Rounded", sans-serif;
+}
+
+.font-hitroad {
+  font-family: "Hit the Road", sans-serif;
 }
 
 .wkw-scrollbar {

@@ -14,7 +14,7 @@ export default function EntryReceivedModal({onClose}: EntryReceivedModalProps) {
   useEffect(() => {
     const timer = window.setInterval(() => {
       setCountdown(prev => prev - 1);
-    }, 1000);
+    }, 5000);
     return () => window.clearInterval(timer);
   }, []);
 
@@ -37,7 +37,7 @@ export default function EntryReceivedModal({onClose}: EntryReceivedModalProps) {
       <div className="relative">
         <Image src="/images/received_pop_up.png" alt="Entry Received" width={320} height={200} className="max-w-xs" />
         <p className="text-white/50 text-sm text-center mt-2">Closing in {countdown}s</p>
-        <span className="absolute -bottom-6 left-1/2 -translate-x-1/2">
+        <span className="absolute -bottom-4 left-1/2 -translate-x-1/2">
           <button
             onClick={onClose}
             className="w-28 h-12 bg-[url('/images/exit_button_untapped.png')] bg-contain bg-center bg-no-repeat active:bg-[url('/images/exit_button_tapped.png')]"

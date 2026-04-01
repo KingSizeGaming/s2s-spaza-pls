@@ -13,7 +13,8 @@ export default function Logo() {
         height={500}
         sizes="(max-width: 250px) 100vw, 250px"
         className="w-3xs h-auto mx-auto"
-        highPriority="true"
+        loading="eager"
+        priority
       />
     </div>
   );

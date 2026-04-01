@@ -1,8 +1,14 @@
 import { eq } from "drizzle-orm";
+import localFont from "next/font/local";
 import { db } from "@/db";
 import { links } from "@/db/schema";
 import ErrorCard from "@/components/ErrorCard";
 import PredictionClient from "@/components/forms/PredictionClient";
+
+const hitRoad = localFont({
+  src: "../../../public/fonts/hitroad.ttf",
+  display: "swap",
+});
 
 export async function PredictionPage({
   params,
@@ -40,7 +46,7 @@ export async function PredictionPage({
     );
   }
 
-  return <PredictionClient token={token} />;
+  return <PredictionClient token={token} fontClass={hitRoad.className} />;
 }
 
 export default PredictionPage;
