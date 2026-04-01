@@ -7,7 +7,8 @@ import { getCurrentWeekId, getIsoWeekEndUtc } from "@/lib/week";
 import { getBaseUrlFromRequest } from "@/lib/url";
 import { normalizeWaNumber, normalizeMessage } from "@/lib/normalize";
 
-const NEW_SID_REGEX = /^new\s+(\S+)/i;
+// const NEW_SID_REGEX = /^new\s+(\S+)/i;
+const NEW_SID_REGEX = /^(\S+)$/i;
 const LEADERBOARD_REGEX = /^leaderboard\s+(\S+)/i;
 
 async function lookupVoucher(code: string, weekId: string) {
@@ -106,6 +107,7 @@ export async function POST(request: NextRequest) {
 
   const newMatch = message.match(NEW_SID_REGEX);
   if (newMatch) {
+    // const sid = newMatch[1];
     const sid = newMatch[1];
 
     const sidRow = await db
