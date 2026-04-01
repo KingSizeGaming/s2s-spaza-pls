@@ -21,7 +21,7 @@ export default function PredictionForm({
   onUpdatePickAction: (index: number, value: Pick) => void;
 }) {
   return (
-    <div className="flex-1 min-h-0 h-full overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden space-y-3">
+    <div className="flex-1 min-h-0 h-full space-y-3">
       {matchesLoading && (
         <div className="p-4 text-center text-sm text-white/80">Loading matches...</div>
       )}
@@ -33,27 +33,31 @@ export default function PredictionForm({
         const kickoff = new Date(match.kickoffAt);
         const kickoffLabel = Number.isNaN(kickoff.getTime())
           ? "TBD"
-          : kickoff.toLocaleString("en-ZA", { weekday: "short", hour: "2-digit", minute: "2-digit" });
+          : kickoff.toLocaleString("en-ZA", { weekday: "long", hour: "2-digit", minute: "2-digit" });
         return (
-          <div key={match.id} className="rounded-2xl bg-green-950 px-4 py-3 mb-2 text-center">
-            <p className="font-extrabold text-white text-base">{`${match.homeTeam} vs ${match.awayTeam}`}</p>
-            <p className="text-white/70 text-xs mb-2">{kickoffLabel}</p>
-            <p className="text-white/60 text-xs mb-2">Select Your Pick!</p>
+          <div key={match.id} className="rounded-2xl bg-purple-dark px-4 py-3 mb-2 text-center">
+            <p className="font-bold text-2xl">{`${match.homeTeam} vs ${match.awayTeam}`}</p>
+            <p className="text-md font-bold mb-2">{kickoffLabel}</p>
             <div className="flex justify-center gap-2">
-              {(["H", "D", "A"] as Pick[]).map((option) => (
+              {(["H", "D", "A"] as Pick[]).map((option) => {
+                const styles = {
+                  H: { active: "bg-orange-500", inactive: "bg-gray-300 text-black" },
+                  D: { active: "bg-yellow-400 text-black ", inactive: "bg-gray-300 text-black" },
+                  A: { active: "bg-cyan-400 ", inactive: "bg-gray-300 text-black" },
+                }[option];
+                return (
                 <button
                   key={option}
                   type="button"
                   onClick={() => onUpdatePickAction(index, option)}
-                  className={`rounded-full px-4 py-1 text-sm font-bold transition ${
-                    pick === option
-                      ? "bg-cyan-500 text-white shadow-[0_3px_0_#0e7490]"
-                      : "bg-cyan-700/60 text-white/80"
+                  className={`rounded-lg px-3 py-1 tracking-wide font-bold transition ${
+                    pick === option ? styles.active : styles.inactive
                   }`}
                 >
                   {option === "H" ? "HOME" : option === "D" ? "DRAW" : "AWAY"}
                 </button>
-              ))}
+                );
+              })}
             </div>
           </div>
         );

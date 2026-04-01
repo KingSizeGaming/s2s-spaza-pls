@@ -44,3 +44,27 @@ body {
 .font-hitroad {
   font-family: "Hit the Road", sans-serif;
 }
+
+.wkw-scrollbar {
+  overflow-y: auto;
+}
+.wkw-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+.wkw-scrollbar::-webkit-scrollbar-track {
+  border-radius: 0;
+  background-color: #f3f4f6;
+}
+.wkw-scrollbar::-webkit-scrollbar-thumb {
+  border-radius: 0;
+  background-color: #d1d5db;
+}
+@media (prefers-color-scheme: dark) {
+  .wkw-scrollbar::-webkit-scrollbar-track {
+    background-color: black;
+  }
+  .wkw-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #ffffff;
+    border-radius: 12px;
+  }
+}
