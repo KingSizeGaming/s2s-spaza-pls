@@ -23,19 +23,19 @@ export default function LeaderboardList({leaderboards, weekId, token, hasToken}:
         {leaderboards.map((row, index) => {
           const hasCrown = index < 1;
           const content = (
-            <div className="relative flex h-16 items-center justify-between px-5 text-white">
+            <div className="relative flex h-18 items-center justify-between px-5 text-white">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/images/player_info_panel.png" alt="" className="absolute inset-0 w-full h-full object-fill" />
               {hasCrown && <Image src="/images/crown.png" alt="" width={20} height={20} className="absolute top-0.5 -translate-y-1/2 -left-4 w-14 z-20" />}
-              <div className="relative z-10 mb-2 flex flex-1 items-center">
-                <span className="text-xl sm:text-2xl tracking-wider ms-3 font-semibold">{row.leaderboardId ?? 'Unknown'}</span>
+              <div className="relative mb-1 z-10 flex flex-1 items-center">
+                <span className="leaderboard-id text-3xl tracking-wider ms-3 font-semibold">{row.leaderboardId ?? 'Unknown'}</span>
               </div>
-              <div className="relative z-10 mb-1 w-22 sm:w-18 h-10 flex items-center justify-center shrink-0">
+              <div className="leaderboard-points-container relative z-10 h-11 px-6 flex items-center justify-center shrink-0">
                 {/* --> The panel images are temporarily used as background frames with object-fill and 
                 absolute inset-0, which doesn't work well with next/image */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/images/player_points_panel.png" alt="" className="absolute inset-0 w-full h-full object-fill" />
-                <span className="relative z-10 mb-1 text-2xl tracking-wider font-bold">{row.totalPoints}ps</span>
+                <span className="leaderboard-points relative z-10 text-3xl tracking-wide font-bold">{row.totalPoints}ps</span>
               </div>
             </div>
           );

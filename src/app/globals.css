@@ -8,6 +8,7 @@
   --black-dark: #001200;
   --purple-dark: #220037;
   --purple-light: #71009a;
+  --yellow-dark: #f6e8a0;
 }
 
 @theme inline {
@@ -18,13 +19,15 @@
   --color-black-dark: var(--black);
   --color-purple-dark: var(--purple-dark);
   --color-purple-light: var(--purple-light);
+  --color-yellow-dark: var(--yellow-dark);
   --font-sans: "Protest Strike", sans-serif;
+  --breakpoint-xs: 320px;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
-    --foreground: #ffffff;
+    --foreground: #ffffff
   }
 }
 
@@ -51,7 +54,7 @@ body {
 
 @font-face {
   font-family: "Hit the Road";
-  src: url("/fonts/hitroad.ttf") format("truetype");
+  src: url("/fonts/hitroad.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -100,15 +103,4 @@ input:-webkit-autofill:focus {
   border-radius: 0;
   background-color: #ffffff;
   border-radius: 12px;
-}
-
-@media (max-width: 640px) {
-  .pick-buttons > * + * {
-    margin-left: 0.75rem;
-  }
-
-  .predict-width {
-    width: 90%;
-    margin: 0 auto;
-  }
 }

@@ -1,12 +1,12 @@
 import LeaderboardList from "@/components/LeaderboardList";
 import { getBaseUrl } from "@/lib/url";
 import Logo from "../ui/Logo";
-import localFont from 'next/font/local';
+// import localFont from 'next/font/local';
 
-const arlrdbd = localFont({
-  src: "../../../public/fonts/arlrdbd.ttf",
-  display: "swap",
-});
+// const arlrdbd = localFont({
+//   src: "../../../public/fonts/arlrdbd.ttf",
+//   display: "swap",
+// });
 
 type LeaderboardRow = {
   leaderboardId: string | null;
@@ -43,7 +43,7 @@ export default async function LeaderboardPage({
   const hasToken = Boolean(token);
 
   return (
-    <main className={'flex justify-center min-h-screen ' + arlrdbd.className}>
+    <main className="flex justify-center min-h-screen font-hitroad">
       <div className="w-full max-w-125 px-4 sm:px-10 flex flex-col items-center bg-[url('/images/bg-purple.webp')] bg-cover bg-center">
         <Logo />
 

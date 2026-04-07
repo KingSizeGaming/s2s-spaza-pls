@@ -1,0 +1,26 @@
+@media (max-width: 640px) {
+  .pick-buttons > * + * {
+    margin-left: 0.75rem;
+  }
+
+  .predict-width {
+    width: 90%;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 435px) {
+  .leaderboard-id {
+    font-size: 1.5rem; /* text-2xl */
+    margin-inline-start: 0.25rem;
+  }
+
+  .leaderboard-points-container {
+    height: 2.5rem; /* h-10 */
+    padding: 0 1rem;
+  }
+
+  .leaderboard-points {
+    font-size: x-large; /* text-xl */
+  }
+}

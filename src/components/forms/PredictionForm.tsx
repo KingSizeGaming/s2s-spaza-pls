@@ -36,7 +36,7 @@ export default function PredictionForm({
     onUpdatePickAction(index, option);
   }, [onUpdatePickAction]);
   return (
-    <div className="font-arlrdbd">
+    <div className="font-hitroad">
       {matchesLoading && (
         <div className="p-4 text-center text-sm text-white/80">Loading matches...</div>
       )}

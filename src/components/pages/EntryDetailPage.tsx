@@ -1,14 +1,8 @@
 import Link from "next/link";
-import localFont from "next/font/local";
 
 import { getBaseUrl } from "@/lib/url";
 import Logo from "../ui/Logo";
 import EntriesErrorModal from "@/components/modals/EntriesErrorModal";
-
-const arlrdbd = localFont({
-  src: "../../../public/fonts/arlrdbd.ttf",
-  display: "swap",
-});
 
 type Pick = "H" | "D" | "A";
 
@@ -59,7 +53,7 @@ export default async function EntryDetailPage({
   }
 
   return (
-    <main className={'flex justify-center min-h-screen ' + arlrdbd.className}>
+    <main className="flex justify-center min-h-screen font-hitroad">
       <div className="w-full max-w-125 px-4 sm:px-6 flex flex-col items-center bg-[url('/images/bg-purple.webp')] bg-cover bg-center">
         <Logo />
 

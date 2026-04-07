@@ -1,15 +1,9 @@
 import Link from 'next/link';
-import localFont from 'next/font/local';
 import {getCurrentWeekId} from '@/lib/week';
 import {getBaseUrl} from '@/lib/url';
 import WeekList from '@/components/WeekList';
 import Logo from '../ui/Logo';
 import EntriesErrorModal from '@/components/modals/EntriesErrorModal';
-
-const arlrdbd = localFont({
-  src: "../../../public/fonts/arlrdbd.ttf",
-  display: "swap",
-});
 
 type LeaderboardDetailResponse = {
   weekId: string;
@@ -39,7 +33,7 @@ export default async function EntriesPage({params, searchParams}: {params: Promi
   }
 
   return (
-    <main className={'flex justify-center min-h-screen ' + arlrdbd.className}>
+    <main className="flex justify-center min-h-screen font-hitroad">
       <div className={`w-full max-w-125 px-4 sm:px-6 flex flex-col items-center bg-[url('/images/bg-purple.webp')] bg-cover bg-center `}>
         <Logo />
 
@@ -52,13 +46,13 @@ export default async function EntriesPage({params, searchParams}: {params: Promi
               <img src="/images/entry_header_text_bg_panel.png" alt="" className="w-48 h-auto" />
               <span className="absolute inset-0 flex items-center justify-center text-xl font-extrabold tracking-wide"></span>
             </div>
-            <div className="text-center text-xl sm:text-2xl shrink-0">{data.leaderboardId}</div>
-            <div className="relative mx-auto shrink-0 mb-2">
+            <div className="text-center text-xl sm:text-2xl tracking-wider shrink-0">{data.leaderboardId}</div>
+            <div className="relative mx-auto -mt-2 shrink-0 ">
               {/* <img src="/images/current_frame_panel.png" alt="" className="w-56 h-auto" /> */}
-              <span className=" flex items-center text-yellow-200 font-semibold justify-center text-sm uppercase">Current Week: {currentWeekId}</span>
+              <span className="flex items-center text-yellow-dark font-semibold justify-center text-lg uppercase">Current Week: {currentWeekId}</span>
             </div>
             <div className="flex-1 max-h-[60%] mx-2 sm:mx-6 overflow-y-auto wkw-scrollbar">
-              {data.weeks.length === 0 ? <p className="text-center text-sm text-white/80">No entries found.</p> : <WeekList weeks={data.weeks} currentWeekId={currentWeekId} leaderboardId={data.leaderboardId} token={token} />}
+              {data.weeks.length === 0 ? <p className="text-center text-sm text-white">No entries found.</p> : <WeekList weeks={data.weeks} currentWeekId={currentWeekId} leaderboardId={data.leaderboardId} token={token} />}
             </div>
           </div>
         </div>
