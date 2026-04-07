@@ -15,16 +15,16 @@ export default function ErrorModal({title, message, onClose}: {title: string; me
       </div> */}
       <div className="relative flex flex-col items-center">
         <div className="relative">
-          <Image src="/images/pop_up_no_text_frame_panel.png" alt="" width={320} height={200} className="max-w-xs" />
+          <Image src="/images/pop_up_no_text_frame_panel.png" alt="" width={320} height={200} className="max-w-xs" loading="eager" />
           <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
-            <h2 className="font-semibold text-3xl tracking-wider">{title}</h2>
+            <h2 className="font-semibold text-2xl tracking-wider">{title}</h2>
             <p className="text-xl mt-1">{message}</p>
           </div>
         </div>
         <span className="absolute -bottom-4">
           <button
             onClick={onClose}
-            className="w-28 h-12 bg-[url('/images/exit_button_untapped.png')] bg-contain bg-center bg-no-repeat active:bg-[url('/images/exit_button_tapped.png')]"
+            className="w-24 h-10 sm:w-28 sm:h-12 bg-[url('/images/exit_button_untapped.png')] bg-contain bg-center bg-no-repeat active:bg-[url('/images/exit_button_tapped.png')]"
           />
         </span>
       </div>
