@@ -139,7 +139,7 @@ export default function NewRegistrationForm({token}: {token: string}) {
       {submitting && <LoadingModal />}
 
       <div className="flex justify-center min-h-screen">
-        <div className="w-full max-w-125 px-6 pb-10 flex flex-col items-center gap-2 bg-[url('/images/bg-purple.webp')] bg-cover bg-center">
+        <div className="w-full max-w-125 px-4 sm:px-6 pb-10 flex flex-col items-center gap-2 bg-[url('/images/bg-purple.webp')] bg-cover bg-center">
           <Logo />
 
           <form onSubmit={handleSubmit} className="w-full py-2 flex flex-col gap-5">
@@ -163,7 +163,7 @@ export default function NewRegistrationForm({token}: {token: string}) {
               Submit
             </Button> */}
 
-            <button type="submit" disabled={submitting} className="mx-auto w-40 h-14 bg-[url('/images/submit_button_untapped.png')] bg-contain bg-center bg-no-repeat active:bg-[url('/images/submit_button_tapped.png')] disabled:opacity-50 transition" />
+            <button type="submit" disabled={submitting} className="mx-auto w-32 h-12 sm:w-40 sm:h-14 bg-[url('/images/submit_button_untapped.png')] bg-contain bg-center bg-no-repeat active:bg-[url('/images/submit_button_tapped.png')] disabled:opacity-50 transition" />
           </form>
         </div>
       </div>

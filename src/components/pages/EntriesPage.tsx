@@ -40,7 +40,7 @@ export default async function EntriesPage({params, searchParams}: {params: Promi
 
   return (
     <main className={'flex justify-center min-h-screen ' + arlrdbd.className}>
-      <div className={`w-full max-w-125 px-6 flex flex-col items-center bg-[url('/images/bg-purple.webp')] bg-cover bg-center `}>
+      <div className={`w-full max-w-125 px-4 sm:px-6 flex flex-col items-center bg-[url('/images/bg-purple.webp')] bg-cover bg-center `}>
         <Logo />
 
         <div className="relative w-full flex flex-col h-[70vh] mt-2">
@@ -52,12 +52,12 @@ export default async function EntriesPage({params, searchParams}: {params: Promi
               <img src="/images/entry_header_text_bg_panel.png" alt="" className="w-48 h-auto" />
               <span className="absolute inset-0 flex items-center justify-center text-xl font-extrabold tracking-wide"></span>
             </div>
-            <div className="text-center text-2xl shrink-0">{data.leaderboardId}</div>
+            <div className="text-center text-xl sm:text-2xl shrink-0">{data.leaderboardId}</div>
             <div className="relative mx-auto shrink-0 mb-2">
               {/* <img src="/images/current_frame_panel.png" alt="" className="w-56 h-auto" /> */}
               <span className=" flex items-center text-yellow-200 font-semibold justify-center text-sm uppercase">Current Week: {currentWeekId}</span>
             </div>
-            <div className="flex-1 max-h-[60%] mx-6 overflow-y-auto wkw-scrollbar">
+            <div className="flex-1 max-h-[60%] mx-2 sm:mx-6 overflow-y-auto wkw-scrollbar">
               {data.weeks.length === 0 ? <p className="text-center text-sm text-white/80">No entries found.</p> : <WeekList weeks={data.weeks} currentWeekId={currentWeekId} leaderboardId={data.leaderboardId} token={token} />}
             </div>
           </div>
@@ -65,7 +65,7 @@ export default async function EntriesPage({params, searchParams}: {params: Promi
         <div className="flex justify-center -mt-3">
           <Link
             href={`/leaderboard?weekId=${data.weekId}${token ? `&token=${token}` : ''}`}
-            className="w-40 h-14 bg-[url('/images/back_button_untapped.png')] bg-contain bg-center bg-no-repeat active:bg-[url('/images/back_button_tapped.png')] block"
+            className="w-32 h-12 sm:w-40 sm:h-14 bg-[url('/images/back_button_untapped.png')] bg-contain bg-center bg-no-repeat active:bg-[url('/images/back_button_tapped.png')] block"
           />
         </div>
       </div>

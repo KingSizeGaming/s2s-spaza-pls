@@ -60,7 +60,7 @@ export default async function EntryDetailPage({
 
   return (
     <main className={'flex justify-center min-h-screen ' + arlrdbd.className}>
-      <div className="w-full max-w-125 px-6 flex flex-col items-center bg-[url('/images/bg-purple.webp')] bg-cover bg-center">
+      <div className="w-full max-w-125 px-4 sm:px-6 flex flex-col items-center bg-[url('/images/bg-purple.webp')] bg-cover bg-center">
         <Logo />
 
         <div className="relative w-full flex flex-col max-h-[80vh] mt-2">
@@ -72,7 +72,7 @@ export default async function EntryDetailPage({
               <img src="/images/header_text_bg_panel.png" alt="" className="w-48 h-auto" />
               <span className="absolute inset-0 flex items-center justify-center text-xl font-extrabold tracking-wide"></span>
             </div>
-            <div className="flex-1 max-h-[78%] mx-6 overflow-y-auto wkw-scrollbar">
+            <div className="flex-1 max-h-[78%] mx-2 sm:mx-6 overflow-y-auto wkw-scrollbar">
               {data.matches.map((match) => {
                 const kickoff = new Date(match.kickoffAt);
                 const kickoffLabel = Number.isNaN(kickoff.getTime())
@@ -83,12 +83,12 @@ export default async function EntryDetailPage({
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src="/images/content_frame_panel.png" alt="" className="absolute inset-0 w-full h-full object-fill" />
                     <div className="relative z-10">
-                      <p className="font-medium text-2xl">{`${match.homeTeam} vs ${match.awayTeam}`}</p>
+                      <p className="font-medium text-lg sm:text-2xl">{`${match.homeTeam} vs ${match.awayTeam}`}</p>
                       <p className="text-md font-medium">{kickoffLabel}</p>
                       {/* {match.isFinished && (
                         <p className="text-sm font-medium">Score: {match.homeScore} - {match.awayScore}</p>
                       )} */}
-                      <div className="flex justify-center -space-x-1">
+                      <div className="flex justify-center -space-x-6 sm:-space-x-5">
                         {(["H", "D", "A"] as Pick[]).map((option) => {
                           const images = {
                             H: { picked: "/images/home_button_picked.png", untapped: "/images/home_button_untapped.png" },
@@ -98,7 +98,7 @@ export default async function EntryDetailPage({
                           return (
                             <div
                               key={option}
-                              className="w-28 h-14 bg-contain bg-center bg-no-repeat"
+                              className="w-20 h-10 sm:w-28 sm:h-14 bg-contain bg-center bg-no-repeat"
                               style={{ backgroundImage: `url('${match.pick === option ? images.picked : images.untapped}')` }}
                             />
                           );
@@ -114,7 +114,7 @@ export default async function EntryDetailPage({
         <div className="flex justify-center">
           <Link
             href={backHref}
-            className="-mt-3 w-40 h-14 bg-[url('/images/back_button_untapped.png')] bg-contain bg-center bg-no-repeat active:bg-[url('/images/back_button_tapped.png')] block"
+            className="-mt-3 w-32 h-12 sm:w-40 sm:h-14 bg-[url('/images/back_button_untapped.png')] bg-contain bg-center bg-no-repeat active:bg-[url('/images/back_button_tapped.png')] block"
           />
         </div>
       </div>

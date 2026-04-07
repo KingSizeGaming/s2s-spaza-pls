@@ -27,11 +27,11 @@ export default function LeaderboardList({leaderboards, weekId, token, hasToken}:
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/images/player_info_panel.png" alt="" className="absolute inset-0 w-full h-full object-fill" />
               {hasCrown && <Image src="/images/crown.png" alt="" width={20} height={20} className="absolute top-0.5 -translate-y-1/2 -left-4 w-14 z-20" />}
-              <div className="relative z-10 flex items-center">
-                <span className="text-2xl tracking-wider ms-3 font-semibold">{row.leaderboardId ?? 'Unknown'}</span>
+              <div className="relative z-10 mb-2 flex flex-1 items-center">
+                <span className="text-xl sm:text-2xl tracking-wider ms-3 font-semibold">{row.leaderboardId ?? 'Unknown'}</span>
               </div>
-              <div className="relative z-10 flex items-center">
-                <span className="right-11 absolute flex items-center justify-center text-2xl tracking-wider font-bold">{row.totalPoints}ps</span>
+              <div className="relative z-10 mb-2 mr-4 flex w-[30%] items-center justify-center">
+                <span className="text-2xl sm:text-2xl tracking-wider font-bold">{row.totalPoints}ps</span>
               </div>
             </div>
           );
