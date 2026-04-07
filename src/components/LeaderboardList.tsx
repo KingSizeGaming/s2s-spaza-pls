@@ -30,8 +30,12 @@ export default function LeaderboardList({leaderboards, weekId, token, hasToken}:
               <div className="relative z-10 mb-2 flex flex-1 items-center">
                 <span className="text-xl sm:text-2xl tracking-wider ms-3 font-semibold">{row.leaderboardId ?? 'Unknown'}</span>
               </div>
-              <div className="relative z-10 mb-2 mr-4 flex w-[30%] items-center justify-center">
-                <span className="text-2xl sm:text-2xl tracking-wider font-bold">{row.totalPoints}ps</span>
+              <div className="relative z-10 mb-1 w-22 sm:w-18 h-10 flex items-center justify-center shrink-0">
+                {/* --> The panel images are temporarily used as background frames with object-fill and 
+                absolute inset-0, which doesn't work well with next/image */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/images/player_points_panel.png" alt="" className="absolute inset-0 w-full h-full object-fill" />
+                <span className="relative z-10 mb-1 text-2xl tracking-wider font-bold">{row.totalPoints}ps</span>
               </div>
             </div>
           );
