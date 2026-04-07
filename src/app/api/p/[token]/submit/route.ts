@@ -20,7 +20,7 @@ export async function POST(
   }
   if (!picksInput.every((pick) => pick === "H" || pick === "D" || pick === "A")) {
     return NextResponse.json(
-      { error: "Invalid picks. Use H, D, or A." },
+      { error: "Complete your picks." },
       { status: 400 }
     );
   }
