@@ -35,12 +35,12 @@ export default function EntryReceivedModal({onClose}: EntryReceivedModalProps) {
         </div>
       </div> */}
       <div className="relative">
-        <Image src="/images/received_pop_up.png" alt="Entry Received" width={320} height={200} className="max-w-xs" />
+        <Image src="/images/received_pop_up.png" alt="Entry Received" width={320} height={200} className="max-w-xs" loading="eager" />
         {/* <p className="text-white/50 text-sm text-center mt-2">Closing in {countdown}s</p> */}
         <span className="absolute -bottom-4 left-1/2 -translate-x-1/2">
           <button
             onClick={onClose}
-            className="w-28 h-12 bg-[url('/images/exit_button_untapped.png')] bg-contain bg-center bg-no-repeat active:bg-[url('/images/exit_button_tapped.png')]"
+            className="w-24 h-10 sm:w-28 sm:h-12 bg-[url('/images/exit_button_untapped.png')] bg-contain bg-center bg-no-repeat active:bg-[url('/images/exit_button_tapped.png')]"
           />
         </span>
       </div>

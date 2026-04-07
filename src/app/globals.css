@@ -2,12 +2,13 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #ffffff;
   --green-dark: #072610;
   --violet-dark: #3c004d;
   --black-dark: #001200;
   --purple-dark: #220037;
   --purple-light: #71009a;
+  --yellow-dark: #f6e8a0;
 }
 
 @theme inline {
@@ -18,13 +19,15 @@
   --color-black-dark: var(--black);
   --color-purple-dark: var(--purple-dark);
   --color-purple-light: var(--purple-light);
+  --color-yellow-dark: var(--yellow-dark);
   --font-sans: "Protest Strike", sans-serif;
+  --breakpoint-xs: 320px;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
-    --foreground: #ededed;
+    --foreground: #ffffff
   }
 }
 
@@ -51,7 +54,7 @@ body {
 
 @font-face {
   font-family: "Hit the Road";
-  src: url("/fonts/hitroad.ttf") format("truetype");
+  src: url("/fonts/hitroad.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -77,6 +80,15 @@ body {
   font-family: "ARLRDBD", sans-serif;
 }
 
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px black inset;
+  -webkit-text-fill-color: white;
+  caret-color: white;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 .wkw-scrollbar {
   overflow-y: auto;
 }
@@ -85,18 +97,10 @@ body {
 }
 .wkw-scrollbar::-webkit-scrollbar-track {
   border-radius: 0;
-  background-color: #f3f4f6;
+  background-color: black;
 }
 .wkw-scrollbar::-webkit-scrollbar-thumb {
   border-radius: 0;
-  background-color: #d1d5db;
-}
-@media (prefers-color-scheme: dark) {
-  .wkw-scrollbar::-webkit-scrollbar-track {
-    background-color: black;
-  }
-  .wkw-scrollbar::-webkit-scrollbar-thumb {
-    background-color: #ffffff;
-    border-radius: 12px;
-  }
+  background-color: #ffffff;
+  border-radius: 12px;
 }

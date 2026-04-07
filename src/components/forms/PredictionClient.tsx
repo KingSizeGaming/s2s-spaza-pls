@@ -128,7 +128,7 @@ export default function PredictionClient({token, fontClass}: {token: string; fon
 
   return (
     <main className="flex justify-center min-h-screen">
-      <div className="w-full max-w-125 px-6 flex flex-col items-center bg-[url('/images/bg-purple.webp')] bg-cover bg-center">
+      <div className="w-full max-w-125 px-4 sm:px-6 flex flex-col items-center bg-[url('/images/bg-purple.webp')] bg-cover bg-center">
         <Logo />
 
         {/* <div className="relative w-full flex flex-col border-3 border-purple-light rounded-3xl bg-violet-dark px-3 pt-8 max-h-[60vh]">
@@ -157,8 +157,8 @@ export default function PredictionClient({token, fontClass}: {token: string; fon
               <img src="/images/header_text_bg_panel.png" alt="" className="w-48 h-auto" />
               <span className="absolute inset-0 flex items-center justify-center text-xl font-extrabold tracking-wide"></span>
             </div>
-            <div className="text-xl text-center font-medium text-white shrink-0">Make Your Selections</div>
-            <div className="flex-1 max-h-[78%] mx-6 overflow-y-auto wkw-scrollbar">
+            <div className="text-lg sm:text-xl text-center font-medium text-white shrink-0">Make Your Selections</div>
+            <div className="flex-1 max-h-[76%] predict-width sm:mx-8 overflow-y-auto wkw-scrollbar">
               <PredictionForm matches={matches} picks={picks} matchesLoading={matchesLoading} onUpdatePickAction={updatePick} />
             </div>
           </div>
@@ -168,7 +168,7 @@ export default function PredictionClient({token, fontClass}: {token: string; fon
             type="button"
             onClick={() => setConfirmOpen(true)}
             disabled={submitting || matchesLoading || matches.length === 0}
-            className="-mt-5 w-40 h-14 bg-[url('/images/submit_button_untapped.png')] bg-contain bg-center bg-no-repeat active:bg-[url('/images/submit_button_tapped.png')] disabled:opacity-50 transition"
+            className="-mt-5 w-32 h-12 sm:w-40 sm:h-14 bg-[url('/images/submit_button_untapped.png')] bg-contain bg-center bg-no-repeat active:bg-[url('/images/submit_button_tapped.png')] disabled:opacity-50 transition"
           />
         </div>
       </div>

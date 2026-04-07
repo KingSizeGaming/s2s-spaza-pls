@@ -32,11 +32,11 @@ export default function WeekList({
               href={`/leaderboard/${leaderboardId}/week/${week.weekId}?entryId=${week.id}${token ? `&token=${token}` : ""}`}
               onClick={() => setLoadingWeekId(week.weekId)}
             >
-              <div className="relative flex min-h-16 items-center justify-between px-5 py-4">
+              <div className="relative flex min-h-16 items-center justify-between px-7 py-3">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/images/entry_content_frame_panel.png" alt="" className="absolute inset-0 w-full h-full object-fill" />
                 <div className="relative z-10 flex flex-col">
-                  <span className="text-sm font-semibold text-white">
+                  <span className="font-semibold -mb-1 text-white tracking-wider">
                     {new Date(week.submittedAt).toLocaleString("en-ZA", {
                       day: "2-digit",
                       month: "short",
@@ -44,13 +44,13 @@ export default function WeekList({
                       minute: "2-digit",
                     })}
                   </span>
-                  <span className="text-sm ms-2 font-semibold text-white">{week.weekId}</span>
+                  <span className="ms-2 font-semibold mb-2 text-white tracking-wider">{week.weekId}</span>
                 </div>
                 {week.weekId === currentWeekId && (
                   <div className="relative z-10">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src="/images/current_frame_panel.png" alt="" className="w-26 h-auto" />
-                    <span className="absolute inset-0 flex items-center justify-center text-xs font-bold tracking-wider"></span>
+                    <img src="/images/current_frame_panel.png" alt="" className="w-28 h-auto mb-2" />
+                    {/* <span className="absolute inset-0 flex items-center justify-center text-xs font-bold tracking-wider"></span> */}
                   </div>
                 )}
               </div>

@@ -23,18 +23,18 @@ export default function ConfirmPicksModal({ onConfirm, onCancel, submitting }: C
         </div>
       </div> */}
       <div className="relative">
-        <Image src="/images/submit_pop_up.png" alt="Submit final picks?" width={320} height={200} className="max-w-xs" />
+        <Image src="/images/submit_pop_up.png" alt="Submit final picks?" width={320} height={200} className="max-w-xs" loading="eager" />
         <span className="flex absolute inset-0 items-center justify-center" style={{ top: "72%", transform: "translateY(-50%)" }}>
           <button
             type="button"
             onClick={onCancel}
-            className="w-28 h-12 bg-[url('/images/no_button_untapped.png')] bg-contain bg-center bg-no-repeat active:bg-[url('/images/no_button_tapped.png')]"
+            className="w-24 h-10 sm:w-28 sm:h-12 bg-[url('/images/no_button_untapped.png')] bg-contain bg-center bg-no-repeat active:bg-[url('/images/no_button_tapped.png')]"
           />
           <button
             type="button"
             onClick={onConfirm}
             disabled={submitting}
-            className="w-28 h-12 bg-[url('/images/yes_button_untapped.png')] bg-contain bg-center bg-no-repeat active:bg-[url('/images/yes_button_tapped.png')] disabled:opacity-50"
+            className="w-24 h-10 sm:w-28 sm:h-12 bg-[url('/images/yes_button_untapped.png')] bg-contain bg-center bg-no-repeat active:bg-[url('/images/yes_button_tapped.png')] disabled:opacity-50"
           />
         </span>
       </div>

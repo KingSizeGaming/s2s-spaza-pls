@@ -20,11 +20,11 @@ export default function RegistrationCompleteModal({onClose}: RegistrationComplet
         </div>
       </div> */}
       <div className="relative">
-        <Image src="/images/reg_pop_up.png" alt="Registration Complete" width={320} height={200} className="max-w-xs" />
+        <Image src="/images/reg_pop_up.png" alt="Registration Complete" width={320} height={200} className="max-w-xs" loading="eager" />
         <span className="absolute -bottom-4 left-1/2 -translate-x-1/2">
           <button
             onClick={onClose}
-            className="w-28 h-12 bg-[url('/images/exit_button_untapped.png')] bg-contain bg-center bg-no-repeat active:bg-[url('/images/exit_button_tapped.png')]"
+            className="w-24 h-10 sm:w-28 sm:h-12 bg-[url('/images/exit_button_untapped.png')] bg-contain bg-center bg-no-repeat active:bg-[url('/images/exit_button_tapped.png')]"
           />
         </span>
       </div>
