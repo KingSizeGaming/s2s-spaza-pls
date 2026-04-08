@@ -1,27 +1,10 @@
 import Link from "next/link";
 
-import { getBaseUrl } from "@/lib/url";
+import { getEntryDetail } from "@/lib/queries/leaderboard";
 import Logo from "../ui/Logo";
 import EntriesErrorModal from "@/components/modals/EntriesErrorModal";
 
 type Pick = "H" | "D" | "A";
-
-type WeekDetailResponse = {
-  leaderboardId: string;
-  weekId: string;
-  submittedAt: string;
-  matches: Array<{
-    id: string;
-    homeTeam: string;
-    awayTeam: string;
-    kickoffAt: string;
-    pick: Pick | null;
-    homeScore: number | null;
-    awayScore: number | null;
-    isFinished: boolean;
-  }>;
-  error?: string;
-};
 
 export default async function EntryDetailPage({
   params,
@@ -35,20 +18,16 @@ export default async function EntryDetailPage({
   const token = resolvedSearchParams?.token;
   const entryId = resolvedSearchParams?.entryId;
 
-  const baseUrl = await getBaseUrl();
-  const query = new URLSearchParams();
-  if (token) query.set("token", token);
-  if (entryId) query.set("entryId", entryId);
-
-  const res = await fetch(
-    `${baseUrl}/api/leaderboard/${resolvedParams.leaderboardId}/week/${resolvedParams.weekId}?${query.toString()}`,
-    { cache: "no-store" }
-  );
-  const data = (await res.json()) as WeekDetailResponse;
+  const data = await getEntryDetail({
+    leaderboardId: resolvedParams.leaderboardId,
+    weekId: resolvedParams.weekId,
+    token,
+    entryId,
+  });
 
   const backHref = `/leaderboard/${resolvedParams.leaderboardId}${token ? `?token=${token}` : ""}`;
 
-  if (!res.ok) {
+  if (!data.ok) {
     return <EntriesErrorModal message={data.error ?? "Unable to load week entry preview."} backHref={backHref} />;
   }
 
@@ -68,8 +47,8 @@ export default async function EntryDetailPage({
             </div>
             <div className="flex-1 max-h-[78%] mx-2 sm:mx-6 overflow-y-auto wkw-scrollbar">
               {data.matches.map((match) => {
-                const kickoff = new Date(match.kickoffAt);
-                const kickoffLabel = Number.isNaN(kickoff.getTime())
+                const kickoff = match.kickoffAt ? new Date(match.kickoffAt) : null;
+                const kickoffLabel = !kickoff || Number.isNaN(kickoff.getTime())
                   ? "TBD"
                   : kickoff.toLocaleString("en-ZA", { weekday: "long", hour: "2-digit", minute: "2-digit" });
                 return (
