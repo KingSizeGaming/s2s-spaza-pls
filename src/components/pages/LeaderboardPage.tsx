@@ -1,25 +1,6 @@
 import LeaderboardList from "@/components/LeaderboardList";
-import { getBaseUrl } from "@/lib/url";
+import { getLeaderboardList } from "@/lib/queries/leaderboard";
 import Logo from "../ui/Logo";
-// import localFont from 'next/font/local';
-
-// const arlrdbd = localFont({
-//   src: "../../../public/fonts/arlrdbd.ttf",
-//   display: "swap",
-// });
-
-type LeaderboardRow = {
-  leaderboardId: string | null;
-  entryCount: number;
-  totalPoints: number;
-  canView?: boolean;
-};
-
-type LeaderboardResponse = {
-  weekId: string;
-  leaderboards?: LeaderboardRow[];
-  error?: string;
-};
 
 export default async function LeaderboardPage({
   searchParams,
@@ -29,17 +10,8 @@ export default async function LeaderboardPage({
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const weekIdQuery = resolvedSearchParams?.weekId;
   const token = resolvedSearchParams?.token;
-  const baseUrl = await getBaseUrl();
-  const queryParts = new URLSearchParams();
-  if (weekIdQuery) queryParts.set("weekId", weekIdQuery);
-  if (token) queryParts.set("token", token);
-  const queryString = queryParts.toString();
-  const res = await fetch(
-    `${baseUrl}/api/leaderboard${queryString ? `?${queryString}` : ""}`,
-    { cache: "no-store" }
-  );
-  const data = (await res.json()) as LeaderboardResponse;
-  const leaderboards = data.leaderboards ?? [];
+  const data = await getLeaderboardList({ weekId: weekIdQuery, token });
+  const leaderboards = data.leaderboards;
   const hasToken = Boolean(token);
 
   return (

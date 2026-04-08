@@ -1,16 +1,9 @@
 import Link from 'next/link';
 import {getCurrentWeekId} from '@/lib/week';
-import {getBaseUrl} from '@/lib/url';
+import {getLeaderboardDetail} from '@/lib/queries/leaderboard';
 import WeekList from '@/components/WeekList';
 import Logo from '../ui/Logo';
 import EntriesErrorModal from '@/components/modals/EntriesErrorModal';
-
-type LeaderboardDetailResponse = {
-  weekId: string;
-  leaderboardId: string;
-  weeks: {id: string; weekId: string; submittedAt: string}[];
-  error?: string;
-};
 
 export default async function EntriesPage({params, searchParams}: {params: Promise<{leaderboardId: string}>; searchParams?: Promise<{weekId?: string; token?: string}>}) {
   const resolvedParams = await params;
@@ -18,16 +11,10 @@ export default async function EntriesPage({params, searchParams}: {params: Promi
   const currentWeekId = getCurrentWeekId();
   const weekIdQuery = resolvedSearchParams?.weekId;
   const token = resolvedSearchParams?.token;
-  const baseUrl = await getBaseUrl();
-  const queryParts = new URLSearchParams();
-  if (weekIdQuery) queryParts.set('weekId', weekIdQuery);
-  if (token) queryParts.set('token', token);
-  const queryString = queryParts.toString();
-  const res = await fetch(`${baseUrl}/api/leaderboard/${resolvedParams.leaderboardId}${queryString ? `?${queryString}` : ''}`, {cache: 'no-store'});
 
-  const data = (await res.json()) as LeaderboardDetailResponse;
+  const data = await getLeaderboardDetail({ leaderboardId: resolvedParams.leaderboardId, weekId: weekIdQuery, token });
 
-  if (!res.ok) {
+  if (!data.ok) {
     const backHref = `/leaderboard${weekIdQuery ? `?weekId=${weekIdQuery}` : ''}`;
     return <EntriesErrorModal message={data.error ?? 'Unable to view this leaderboard.'} backHref={backHref} />;
   }
