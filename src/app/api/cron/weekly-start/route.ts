@@ -16,6 +16,7 @@ export async function POST(request: NextRequest) {
   const currentWeekId = getCurrentWeekId();
   const baseUrl = getBaseUrlFromRequest(request);
   const now = new Date();
+
   const latestPredictionWeek = await db
     .select({ weekId: links.weekId })
     .from(links)
@@ -44,7 +45,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       ok: true,
       weekId,
-      previousWeekId: baseWeekId,
+      previousWeekId: currentWeekId,
       created: 0,
       expiredPreviousLinks: 0,
       broadcasts: [],
@@ -109,7 +110,7 @@ export async function POST(request: NextRequest) {
   return NextResponse.json({
     ok: true,
     weekId,
-    previousWeekId: baseWeekId,
+    previousWeekId: currentWeekId,
     created: result.created,
     expiredPreviousLinks: result.expiredPreviousLinks,
     broadcasts,
