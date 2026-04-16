@@ -24,17 +24,13 @@ export default function LeaderboardList({leaderboards, weekId, token, hasToken}:
           const hasCrown = index < 1;
           const content = (
             <div className="relative flex h-18 items-center justify-between px-5 text-white">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/images/player_info_panel.png" alt="" className="absolute inset-0 w-full h-full object-fill" />
-              {hasCrown && <Image src="/images/crown.png" alt="" width={20} height={20} className="absolute top-0.5 -translate-y-1/2 -left-4 w-14 z-20" />}
+              <Image src="/images/player_info_panel.png" alt="" fill sizes="(max-width: 500px) 100vw, 500px" style={{ objectFit: 'fill' }} />
+              {hasCrown && <Image src="/images/crown.png" alt="" width={20} height={20} sizes="56px" className="absolute top-0.5 -translate-y-1/2 -left-4 w-14 z-20" />}
               <div className="relative mb-1 z-10 flex flex-1 items-center">
                 <span className="leaderboard-id text-3xl tracking-wider ms-3 font-semibold">{row.leaderboardId ?? 'Unknown'}</span>
               </div>
               <div className="leaderboard-points-container relative z-10 h-11 px-6 flex items-center justify-center shrink-0">
-                {/* --> The panel images are temporarily used as background frames with object-fill and 
-                absolute inset-0, which doesn't work well with next/image */}
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/images/player_points_panel.png" alt="" className="absolute inset-0 w-full h-full object-fill" />
+                <Image src="/images/player_points_panel.png" alt="" fill sizes="120px" style={{ objectFit: 'fill' }} />
                 <span className="leaderboard-points relative z-10 text-3xl tracking-wide font-bold">{row.totalPoints}ps</span>
               </div>
             </div>

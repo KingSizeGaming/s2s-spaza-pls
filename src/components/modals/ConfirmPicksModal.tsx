@@ -23,7 +23,7 @@ export default function ConfirmPicksModal({ onConfirm, onCancel, submitting }: C
         </div>
       </div> */}
       <div className="relative">
-        <Image src="/images/submit_pop_up.png" alt="Submit final picks?" width={320} height={200} className="max-w-xs" loading="eager" />
+        <Image src="/images/submit_pop_up.png" alt="Submit final picks?" width={320} height={200} sizes="(max-width: 320px) 100vw, 320px" className="w-full max-w-xs" loading="eager" />
         <span className="flex absolute inset-0 items-center justify-center" style={{ top: "72%", transform: "translateY(-50%)" }}>
           <button
             type="button"

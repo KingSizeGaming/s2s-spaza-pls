@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import {getCurrentWeekId} from '@/lib/week';
 import {getLeaderboardDetail} from '@/lib/queries/leaderboard';
@@ -25,12 +26,10 @@ export default async function EntriesPage({params, searchParams}: {params: Promi
         <Logo />
 
         <div className="relative w-full flex flex-col h-[70vh] mt-2">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/entry_big_frame_panel.png" alt="" className="absolute inset-0 w-full h-full object-fill" />
+          <Image src="/images/entry_big_frame_panel.png" alt="" fill sizes="(max-width: 500px) 100vw, 500px" style={{ objectFit: 'fill' }} />
           <div className="relative z-10 flex flex-col px-3 flex-1 min-h-0">
             <div className="mx-auto -mt-4 relative shrink-0">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/images/entry_header_text_bg_panel.png" alt="" className="w-48 h-auto" />
+              <Image src="/images/entry_header_text_bg_panel.png" alt="" width={192} height={48} sizes="192px" className="w-48 h-auto" />
               <span className="absolute inset-0 flex items-center justify-center text-xl font-extrabold tracking-wide"></span>
             </div>
             <div className="text-center text-xl sm:text-2xl tracking-wider shrink-0">{data.leaderboardId}</div>

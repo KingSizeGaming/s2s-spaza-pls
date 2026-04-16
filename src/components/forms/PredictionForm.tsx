@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState, useCallback } from "react";
 
 type Pick = "H" | "D" | "A";
@@ -51,8 +52,7 @@ export default function PredictionForm({
           : kickoff.toLocaleString("en-ZA", { weekday: "long", hour: "2-digit", minute: "2-digit" });
         return (
           <div key={match.id} className="relative px-2 py-4 text-center -mb-4">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/content_frame_panel.png" alt="" className="absolute inset-0 w-full h-full object-fill" />
+            <Image src="/images/content_frame_panel.png" alt="" fill sizes="(max-width: 500px) 100vw, 500px" style={{ objectFit: 'fill' }} />
             <div className="relative z-10">
               <p className="font-medium text-lg sm:text-2xl">{`${match.homeTeam} vs ${match.awayTeam}`}</p>
               <p className="text-md font-medium">{kickoffLabel}</p>
