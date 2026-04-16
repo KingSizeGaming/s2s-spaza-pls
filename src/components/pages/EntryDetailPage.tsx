@@ -59,7 +59,7 @@ export default async function EntryDetailPage({
                       {/* {match.isFinished && (
                         <p className="text-sm font-medium">Score: {match.homeScore} - {match.awayScore}</p>
                       )} */}
-                      <div className="flex justify-center -space-x-6 sm:-space-x-5">
+                      <div className="pick-buttons flex justify-center -space-x-6 sm:-space-x-5">
                         {(["H", "D", "A"] as Pick[]).map((option) => {
                           const images = {
                             H: { picked: "/images/home_button_picked.png", untapped: "/images/home_button_untapped.png" },
@@ -69,7 +69,7 @@ export default async function EntryDetailPage({
                           return (
                             <div
                               key={option}
-                              className="w-20 h-10 sm:w-28 sm:h-14 bg-contain bg-center bg-no-repeat"
+                              className="w-22 h-12 -mb-3 -mt-2 sm:w-30 sm:h-16 bg-contain bg-center bg-no-repeat"
                               style={{ backgroundImage: `url('${match.pick === option ? images.picked : images.untapped}')` }}
                             />
                           );
