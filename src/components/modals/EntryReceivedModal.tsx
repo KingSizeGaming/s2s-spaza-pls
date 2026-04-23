@@ -35,7 +35,7 @@ export default function EntryReceivedModal({onClose}: EntryReceivedModalProps) {
         </div>
       </div> */}
       <div className="relative">
-        <Image src="/images/received_pop_up.png" alt="Entry Received" width={320} height={200} className="max-w-xs" loading="eager" />
+        <Image src="/images/received_pop_up.png" alt="Entry Received" width={320} height={200} sizes="(max-width: 320px) 100vw, 320px" className="w-full max-w-xs" loading="eager" />
         {/* <p className="text-white/50 text-sm text-center mt-2">Closing in {countdown}s</p> */}
         <span className="absolute -bottom-4 left-1/2 -translate-x-1/2">
           <button

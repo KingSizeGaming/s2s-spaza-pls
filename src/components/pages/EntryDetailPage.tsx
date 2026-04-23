@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { getEntryDetail } from "@/lib/queries/leaderboard";
@@ -37,12 +38,10 @@ export default async function EntryDetailPage({
         <Logo />
 
         <div className="relative w-full flex flex-col max-h-[80vh] mt-2">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/big_frame_panel.png" alt="" className="absolute inset-0 w-full h-full object-fill" />
+          <Image src="/images/big_frame_panel.png" alt="" fill sizes="(max-width: 500px) 100vw, 500px" style={{ objectFit: 'fill' }} />
           <div className="relative z-10 flex flex-col px-3 flex-1 min-h-0">
             <div className="mx-auto -mt-2 relative shrink-0">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/images/header_text_bg_panel.png" alt="" className="w-48 h-auto" />
+              <Image src="/images/header_text_bg_panel.png" alt="" width={192} height={48} sizes="192px" className="w-48 h-auto" />
               <span className="absolute inset-0 flex items-center justify-center text-xl font-extrabold tracking-wide"></span>
             </div>
             <div className="flex-1 max-h-[78%] mx-2 sm:mx-6 overflow-y-auto wkw-scrollbar">
@@ -53,15 +52,14 @@ export default async function EntryDetailPage({
                   : kickoff.toLocaleString("en-ZA", { weekday: "long", hour: "2-digit", minute: "2-digit" });
                 return (
                   <div key={match.id} className="relative px-2 py-4 text-center -mb-4">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src="/images/content_frame_panel.png" alt="" className="absolute inset-0 w-full h-full object-fill" />
+                    <Image src="/images/content_frame_panel.png" alt="" fill sizes="(max-width: 500px) 100vw, 500px" style={{ objectFit: 'fill' }} />
                     <div className="relative z-10">
                       <p className="font-medium text-lg sm:text-2xl">{`${match.homeTeam} vs ${match.awayTeam}`}</p>
                       <p className="text-md font-medium">{kickoffLabel}</p>
                       {/* {match.isFinished && (
                         <p className="text-sm font-medium">Score: {match.homeScore} - {match.awayScore}</p>
                       )} */}
-                      <div className="flex justify-center -space-x-6 sm:-space-x-5">
+                      <div className="pick-buttons flex justify-center -space-x-6 sm:-space-x-5">
                         {(["H", "D", "A"] as Pick[]).map((option) => {
                           const images = {
                             H: { picked: "/images/home_button_picked.png", untapped: "/images/home_button_untapped.png" },
@@ -71,7 +69,7 @@ export default async function EntryDetailPage({
                           return (
                             <div
                               key={option}
-                              className="w-20 h-10 sm:w-28 sm:h-14 bg-contain bg-center bg-no-repeat"
+                              className="w-22 h-12 -mb-3 -mt-2 sm:w-30 sm:h-16 bg-contain bg-center bg-no-repeat"
                               style={{ backgroundImage: `url('${match.pick === option ? images.picked : images.untapped}')` }}
                             />
                           );

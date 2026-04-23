@@ -15,7 +15,7 @@ export default function ErrorModal({title, message, onClose}: {title: string; me
       </div> */}
       <div className="relative flex flex-col items-center">
         <div className="relative">
-          <Image src="/images/pop_up_no_text_frame_panel.png" alt="" width={320} height={200} className="max-w-xs" loading="eager" />
+          <Image src="/images/pop_up_no_text_frame_panel.png" alt="" width={320} height={200} sizes="(max-width: 320px) 100vw, 320px" className="w-full max-w-xs" loading="eager" />
           <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
             <h2 className="font-semibold text-2xl tracking-wider">{title}</h2>
             <p className="text-xl mt-1">{message}</p>
