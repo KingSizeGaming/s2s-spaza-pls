@@ -1,9 +1,10 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "module": "preserve",
+    "moduleResolution": "bundler",
     "lib": ["ES2022"],
+    "typeRoots": ["./node_modules/@types"],
     "types": ["node", "aws-lambda"],
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -12,12 +13,10 @@
     "isolatedModules": true,
     "noEmit": true,
     "rootDir": "..",
-    "baseUrl": ".",
     "paths": {
-      "drizzle-orm": ["node_modules/drizzle-orm"],
-      "drizzle-orm/*": ["node_modules/drizzle-orm/*"],
-      "pg": ["node_modules/pg"],
-      "@aws-sdk/*": ["node_modules/@aws-sdk/*"]
+      "drizzle-orm": ["./node_modules/drizzle-orm"],
+      "drizzle-orm/*": ["./node_modules/drizzle-orm/*"],
+      "@aws-sdk/*": ["./node_modules/@aws-sdk/*"]
     }
   },
   "include": ["src/**/*.ts", "../shared/**/*.ts"],
