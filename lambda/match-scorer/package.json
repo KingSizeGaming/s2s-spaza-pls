@@ -1,0 +1,21 @@
+{
+  "name": "match-scorer",
+  "version": "1.0.0",
+  "private": true,
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "esbuild src/index.ts --bundle --platform=node --target=node22 --outfile=dist/index.js --external:@aws-sdk/*",
+    "zip": "npm run build && cd dist && zip -r ../function.zip index.js"
+  },
+  "dependencies": {
+    "@aws-sdk/client-secrets-manager": "^3.0.0",
+    "drizzle-orm": "^0.39.0",
+    "pg": "^8.0.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.0",
+    "@types/pg": "^8.0.0",
+    "esbuild": "^0.25.0",
+    "typescript": "^5.0.0"
+  }
+}

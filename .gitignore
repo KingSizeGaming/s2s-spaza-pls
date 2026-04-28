@@ -20,6 +20,11 @@
 # production
 /build
 
+# lambda build artifacts
+lambda/*/dist/
+lambda/*/function.zip
+lambda/*/node_modules/
+
 # misc
 .DS_Store
 *.pem
