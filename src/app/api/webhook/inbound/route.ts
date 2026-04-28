@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
+import { createHmac, timingSafeEqual } from "crypto";
 import { and, eq, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { links, matches, spazaSids, users, vouchers } from "@/db/schema";
@@ -335,9 +336,42 @@ async function processMessageSynchronously(
  * ```
  */
 export async function POST(request: NextRequest) {
-  const body = await request.json().catch(() => null);
-  const from = normalizeWaNumber(String(body?.from ?? ""));
-  const message = normalizeMessage(String(body?.message ?? ""));
+  // Read raw body first — signature verification requires the exact bytes before any parsing
+  const rawBody = await request.text();
+
+  // Signature verification
+  const secret = process.env.WHATSAPP_WEBHOOK_SECRET;
+  const signature =
+    request.headers.get("x-whatsapp-signature-256") ??
+    request.headers.get("x-hub-signature-256");
+
+  if (process.env.NODE_ENV === "development" && !signature) {
+    console.warn("[webhook] No signature header — skipping verification in development");
+  } else if (!signature) {
+    return new NextResponse(null, { status: 401 });
+  } else if (secret) {
+    const expected = createHmac("sha256", secret).update(rawBody).digest("hex");
+    const expectedBuf = Buffer.from(expected, "hex");
+    // Strip any "sha256=" prefix the provider may include
+    const receivedHex = signature.replace(/^sha256=/, "");
+    const receivedBuf = Buffer.from(receivedHex, "hex");
+    const signaturesMatch =
+      expectedBuf.length === receivedBuf.length &&
+      timingSafeEqual(expectedBuf, receivedBuf);
+    if (!signaturesMatch) {
+      return new NextResponse(null, { status: 401 });
+    }
+  }
+
+  // Parse body from the already-read raw text
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(rawBody);
+  } catch {
+    parsed = null;
+  }
+  const from = normalizeWaNumber(String((parsed as Record<string, unknown>)?.from ?? ""));
+  const message = normalizeMessage(String((parsed as Record<string, unknown>)?.message ?? ""));
 
   if (!from || !message) {
     return NextResponse.json(
