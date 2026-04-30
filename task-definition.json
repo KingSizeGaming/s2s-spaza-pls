@@ -1,0 +1,119 @@
+{
+  "containerDefinitions": [
+    {
+      "name": "spaza-app",
+      "image": "497960265277.dkr.ecr.af-south-1.amazonaws.com/spaza-app:latest",
+      "cpu": 0,
+      "portMappings": [
+        {
+          "containerPort": 8080,
+          "hostPort": 8080,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true,
+      "environment": [
+        {
+          "name": "PORT",
+          "value": "8080"
+        },
+        {
+          "name": "NODE_ENV",
+          "value": "production"
+        }
+      ],
+      "mountPoints": [],
+      "volumesFrom": [],
+      "secrets": [
+        {
+          "name": "POSTGRES_URL",
+          "valueFrom": "arn:aws:secretsmanager:af-south-1:497960265277:secret:spaza/POSTGRES_URL-8Sws2A"
+        },
+        {
+          "name": "SA_ID_HASH_SALT",
+          "valueFrom": "arn:aws:secretsmanager:af-south-1:497960265277:secret:spaza/SA_ID_HASH_SALT-HhwxFh"
+        },
+        {
+          "name": "CRON_SECRET",
+          "valueFrom": "arn:aws:secretsmanager:af-south-1:497960265277:secret:spaza/CRON_SECRET-xKVf18"
+        },
+        {
+          "name": "WHATSAPP_WEBHOOK_SECRET",
+          "valueFrom": "arn:aws:secretsmanager:af-south-1:497960265277:secret:spaza/WHATSAPP_WEBHOOK_SECRET-uXLIIT"
+        },
+        {
+          "name": "DEMO_ADMIN_KEY",
+          "valueFrom": "arn:aws:secretsmanager:af-south-1:497960265277:secret:spaza/DEMO_ADMIN_KEY-k0TTNv"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/spaza-app",
+          "awslogs-region": "af-south-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "healthCheck": {
+        "command": [
+          "CMD-SHELL",
+          "curl -f http://localhost:8080/api/health || exit 1"
+        ],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 60
+      },
+      "systemControls": []
+    }
+  ],
+  "family": "spaza-app-task",
+  "executionRoleArn": "arn:aws:iam::497960265277:role/spaza-ecs-task-execution-role",
+  "networkMode": "awsvpc",
+  "volumes": [],
+  "requiresAttributes": [
+    {
+      "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
+    },
+    {
+      "name": "ecs.capability.execution-role-awslogs"
+    },
+    {
+      "name": "com.amazonaws.ecs.capability.ecr-auth"
+    },
+    {
+      "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
+    },
+    {
+      "name": "ecs.capability.secrets.asm.environment-variables"
+    },
+    {
+      "name": "ecs.capability.container-health-check"
+    },
+    {
+      "name": "ecs.capability.execution-role-ecr-pull"
+    },
+    {
+      "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
+    },
+    {
+      "name": "ecs.capability.task-eni"
+    },
+    {
+      "name": "com.amazonaws.ecs.capability.docker-remote-api.1.29"
+    }
+  ],
+  "placementConstraints": [],
+  "compatibilities": [
+    "EC2",
+    "MANAGED_INSTANCES",
+    "FARGATE"
+  ],
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "cpu": "512",
+  "memory": "1024",
+  "registeredAt": "2026-04-30T14:35:05.919000+08:00",
+  "registeredBy": "arn:aws:iam::497960265277:user/mariane@kingsizegames.com"
+}
