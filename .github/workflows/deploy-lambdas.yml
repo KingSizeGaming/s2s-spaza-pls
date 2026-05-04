@@ -1,0 +1,66 @@
+name: Deploy Lambda Functions
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "lambda/**"
+
+env:
+  AWS_REGION: af-south-1
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    strategy:
+      matrix:
+        lambda:
+          - name: whatsapp-processor
+            function_name_var: LAMBDA_WHATSAPP_PROCESSOR
+          - name: match-scorer
+            function_name_var: LAMBDA_MATCH_SCORER
+          - name: prize-draw
+            function_name_var: LAMBDA_PRIZE_DRAW
+          - name: notification-sender
+            function_name_var: LAMBDA_NOTIFICATION_SENDER
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: lambda/${{ matrix.lambda.name }}/package-lock.json
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Install and build ${{ matrix.lambda.name }}
+        working-directory: lambda/${{ matrix.lambda.name }}
+        run: |
+          npm ci
+          npm run zip
+
+      - name: Update Lambda function code
+        working-directory: lambda/${{ matrix.lambda.name }}
+        env:
+          LAMBDA_WHATSAPP_PROCESSOR: ${{ vars.LAMBDA_WHATSAPP_PROCESSOR }}
+          LAMBDA_MATCH_SCORER: ${{ vars.LAMBDA_MATCH_SCORER }}
+          LAMBDA_PRIZE_DRAW: ${{ vars.LAMBDA_PRIZE_DRAW }}
+          LAMBDA_NOTIFICATION_SENDER: ${{ vars.LAMBDA_NOTIFICATION_SENDER }}
+        run: |
+          VAR_NAME="${{ matrix.lambda.function_name_var }}"
+          FUNCTION_NAME="${!VAR_NAME}"
+          aws lambda update-function-code \
+            --function-name "$FUNCTION_NAME" \
+            --zip-file fileb://function.zip \
+            --publish

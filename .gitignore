@@ -20,9 +20,15 @@
 # production
 /build
 
+# lambda build artifacts
+lambda/*/dist/
+lambda/*/function.zip
+lambda/*/node_modules/
+
 # misc
 .DS_Store
 *.pem
+!certs/rds-global-bundle.pem
 
 # debug
 npm-debug.log*
@@ -30,8 +36,11 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+
+.env
+.env.local
+.env.development.local
+.env.production.local
 
 # vercel
 .vercel

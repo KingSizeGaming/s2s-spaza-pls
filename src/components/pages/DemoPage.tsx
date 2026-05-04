@@ -87,7 +87,7 @@ export default function DemoPage() {
 
     let res: Response | null = null;
     try {
-      res = await fetch("/api/simulate/inbound-message", {
+      res = await fetch("/api/webhook/inbound", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ from: waNumber, message: text }),
