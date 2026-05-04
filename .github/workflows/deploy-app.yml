@@ -1,4 +1,4 @@
-name: Deploy App to AWS App Runner
+name: Deploy App to ECS
 
 on:
   push:
@@ -9,6 +9,8 @@ on:
 
 env:
   AWS_REGION: af-south-1
+  ECS_CLUSTER: spaza-cluster
+  ECS_SERVICE: spaza-app-service
 
 jobs:
   deploy:
@@ -31,31 +33,28 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build and push Docker image to ECR
-        id: build-image
+      - name: Build and push Docker image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
+          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          IMAGE="$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-          docker build -t "$IMAGE" .
-          docker push "$IMAGE"
-          echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
+          IMAGE="$ECR_REGISTRY/$ECR_REPOSITORY"
+          docker build --platform linux/amd64 -t "$IMAGE:$IMAGE_TAG" -t "$IMAGE:latest" .
+          docker push "$IMAGE:$IMAGE_TAG"
+          docker push "$IMAGE:latest"
 
-      - name: Deploy to App Runner
-        env:
-          APP_RUNNER_SERVICE_ARN: ${{ secrets.APP_RUNNER_SERVICE_ARN }}
-          IMAGE: ${{ steps.build-image.outputs.image }}
+      - name: Force new ECS deployment
         run: |
-          aws apprunner update-service \
-            --service-arn "$APP_RUNNER_SERVICE_ARN" \
-            --source-configuration "{
-              \"ImageRepository\": {
-                \"ImageIdentifier\": \"$IMAGE\",
-                \"ImageRepositoryType\": \"ECR\"
-              }
-            }"
+          aws ecs update-service \
+            --cluster "$ECS_CLUSTER" \
+            --service "$ECS_SERVICE" \
+            --force-new-deployment \
+            --query 'service.deployments[0].rolloutState' \
+            --output text
 
-          aws apprunner wait service-updated \
-            --service-arn "$APP_RUNNER_SERVICE_ARN"
+      - name: Wait for deployment to stabilize
+        run: |
+          aws ecs wait services-stable \
+            --cluster "$ECS_CLUSTER" \
+            --services "$ECS_SERVICE"
