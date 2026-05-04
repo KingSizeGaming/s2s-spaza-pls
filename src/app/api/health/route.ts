@@ -13,6 +13,7 @@ export async function GET() {
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
+    console.error("[health] db check failed:", error);
     return NextResponse.json(
       {
         status: "error",

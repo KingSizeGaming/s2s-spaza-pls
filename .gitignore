@@ -28,6 +28,7 @@ lambda/*/node_modules/
 # misc
 .DS_Store
 *.pem
+!certs/rds-global-bundle.pem
 
 # debug
 npm-debug.log*
