@@ -1,6 +1,7 @@
 import { SecretsManagerClient, GetSecretValueCommand } from "@aws-sdk/client-secrets-manager";
 import { Pool } from "pg";
 import { drizzle } from "drizzle-orm/node-postgres";
+import rdsCa from "../../certs/rds-global-bundle.pem";
 
 let cachedDb: ReturnType<typeof drizzle> | null = null;
 let cachedPool: Pool | null = null;
@@ -18,16 +19,21 @@ let cachedPool: Pool | null = null;
 export async function getDb() {
   if (cachedDb) return cachedDb;
 
-  const secretsClient = new SecretsManagerClient({
-    region: process.env.AWS_REGION ?? "af-south-1",
-  });
+  let connectionString = process.env.POSTGRES_URL;
 
-  const secret = await secretsClient.send(
-    new GetSecretValueCommand({ SecretId: "spaza/POSTGRES_URL" })
-  );
+  if (!connectionString) {
+    const secretsClient = new SecretsManagerClient({
+      region: process.env.AWS_REGION ?? "af-south-1",
+    });
+    const secret = await secretsClient.send(
+      new GetSecretValueCommand({ SecretId: "spaza/POSTGRES_URL" })
+    );
+    connectionString = secret.SecretString!;
+  }
 
   cachedPool = new Pool({
-    connectionString: secret.SecretString!,
+    connectionString,
+    ssl: { ca: rdsCa, rejectUnauthorized: true },
     max: 2,
   });
 
