@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Lambda esbuild bundles — generated artifacts, not source.
+    "lambda/*/dist/**",
   ]),
 ]);
 
