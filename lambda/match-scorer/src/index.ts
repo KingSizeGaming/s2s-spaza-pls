@@ -12,9 +12,9 @@
  * this Lambda independently deployable without the Next.js build).
  */
 
-import { eq, isNotNull, isNull } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import {
-  integer, pgEnum, pgTable, text, timestamp, uuid,
+  integer, pgTable, text, timestamp, uuid,
 } from "drizzle-orm/pg-core";
 import { getDb, closeDb } from "../../shared/db";
 import { getPreviousWeekId } from "../../shared/week";

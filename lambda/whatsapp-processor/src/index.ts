@@ -17,11 +17,11 @@ import { SQSEvent } from "aws-lambda";
 import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
 import { eq, sql, and } from "drizzle-orm";
 import {
-  boolean, index, integer, pgEnum, pgTable,
-  text, timestamp, uniqueIndex, uuid,
+  boolean, pgEnum, pgTable,
+  text, timestamp, uuid,
 } from "drizzle-orm/pg-core";
 import { getDb } from "../../shared/db";
-import { getCurrentWeekId, getPreviousWeekId } from "../../shared/week";
+import { getCurrentWeekId } from "../../shared/week";
 
 // ---------------------------------------------------------------------------
 // Inline schema (subset of tables needed by this Lambda)

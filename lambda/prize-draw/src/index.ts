@@ -16,7 +16,7 @@
  * Lambda independently deployable without the Next.js build).
  */
 
-import { eq, isNotNull, isNull, sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
 import {
   integer, pgTable, text, timestamp, uuid,

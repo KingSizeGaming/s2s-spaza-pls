@@ -20,7 +20,6 @@ function buildConfig(): PoolConfig {
     return { connectionString: url };
   }
   const ca = readFileSync(caPath, 'utf8');
-  console.log(`[db] loaded RDS CA bundle (${ca.length} bytes) from ${caPath}`);
   return {
     connectionString: url ? stripSslmode(url) : undefined,
     ssl: { ca, rejectUnauthorized: true },
