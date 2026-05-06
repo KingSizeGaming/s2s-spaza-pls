@@ -44,6 +44,10 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
+      - name: Install shared deps
+        working-directory: lambda/shared
+        run: npm ci
+
       - name: Install and build ${{ matrix.lambda.name }}
         working-directory: lambda/${{ matrix.lambda.name }}
         run: |
